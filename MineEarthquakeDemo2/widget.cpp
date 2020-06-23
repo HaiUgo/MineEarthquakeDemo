@@ -22,12 +22,18 @@ Widget::Widget(QWidget *parent)
     view2->setChart(chart2);
     view2->setRubberBand(QChartView::RectangleRubberBand);
 
+    view3 = new QChartView();
+    initSplineWaveChart3();
+    view3->setChart(chart3);
+    view3->setRubberBand(QChartView::RectangleRubberBand);
+
     ui->verticalLayout_2->addWidget(view);
     ui->verticalLayout_2->addWidget(view2);
+    ui->verticalLayout_2->addWidget(view3);
 
     view->installEventFilter(this);  //注册部件事件过滤
     view2->installEventFilter(this);
-
+    view3->installEventFilter(this);
     connect(ui->stopButton,SIGNAL(clicked()),this,SLOT(stopButtonClick()));
     connect(ui->displayButton,SIGNAL(clicked()),this,SLOT(displayButtonClick()));
 }
@@ -238,32 +244,55 @@ void Widget::initSplineWaveChart2()
     splineSeries2->setUseOpenGL(true);//openGL加速
     scatterSeries2 = new QScatterSeries(); //点序列
     scatterSeries2->setMarkerSize(8);  //设置描点的大小
-
     chart2 = new QChart();
     chart2->legend()->hide();    //不显示注释
-    //chart2->createDefaultAxes();
     chart2->setTitle("实时动态曲线");
     chart2->addSeries(splineSeries2);  //添加曲线到chart中
     chart2->addSeries(scatterSeries2);
-
-
     axisX2 = new QValueAxis();
     axisX2->setRange(0, 90000);  //设置坐标轴范围
     axisX2->setTitleText("time(0.2millisecs)");//标题
     axisX2->setTickCount(10); //18个区域，19个刻度
     axisX2->setMinorTickCount(1);
-
     axisY2 = new QValueAxis();
     axisY2->setRange(-2, 2);
     axisY2->setTitleText("accelerated speed");
     axisY2->setTickCount(5);
-
     chart2->addAxis(axisX2, Qt::AlignBottom);
     splineSeries2->attachAxis(axisX2);  //把曲线关联到坐标轴
     scatterSeries2->attachAxis(axisX2);
     chart2->addAxis(axisY2, Qt::AlignLeft);
     splineSeries2->attachAxis(axisY2);
     scatterSeries2->attachAxis(axisY2);
+}
+
+void Widget::initSplineWaveChart3()
+{
+    splineSeries3 = new QSplineSeries(); //曲线序列
+    splineSeries3->setColor(QColor(Qt::black));//设置线的颜色
+    splineSeries3->setUseOpenGL(true);//openGL加速
+    scatterSeries3 = new QScatterSeries(); //点序列
+    scatterSeries3->setMarkerSize(8);  //设置描点的大小
+    chart3 = new QChart();
+    chart3->legend()->hide();    //不显示注释
+    chart3->setTitle("实时动态曲线");
+    chart3->addSeries(splineSeries3);  //添加曲线到chart中
+    chart3->addSeries(scatterSeries3);
+    axisX3 = new QValueAxis();
+    axisX3->setRange(0, 90000);  //设置坐标轴范围
+    axisX3->setTitleText("time(0.2millisecs)");//标题
+    axisX3->setTickCount(10); //18个区域，19个刻度
+    axisX3->setMinorTickCount(1);
+    axisY3 = new QValueAxis();
+    axisY3->setRange(-2, 2);
+    axisY3->setTitleText("accelerated speed");
+    axisY3->setTickCount(5);
+    chart3->addAxis(axisX3, Qt::AlignBottom);
+    splineSeries3->attachAxis(axisX3);  //把曲线关联到坐标轴
+    scatterSeries3->attachAxis(axisX3);
+    chart3->addAxis(axisY3, Qt::AlignLeft);
+    splineSeries3->attachAxis(axisY3);
+    scatterSeries3->attachAxis(axisY3);
 }
 
 //显示 按钮
@@ -330,6 +359,7 @@ void Widget::drawSplineWave(int axis_x, double data)
     pointBuffer.append(QPointF(axis_x, data)); //点坐标集合
     splineSeries->replace(pointBuffer);
     splineSeries2->replace(pointBuffer);
+    splineSeries3->replace(pointBuffer);
 }
 
 //chartView事件过滤封装
