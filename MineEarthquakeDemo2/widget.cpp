@@ -407,6 +407,9 @@ bool Widget::eventFilter(QObject *obj, QEvent *event)
     if(obj == view2){
         charViewEventFilter(event,chart2);
     }
+    if(obj == view3){
+        charViewEventFilter(event,chart3);
+    }
     else return QWidget::eventFilter(obj,event);
 }
 
