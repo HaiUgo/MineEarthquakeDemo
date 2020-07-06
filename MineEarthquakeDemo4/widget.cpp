@@ -42,6 +42,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->zoomIn,SIGNAL(clicked()),this,SLOT(zoomInClicked()));
     connect(ui->zoomOut,SIGNAL(clicked()),this,SLOT(zoomOutClicked()));
     connect(ui->restoreButton,SIGNAL(clicked()),this,SLOT(restoreButtonClicked()));
+    connect(ui->moveViewButton,SIGNAL(clicked()),SLOT(moveViewButtonClicked()));
 }
 
 Widget::~Widget()
@@ -66,17 +67,23 @@ Widget::~Widget()
 void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
 {
     if(iCommandId == 1){
-        // 调用控件打开函数，打开.dwg文件。
-        ui->axWidget->dynamicCall("OpenDwgFile(const QString&)","C:\\Users\\13696\\Desktop\\项目参考资料\\test.dwg");
+        // 调用控件打开dwg文件命令。
+        ui->axWidget->dynamicCall("OpenDwgFile(const QString&)","C:\\Users\\13696\\Desktop\\项目参考资料\\红阳三矿.dwg");
     }
     if(iCommandId == 5){
+        // 调用控件缩放命令。
         ui->axWidget->dynamicCall("ZoomScale(double dScale)",0.8);
     }
     if(iCommandId == 6){
         ui->axWidget->dynamicCall("ZoomScale(double dScale)",1.1);
     }
     if(iCommandId == 7){
-        ui->axWidget->dynamicCall("ZommAll()");
+        // 调用控件视区还原命令
+        ui->axWidget->dynamicCall("ZoomAll()");
+    }
+    if(iCommandId == 8){
+        // 调用控件移动视区命令
+        ui->axWidget->dynamicCall("SendStringToExecute(P)");
     }
 }
 
@@ -84,6 +91,7 @@ void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
 void Widget::startButtonClicked()
 { 
     ui->axWidget->dynamicCall("DoCommand(const qint32&)",1); //执行控件自定义命令函数，命令的id为2，该值为命令编号，可任取.
+    //ui->axWidget->dynamicCall("DoCommand(const qint32&)",7);
     showTable();
 }
 //日报表
@@ -111,6 +119,11 @@ void Widget::zoomInClicked()
 void Widget::zoomOutClicked()
 {
     ui->axWidget->dynamicCall("DoCommand(const qint32&)",6);
+}
+//移动视区按钮
+void Widget::moveViewButtonClicked()
+{
+    ui->axWidget->dynamicCall("DoCommand(const qint32&)",8);
 }
 //还原按钮
 void Widget::restoreButtonClicked()
@@ -214,7 +227,19 @@ void Widget::stopButtonClick()
 //全屏按钮，显示T1~T9站台全部曲线图信息
 void Widget::fulllScreenButtonClicked()
 {
+    QWidget *childWidget = new QWidget();
 
+    QVBoxLayout *vBoxLayout = new QVBoxLayout(childWidget);
+
+    QHBoxLayout *hBoxLayout1 = new QHBoxLayout();
+    hBoxLayout1->addWidget(&view[T1X]);
+    hBoxLayout1->addWidget(&view[T1Y]);
+    hBoxLayout1->addWidget(&view[T1Z]);
+
+    vBoxLayout->addItem(hBoxLayout1);
+    childWidget->setLayout(vBoxLayout);
+    childWidget->resize(500,500);
+    childWidget->show();
 }
 
 //定时器每计时到8ms，将引起超时事件，从而绘制一条曲线和一个点序列
@@ -514,5 +539,3 @@ void Widget::on_t9Z_clicked()
 {
     ui->stackedWidget->setCurrentWidget(&view[T9Z]);
 }
-
-

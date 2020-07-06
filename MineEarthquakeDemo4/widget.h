@@ -59,6 +59,7 @@ private slots:
     void zoomInClicked();             //放大按钮
     void zoomOutClicked();            //缩小按钮
     void restoreButtonClicked();      //还原按钮
+    void moveViewButtonClicked();     //移动视区按钮
 
     void startButtonClicked();        //运行按钮
     void dailyStatementClicked();     //日报表按钮

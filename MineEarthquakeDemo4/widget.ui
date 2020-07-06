@@ -30,7 +30,7 @@
    <string>矿山微震监控系统 </string>
   </property>
   <property name="windowIcon">
-   <iconset resource="myicons.qrc">
+   <iconset resource="../MineEarthquakeDemo5/myicons.qrc">
     <normaloff>:/image/images/lnu.jpg</normaloff>:/image/images/lnu.jpg</iconset>
   </property>
   <property name="toolTip">
@@ -349,6 +349,42 @@ color: rgb(255, 255, 255);</string>
          </item>
          <item>
           <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>5</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="moveViewButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Adobe 楷体 Std R</family>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>移动(&amp;P)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_7">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -1186,8 +1222,6 @@ color: rgb(255, 255, 255);</string>
    <header>qaxwidget.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="myicons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
