@@ -48,7 +48,7 @@ public:
     void showTable();                               //在UI上显示数据库列表
     void initCharts();                              //初始化曲线图表
     void showStackedWidgetCharts();                 //将标签和view[T]图表添加到stackWidget的GridLayout布局中
-    void drawSplineWave();   //绘制曲线图
+    void drawSplineWave();                          //绘制曲线图
     bool eventFilter(QObject *obj,QEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
@@ -70,10 +70,20 @@ private slots:
 
     void displayButtonClick();        //显示波形图按钮
     void stopButtonClick();           //暂停按钮
-    void fullChartsButtonClicked();  //显示全部波形按钮
+    void fullChartsButtonClicked();   //显示全部波形按钮
 
     void on_nextPage_clicked();       //下一页
     void on_previousPage_clicked();   //上一页
+
+    void on_T1Button_clicked();       //T1~T9按钮
+    void on_T2Button_clicked();
+    void on_T3Button_clicked();
+    void on_T4Button_clicked();
+    void on_T5Button_clicked();
+    void on_T6Button_clicked();
+    void on_T7Button_clicked();
+    void on_T8Button_clicked();
+    void on_T9Button_clicked();
 
 private:
     Ui::Widget *ui;
@@ -99,6 +109,13 @@ private:
     QValueAxis *axisX;                //X坐标轴
     QValueAxis *axisY;                //Y坐标轴
     QChartView *view;                 //视图
+
+    QSplineSeries *splineSeries2;      //曲线序列
+    QScatterSeries *scatterSeries2;    //点序列
+    QChart *chart2;                    //图表
+    QValueAxis *axisX2;                //X坐标轴
+    QValueAxis *axisY2;                //Y坐标轴
+    QChartView *view2;                 //视图
 
     int pageSwitchIndex;                            //stackWidget页面索引，用于切换当前页面
 

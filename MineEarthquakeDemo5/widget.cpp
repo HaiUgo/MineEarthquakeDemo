@@ -9,8 +9,9 @@ Widget::Widget(QWidget *parent)
     ui->setupUi(this);
 
     filePath = "C:/Users/13696/Desktop/项目参考资料/124637 2020 13-52-55`13.csv";
-    originListIndex = 0;
+    originListIndex = 0;         //一定要初始化，否则可能产生随机数
     isStoppingTimer = false;
+
     pageSwitchIndex = 0;
 
     db = new ConnectDataBase;
@@ -24,7 +25,7 @@ Widget::Widget(QWidget *parent)
     initCharts();
     showStackedWidgetCharts();
 
-    //以下为信号和槽函数
+    //以下为信号和槽函数，只写了一部分，剩余按钮用的自动关联
     connect(ui->displayButton,SIGNAL(clicked()),this,SLOT(displayButtonClick()));
     connect(ui->stopButton,SIGNAL(clicked()),this,SLOT(stopButtonClick()));
     connect(ui->fulllScreenButton,SIGNAL(clicked()),this,SLOT(fullChartsButtonClicked()));
@@ -148,6 +149,14 @@ void Widget::initCharts()
     axisX = new QValueAxis[27];
     axisY = new QValueAxis[27];
     view = new QChartView[27];
+
+    splineSeries2 = new QSplineSeries[27];
+    scatterSeries2 = new QScatterSeries[27];
+    chart2 = new QChart[27];
+    axisX2 = new QValueAxis[27];
+    axisY2 = new QValueAxis[27];
+    view2 = new QChartView[27];
+
     for (int i=0;i<27;i++) {
         splineSeries[i].setColor(QColor(Qt::black));
         splineSeries[i].setUseOpenGL(true);
@@ -178,6 +187,32 @@ void Widget::initCharts()
         view[i].setChart(&chart[i]);
         view[i].setRubberBand(QChartView::RectangleRubberBand);
         view[i].installEventFilter(this);                //注册部件事件过滤
+    }
+
+    for (int i=0;i<27;i++) {
+        splineSeries2[i].setColor(QColor(Qt::black));
+        splineSeries2[i].setUseOpenGL(true);
+        splineSeries2[i].setPointsVisible(true);
+        scatterSeries2[i].setMarkerSize(8);
+
+        chart2[i].legend()->hide();
+        chart2[i].addSeries(&splineSeries2[i]);            //为图表添加曲线序列
+        chart2[i].addSeries(&scatterSeries2[i]);           //为图表添加点序列
+
+        axisX2[i].setRange(0, 90000);                     //设置坐标轴范围
+        axisY2[i].setRange(-50000, 50000);
+
+        chart2[i].addAxis(&axisX2[i], Qt::AlignBottom);    //把坐标轴添加到chart中，第二个参数是设置坐标轴的位置，
+        splineSeries2[i].attachAxis(&axisX2[i]);           //把曲线关联到坐标轴
+        scatterSeries2[i].attachAxis(&axisX2[i]);
+
+        chart2[i].addAxis(&axisY2[i], Qt::AlignLeft);
+        splineSeries2[i].attachAxis(&axisY2[i]);
+        scatterSeries2[i].attachAxis(&axisY2[i]);
+
+        view2[i].setChart(&chart2[i]);
+        view2[i].setRubberBand(QChartView::RectangleRubberBand);
+        view2[i].installEventFilter(this);                //注册部件事件过滤
     }
 }
 
@@ -257,35 +292,73 @@ void Widget::showStackedWidgetCharts()
     ui->gridLayout_9->addWidget(&view[T9Z],2,2);
 
 
-//    ui->gridLayout_10->addWidget(&view[T1X],0,0);
-//    ui->gridLayout_10->addWidget(&view[T1Y],0,1);
-//    ui->gridLayout_10->addWidget(&view[T1Z],0,2);
-//    ui->gridLayout_10->addWidget(&view[T2X],1,0);
-//    ui->gridLayout_10->addWidget(&view[T2Y],1,1);
-//    ui->gridLayout_10->addWidget(&view[T2Z],1,2);
-//    ui->gridLayout_10->addWidget(&view[T3X],2,0);
-//    ui->gridLayout_10->addWidget(&view[T3Y],2,1);
-//    ui->gridLayout_10->addWidget(&view[T3Z],2,2);
-//    ui->gridLayout_10->addWidget(&view[T4X],3,0);
-//    ui->gridLayout_10->addWidget(&view[T4Y],3,1);
-//    ui->gridLayout_10->addWidget(&view[T4Z],3,2);
-//    ui->gridLayout_10->addWidget(&view[T5X],4,0);
-//    ui->gridLayout_10->addWidget(&view[T5Y],4,1);
-//    ui->gridLayout_10->addWidget(&view[T5Z],4,2);
-//    ui->gridLayout_10->addWidget(&view[T6X],5,0);
-//    ui->gridLayout_10->addWidget(&view[T6Y],5,1);
-//    ui->gridLayout_10->addWidget(&view[T6Z],5,2);
-//    ui->gridLayout_10->addWidget(&view[T7X],6,0);
-//    ui->gridLayout_10->addWidget(&view[T7Y],6,1);
-//    ui->gridLayout_10->addWidget(&view[T7Z],6,2);
-//    ui->gridLayout_10->addWidget(&view[T8X],7,0);
-//    ui->gridLayout_10->addWidget(&view[T8Y],7,1);
-//    ui->gridLayout_10->addWidget(&view[T8Z],7,2);
-//    ui->gridLayout_10->addWidget(&view[T9X],8,0);
-//    ui->gridLayout_10->addWidget(&view[T9Y],8,1);
-//    ui->gridLayout_10->addWidget(&view[T9Z],8,2);
+    ui->gridLayout_10->addWidget(&view2[T1X],0,0);
+    ui->gridLayout_10->addWidget(&view2[T1Y],0,1);
+    ui->gridLayout_10->addWidget(&view2[T1Z],0,2);
+    ui->gridLayout_10->addWidget(&view2[T2X],1,0);
+    ui->gridLayout_10->addWidget(&view2[T2Y],1,1);
+    ui->gridLayout_10->addWidget(&view2[T2Z],1,2);
+    ui->gridLayout_10->addWidget(&view2[T3X],2,0);
+    ui->gridLayout_10->addWidget(&view2[T3Y],2,1);
+    ui->gridLayout_10->addWidget(&view2[T3Z],2,2);
+    ui->gridLayout_10->addWidget(&view2[T4X],3,0);
+    ui->gridLayout_10->addWidget(&view2[T4Y],3,1);
+    ui->gridLayout_10->addWidget(&view2[T4Z],3,2);
+    ui->gridLayout_10->addWidget(&view2[T5X],4,0);
+    ui->gridLayout_10->addWidget(&view2[T5Y],4,1);
+    ui->gridLayout_10->addWidget(&view2[T5Z],4,2);
+    ui->gridLayout_10->addWidget(&view2[T6X],5,0);
+    ui->gridLayout_10->addWidget(&view2[T6Y],5,1);
+    ui->gridLayout_10->addWidget(&view2[T6Z],5,2);
+    ui->gridLayout_10->addWidget(&view2[T7X],6,0);
+    ui->gridLayout_10->addWidget(&view2[T7Y],6,1);
+    ui->gridLayout_10->addWidget(&view2[T7Z],6,2);
+    ui->gridLayout_10->addWidget(&view2[T8X],7,0);
+    ui->gridLayout_10->addWidget(&view2[T8Y],7,1);
+    ui->gridLayout_10->addWidget(&view2[T8Z],7,2);
+    ui->gridLayout_10->addWidget(&view2[T9X],8,0);
+    ui->gridLayout_10->addWidget(&view2[T9Y],8,1);
+    ui->gridLayout_10->addWidget(&view2[T9Z],8,2);
 
     ui->stackedWidget->setCurrentIndex(0);
+}
+
+//T1~T9按钮，用来显示不同站台曲线图
+void Widget::on_T1Button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+}
+void Widget::on_T2Button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+}
+void Widget::on_T3Button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(2);
+}
+void Widget::on_T4Button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(3);
+}
+void Widget::on_T5Button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(4);
+}
+void Widget::on_T6Button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(5);
+}
+void Widget::on_T7Button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(6);
+}
+void Widget::on_T8Button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(7);
+}
+void Widget::on_T9Button_clicked()
+{
+    ui->stackedWidget->setCurrentIndex(8);
 }
 
 //下一页
@@ -336,7 +409,8 @@ void Widget::stopButtonClick()
 //全部按钮，显示T1~T9站台全部曲线图信息
 void Widget::fullChartsButtonClicked()
 {
-     ui->stackedWidget->setCurrentIndex(10);
+    qDebug()<<"pageSwitchIndex = "<<pageSwitchIndex<<'\n';
+    ui->stackedWidget->setCurrentIndex(9);
 }
 
 //定时器每计时到8ms，将引起超时事件，从而绘制一条曲线和一个点序列
@@ -378,6 +452,10 @@ void Widget::drawSplineWave()
     splineSeries[T9X].replace(readData->pointBuffer[P9X]);
     splineSeries[T9Y].replace(readData->pointBuffer[P9Y]);
     splineSeries[T9Z].replace(readData->pointBuffer[P9Z]);
+
+    for(int i=0;i<27;i++){
+        splineSeries2[i].replace(readData->pointBuffer[i]);
+    }
 }
 
 //chartView事件过滤封装
@@ -419,8 +497,86 @@ void Widget::charViewEventFilter(QEvent *event,QChart *tempChart)
 //事件过滤
 bool Widget::eventFilter(QObject *obj, QEvent *event)
 {
-    if(obj == view){
-        charViewEventFilter(event,chart);
+    if(obj == &view[T1X]){
+        charViewEventFilter(event,&chart[T1X]);
+    }
+    if(obj == &view[T1Y]){
+        charViewEventFilter(event,&chart[T1Y]);
+    }
+    if(obj == &view[T1Z]){
+        charViewEventFilter(event,&chart[T1Z]);
+    }
+    if(obj == &view[T2X]){
+        charViewEventFilter(event,&chart[T2X]);
+    }
+    if(obj == &view[T2Y]){
+        charViewEventFilter(event,&chart[T2Y]);
+    }
+    if(obj == &view[T2Z]){
+        charViewEventFilter(event,&chart[T2Z]);
+    }
+    if(obj == &view[T3X]){
+        charViewEventFilter(event,&chart[T3X]);
+    }
+    if(obj == &view[T3Y]){
+        charViewEventFilter(event,&chart[T3Y]);
+    }
+    if(obj == &view[T3Z]){
+        charViewEventFilter(event,&chart[T3Z]);
+    }
+    if(obj == &view[T4X]){
+        charViewEventFilter(event,&chart[T4X]);
+    }
+    if(obj == &view[T4Y]){
+        charViewEventFilter(event,&chart[T4Y]);
+    }
+    if(obj == &view[T4Z]){
+        charViewEventFilter(event,&chart[T4Z]);
+    }
+    if(obj == &view[T5X]){
+        charViewEventFilter(event,&chart[T5X]);
+    }
+    if(obj == &view[T5Y]){
+        charViewEventFilter(event,&chart[T5Y]);
+    }
+    if(obj == &view[T5Z]){
+        charViewEventFilter(event,&chart[T5Z]);
+    }
+    if(obj == &view[T6X]){
+        charViewEventFilter(event,&chart[T6X]);
+    }
+    if(obj == &view[T6Y]){
+        charViewEventFilter(event,&chart[T6Y]);
+    }
+    if(obj == &view[T6Z]){
+        charViewEventFilter(event,&chart[T6Z]);
+    }
+    if(obj == &view[T7X]){
+        charViewEventFilter(event,&chart[T7X]);
+    }
+    if(obj == &view[T7Y]){
+        charViewEventFilter(event,&chart[T7Y]);
+    }
+    if(obj == &view[T7Z]){
+        charViewEventFilter(event,&chart[T7Z]);
+    }
+    if(obj == &view[T8X]){
+        charViewEventFilter(event,&chart[T8X]);
+    }
+    if(obj == &view[T8Y]){
+        charViewEventFilter(event,&chart[T8Y]);
+    }
+    if(obj == &view[T8Z]){
+        charViewEventFilter(event,&chart[T8Z]);
+    }
+    if(obj == &view[T9X]){
+        charViewEventFilter(event,&chart[T9X]);
+    }
+    if(obj == &view[T9Y]){
+        charViewEventFilter(event,&chart[T9Y]);
+    }
+    if(obj == &view[T9Z]){
+        charViewEventFilter(event,&chart[T9Z]);
     }
     else return QWidget::eventFilter(obj,event);
 }
@@ -452,4 +608,5 @@ void Widget::mouseReleaseEvent(QMouseEvent *event)
         isClickingChart = false;
     }
 }
+
 

@@ -544,6 +544,76 @@ color: rgb(255, 255, 255);</string>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
+          <widget class="QPushButton" name="T1Button">
+           <property name="text">
+            <string>T1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="T2Button">
+           <property name="text">
+            <string>T2</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="T3Button">
+           <property name="text">
+            <string>T3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="T4Button">
+           <property name="text">
+            <string>T4</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="T5Button">
+           <property name="text">
+            <string>T5</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="T6Button">
+           <property name="text">
+            <string>T6</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="T7Button">
+           <property name="text">
+            <string>T7</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="T8Button">
+           <property name="text">
+            <string>T8</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="T9Button">
+           <property name="text">
+            <string>T9</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
           <widget class="QPushButton" name="previousPage">
            <property name="text">
             <string>上一页</string>
@@ -557,13 +627,6 @@ color: rgb(255, 255, 255);</string>
            </property>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
          <item>
           <widget class="QPushButton" name="displayButton">
            <property name="minimumSize">
