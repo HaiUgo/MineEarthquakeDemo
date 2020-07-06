@@ -74,6 +74,9 @@ void ReadCSVData::parseCSVFileName(QString filePath)
     //存储每个事件触发台站的X，Y，Z轴的数据
     pointBuffer = new QVector<QPointF>[27];
 
+    //用于绘制P波到时（红线）
+    pointBuffer_P = new QVector<QPointF>[10];
+
     qDebug()<<"parsing the csv file completed"<<'\n';
 }
 
@@ -94,7 +97,7 @@ void ReadCSVData::readCSVFile(QString fileName)
     while (!stream.atEnd())
     {
         line = stream.readLine();
-        qDebug()<<"line = "<<line<<'\n';
+        //qDebug()<<"line = "<<line<<'\n';
         if(line.isEmpty()){
             qDebug()<<"CSV文件读取完毕！"<<'\n';
             break;
@@ -107,6 +110,7 @@ void ReadCSVData::readCSVFile(QString fileName)
             senChannelX[count][i] = item.at(4+i*8);       //存储每个事件后三个通道中X轴的数据
             senChannelNum[count][i] = item.at(8+i*8);     //存储每个事件触发台站名称
             motiPos[i] = item.at(7+i*8).toInt();          //存储每个传感器波形激发位置
+            //qDebug()<<"motiPos["<<i<<"] = "<<motiPos[i]<<'\n';
         }
         count++;
     }
@@ -133,36 +137,27 @@ void ReadCSVData::locateCSVData()
             //因为CSV文件中站台名称并不是从小到大排序的，
             //所以必须要定位到该站台在哪一列，从而才能够定位到该站台X，Y，Z轴以及激发位置在哪一列
             case 1:
-                    qDebug()<<"start case 1"<<'\n';
+                    //qDebug()<<"start case 1"<<'\n';
                     if(1==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为1站台
-                        qDebug()<<" case 1:enter paddingPointBuffer"<<'\n';
+                        //qDebug()<<" case 1:enter paddingPointBuffer"<<'\n';
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX1);
-                        qDebug()<<" case 1:out paddingPointBuffer"<<'\n';
-                        tempMotiPos[i] = motiPos[0];               //表示tempStation[i]站台的激发位置，存储在tempMotiPos[i]中
-                        //for(int j=0;j<readData->count;j++){
-                        //	parseDataX = readData->senChannelX[j][4].toFloat();
-                        //	parseDataY = readData->senChannelY[j][5].toFloat();
-                        //	parseDataZ = readData->senChannelZ[j][6].toFloat();
-                        //	pointBufferT1X.append(QPointF(listIndex, parseDataX)); //点坐标集合
-                        //	pointBufferT1Y.append(QPointF(listIndex, parseDataY)); //点坐标集合
-                        //	pointBufferT1Z.append(QPointF(listIndex, parseDataZ)); //点坐标集合
-                        //	listIndex++;
-                        //}
+                        //qDebug()<<" case 1:out paddingPointBuffer"<<'\n';
+                        tempMotiPos[tempStation[i]][0] = motiPos[0];            //表示tempStation[i]站台的激发位置，存储在tempMotiPos[i][0]中
                     }else if(1==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为1站台
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX2);
-                        tempMotiPos[i] = motiPos[1];               //
+                        tempMotiPos[tempStation[i]][0] = motiPos[1];               //
                     }else if(1==tempStation[2]){                   //表示读取CSV文件数据时每行的第三个站台为1站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX3);
-                        tempMotiPos[i] = motiPos[2];
+                        tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(1==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX4);
-                        tempMotiPos[i] = motiPos[3];
+                        tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(1==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX5);
-                        tempMotiPos[i] = motiPos[4];
+                        tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(1==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX6);
-                        tempMotiPos[i] = motiPos[5];
+                        tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(1==tempStation[6]){
 
                     }else if(1==tempStation[7]){
@@ -172,27 +167,27 @@ void ReadCSVData::locateCSVData()
                     }else{
                         qDebug()<<"error, please check!"<<'\n';
                     }
-                    qDebug()<<"end case 1"<<'\n';
+                    //qDebug()<<"end case 1"<<'\n';
                     break;
             case 2:
                     if(2==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为2站台,以此类推
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX1);
-                        tempMotiPos[i] = motiPos[0];
+                        tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(2==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为2站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX2);
-                        tempMotiPos[i] = motiPos[1];
+                        tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(2==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX3);
-                        tempMotiPos[i] = motiPos[2];
+                        tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(2==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX4);
-                        tempMotiPos[i] = motiPos[3];
+                        tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(2==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX5);
-                        tempMotiPos[i] = motiPos[4];
+                        tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(2==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX6);
-                        tempMotiPos[i] = motiPos[5];
+                        tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(2==tempStation[6]){
 
                     }else if(2==tempStation[7]){
@@ -205,22 +200,22 @@ void ReadCSVData::locateCSVData()
             case 3:
                     if(3==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为3站台,以此类推
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX1);
-                        tempMotiPos[i] = motiPos[0];
+                        tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(3==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为3站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX2);
-                        tempMotiPos[i] = motiPos[1];
+                        tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(3==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX3);
-                        tempMotiPos[i] = motiPos[2];
+                        tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(3==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX4);
-                        tempMotiPos[i] = motiPos[3];
+                        tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(3==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX5);
-                        tempMotiPos[i] = motiPos[4];
+                        tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(3==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX6);
-                        tempMotiPos[i] = motiPos[5];
+                        tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(3==tempStation[6]){
 
                     }else if(3==tempStation[7]){
@@ -233,22 +228,22 @@ void ReadCSVData::locateCSVData()
             case 4:
                     if(4==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为4站台,以此类推
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX1);
-                        tempMotiPos[i] = motiPos[0];
+                        tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(4==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为4站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX2);
-                        tempMotiPos[i] = motiPos[1];
+                        tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(4==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX3);
-                        tempMotiPos[i] = motiPos[2];
+                        tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(4==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX4);
-                        tempMotiPos[i] = motiPos[3];
+                        tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(4==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX5);
-                        tempMotiPos[i] = motiPos[4];
+                        tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(4==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX6);
-                        tempMotiPos[i] = motiPos[5];
+                        tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(4==tempStation[6]){
 
                     }else if(4==tempStation[7]){
@@ -261,22 +256,22 @@ void ReadCSVData::locateCSVData()
             case 5:
                     if(5==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为5站台,以此类推
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX1);
-                        tempMotiPos[i] = motiPos[0];
+                        tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(5==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为5站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX2);
-                        tempMotiPos[i] = motiPos[1];
+                        tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(5==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX3);
-                        tempMotiPos[i] = motiPos[2];
+                        tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(5==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX4);
-                        tempMotiPos[i] = motiPos[3];
+                        tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(5==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX5);
-                        tempMotiPos[i] = motiPos[4];
+                        tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(5==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX6);
-                        tempMotiPos[i] = motiPos[5];
+                        tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(5==tempStation[6]){
 
                     }else if(5==tempStation[7]){
@@ -289,22 +284,22 @@ void ReadCSVData::locateCSVData()
             case 6:
                     if(6==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为6站台,以此类推
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX1);
-                        tempMotiPos[i] = motiPos[0];
+                        tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(6==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为6站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX2);
-                        tempMotiPos[i] = motiPos[1];
+                        tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(6==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX3);
-                        tempMotiPos[i] = motiPos[2];
+                        tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(6==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX4);
-                        tempMotiPos[i] = motiPos[3];
+                        tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(6==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX5);
-                        tempMotiPos[i] = motiPos[4];
+                        tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(6==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX6);
-                        tempMotiPos[i] = motiPos[5];
+                        tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(6==tempStation[6]){
 
                     }else if(6==tempStation[7]){
@@ -317,22 +312,22 @@ void ReadCSVData::locateCSVData()
             case 7:
                 if(7==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为6站台,以此类推
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX1);
-                    tempMotiPos[i] = motiPos[0];
+                    tempMotiPos[tempStation[i]][0] = motiPos[0];
                 }else if(7==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为6站台，后面以此类推
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX2);
-                    tempMotiPos[i] = motiPos[1];
+                    tempMotiPos[tempStation[i]][0] = motiPos[1];
                 }else if(7==tempStation[2]){
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX3);
-                    tempMotiPos[i] = motiPos[2];
+                    tempMotiPos[tempStation[i]][0] = motiPos[2];
                 }else if(7==tempStation[3]){
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX4);
-                    tempMotiPos[i] = motiPos[3];
+                    tempMotiPos[tempStation[i]][0] = motiPos[3];
                 }else if(7==tempStation[4]){
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX5);
-                    tempMotiPos[i] = motiPos[4];
+                    tempMotiPos[tempStation[i]][0] = motiPos[4];
                 }else if(7==tempStation[5]){
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX6);
-                    tempMotiPos[i] = motiPos[5];
+                    tempMotiPos[tempStation[i]][0] = motiPos[5];
                 }else if(7==tempStation[6]){
 
                 }else if(7==tempStation[7]){
@@ -348,6 +343,17 @@ void ReadCSVData::locateCSVData()
                   qDebug()<<"current station"<<tempStation[i]<<'\n';
         }
     }
+    for(int j=0;j<10;j++){
+        if(tempMotiPos[j][0]!=0){
+            qDebug()<<"this station is"<<j<<"and its motivated position is "<<tempMotiPos[j][0]<<'\n';  //打印测试站台及其激发位置
+            //因为P波到时是一条垂线，所以只需要添加横坐标相同的几个点就好
+            pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],0));
+            pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],25000));
+            pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],50000));
+            pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],-25000));
+            pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],-50000));
+        }
+    }
     qDebug()<<"locateCSVData successfully!"<<'\n';
 }
 
@@ -359,22 +365,23 @@ void ReadCSVData::paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPoi
     double parseDataY;
     double parseDataZ;
     for(int j=0;j<count;j++){
-        qDebug()<<"enter internal paddingPointBuffer!"<<'\n';
+        //qDebug()<<"enter internal paddingPointBuffer!"<<'\n';
         parseDataX = senChannelX[j][index].toDouble();        //QString转为float型
-        qDebug()<<"senChannelX[j][index]="<<senChannelX[j][index]<<'\n';
-        qDebug()<<"parseDataX="<<parseDataX<<'\n';
+        //qDebug()<<"senChannelX[j][index]="<<senChannelX[j][index]<<'\n';
+        //qDebug()<<"parseDataX="<<parseDataX<<'\n';
         parseDataY = senChannelY[j][index].toDouble();
-        qDebug()<<"senChannelY[j][index]="<<senChannelY[j][index]<<'\n';
-        qDebug()<<"parseDataY="<<parseDataY<<'\n';
+        //qDebug()<<"senChannelY[j][index]="<<senChannelY[j][index]<<'\n';
+        //qDebug()<<"parseDataY="<<parseDataY<<'\n';
         parseDataZ = senChannelZ[j][index].toDouble();
-        qDebug()<<"senChannelZ[j][index]="<<senChannelZ[j][index]<<'\n';
-        qDebug()<<"parseDataZ="<<parseDataZ<<'\n';
-        qDebug()<<" between paddingPointBuffer !"<<'\n';
+        //qDebug()<<"senChannelZ[j][index]="<<senChannelZ[j][index]<<'\n';
+        //qDebug()<<"parseDataZ="<<parseDataZ<<'\n';
+        //qDebug()<<" between paddingPointBuffer !"<<'\n';
         pointBufferX->append(QPointF(listIndex, parseDataX)); //点坐标集合
         pointBufferY->append(QPointF(listIndex, parseDataY));
         pointBufferZ->append(QPointF(listIndex, parseDataZ));
         listIndex++;
-        qDebug()<<"leave internal paddingPointBuffer"<<'\n';
+        //qDebug()<<"leave internal paddingPointBuffer"<<'\n';
     }
     qDebug()<<"paddingPointBuffer successfully!"<<'\n';
 }
+

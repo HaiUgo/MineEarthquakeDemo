@@ -52,10 +52,11 @@ public:
     QString *date;                           //存储每个事件的日期
 
     QVector<QPointF> *pointBuffer;           //存储坐标点序列
+    QVector<QPointF> *pointBuffer_P;         //用于绘制P波到时
 
     int count=0;                             //记录事件的个数，在CSV文件中表现为行数
     int *motiPos;                            //每个传感器的激发位置
-    int tempMotiPos[9] ={0};                 //存储具体站台的传感器的激发位置，站台标号为1-9对应tempMotiPos[0]-[8]
+    int tempMotiPos[10][1] ={{0}};           //存储具体站台名称及其激发位置，站台标号为1-9对应tempMotiPos[1][0]~[9][0]
 
     const int startTime = 3;                 //开始的截取时间，激发位置前面5s
     const int endTime = 15;                  //结束的截取时间，激发位置后面10s
@@ -67,7 +68,6 @@ public:
     void locateCSVData();                    //定位事件站台在CSV文件哪一列，从而定位到该站台X，Y，Z轴以及激发位置在哪一列
     //存储X，Y，Z轴的坐标点
     void paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPointF> *pointBufferY,QVector<QPointF> *pointBufferZ,int index);
-
 };
 
 

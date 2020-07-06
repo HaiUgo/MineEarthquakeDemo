@@ -20,7 +20,7 @@
 #include "readcsvdata.h"
 #include "connectdatabase.h"
 
-//T为1-9台站每个曲线图表的XYZ三轴方向
+//T为1-9台站每个曲线图表的XYZ三轴方向，也用作计数
 enum T{
     T1X,T1Y,T1Z,
     T2X,T2Y,T2Z,
@@ -104,13 +104,18 @@ private:
     int originListIndex;              //当前CSV数据索引
 
     QSplineSeries *splineSeries;      //曲线序列
+    QLineSeries *lineSeries;          //折线图数据序列
     QScatterSeries *scatterSeries;    //点序列
     QChart *chart;                    //图表
     QValueAxis *axisX;                //X坐标轴
     QValueAxis *axisY;                //Y坐标轴
     QChartView *view;                 //视图
 
+    //这里的图表相关的指针其概念和上面的相同，但是因为stackwidget组件不能添加相同对象
+    //即添加相同对象后上一个对象的所属指针会被释放掉，因此T1~T9按钮和全部按钮所显示的图表
+    //不可兼得，因此要再另外定义一组对象才能达到所需效果。
     QSplineSeries *splineSeries2;      //曲线序列
+    QLineSeries *lineSeries2;          //折线序列
     QScatterSeries *scatterSeries2;    //点序列
     QChart *chart2;                    //图表
     QValueAxis *axisX2;                //X坐标轴

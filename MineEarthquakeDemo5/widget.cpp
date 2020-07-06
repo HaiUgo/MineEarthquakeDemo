@@ -144,6 +144,7 @@ void Widget::showTable()
 void Widget::initCharts()
 {
     splineSeries = new QSplineSeries[27];
+    lineSeries = new QLineSeries[27];
     scatterSeries = new QScatterSeries[27];
     chart = new QChart[27];
     axisX = new QValueAxis[27];
@@ -151,6 +152,7 @@ void Widget::initCharts()
     view = new QChartView[27];
 
     splineSeries2 = new QSplineSeries[27];
+    lineSeries2 = new QLineSeries[27];
     scatterSeries2 = new QScatterSeries[27];
     chart2 = new QChart[27];
     axisX2 = new QValueAxis[27];
@@ -162,9 +164,11 @@ void Widget::initCharts()
         splineSeries[i].setUseOpenGL(true);
         splineSeries[i].setPointsVisible(true);
         scatterSeries[i].setMarkerSize(8);
+        lineSeries[i].setColor(QColor(255,0,0));
 
         chart[i].legend()->hide();
         chart[i].addSeries(&splineSeries[i]);            //为图表添加曲线序列
+        chart[i].addSeries(&lineSeries[i]);              //为图标添加折线序列
         chart[i].addSeries(&scatterSeries[i]);           //为图表添加点序列
 
         axisX[i].setRange(0, 90000);                     //设置坐标轴范围
@@ -179,9 +183,11 @@ void Widget::initCharts()
         chart[i].addAxis(&axisX[i], Qt::AlignBottom);    //把坐标轴添加到chart中，第二个参数是设置坐标轴的位置，
         splineSeries[i].attachAxis(&axisX[i]);           //把曲线关联到坐标轴
         scatterSeries[i].attachAxis(&axisX[i]);
+        lineSeries[i].attachAxis(&axisX[i]);
 
         chart[i].addAxis(&axisY[i], Qt::AlignLeft);
         splineSeries[i].attachAxis(&axisY[i]);
+        lineSeries[i].attachAxis(&axisY[i]);
         scatterSeries[i].attachAxis(&axisY[i]);
 
         view[i].setChart(&chart[i]);
@@ -194,10 +200,12 @@ void Widget::initCharts()
         splineSeries2[i].setUseOpenGL(true);
         splineSeries2[i].setPointsVisible(true);
         scatterSeries2[i].setMarkerSize(8);
+        lineSeries2[i].setColor(QColor(255,0,0));
 
         chart2[i].legend()->hide();
         chart2[i].addSeries(&splineSeries2[i]);            //为图表添加曲线序列
         chart2[i].addSeries(&scatterSeries2[i]);           //为图表添加点序列
+        chart2[i].addSeries(&lineSeries2[i]);
 
         axisX2[i].setRange(0, 90000);                     //设置坐标轴范围
         axisY2[i].setRange(-50000, 50000);
@@ -205,10 +213,12 @@ void Widget::initCharts()
         chart2[i].addAxis(&axisX2[i], Qt::AlignBottom);    //把坐标轴添加到chart中，第二个参数是设置坐标轴的位置，
         splineSeries2[i].attachAxis(&axisX2[i]);           //把曲线关联到坐标轴
         scatterSeries2[i].attachAxis(&axisX2[i]);
+        lineSeries2[i].attachAxis(&axisX2[i]);
 
         chart2[i].addAxis(&axisY2[i], Qt::AlignLeft);
         splineSeries2[i].attachAxis(&axisY2[i]);
         scatterSeries2[i].attachAxis(&axisY2[i]);
+        lineSeries2[i].attachAxis(&axisY2[i]);
 
         view2[i].setChart(&chart2[i]);
         view2[i].setRubberBand(QChartView::RectangleRubberBand);
@@ -455,6 +465,93 @@ void Widget::drawSplineWave()
 
     for(int i=0;i<27;i++){
         splineSeries2[i].replace(readData->pointBuffer[i]);
+    }
+
+    //根据readData->tempMotiPos[j][0]获取站台及激发位置，然后将其绘制到图表中（P波到时）
+    for(int j=0;j<10;j++){
+        if(readData->tempMotiPos[j][0]!=0){
+            if(1==j){                 //如果站台是1站台，则将P波到时绘制到T1的XYZ轴曲线图表中
+                lineSeries[T1X].replace(readData->pointBuffer_P[j]);
+                lineSeries[T1Y].replace(readData->pointBuffer_P[j]);
+                lineSeries[T1Z].replace(readData->pointBuffer_P[j]);
+
+                lineSeries2[T1X].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T1Y].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T1Z].replace(readData->pointBuffer_P[j]);
+            }
+            if(2==j){
+                lineSeries[T2X].replace(readData->pointBuffer_P[j]);
+                lineSeries[T2Y].replace(readData->pointBuffer_P[j]);
+                lineSeries[T2Z].replace(readData->pointBuffer_P[j]);
+
+                lineSeries2[T2X].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T2Y].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T2Z].replace(readData->pointBuffer_P[j]);
+            }
+            if(3==j){
+                lineSeries[T3X].replace(readData->pointBuffer_P[j]);
+                lineSeries[T3Y].replace(readData->pointBuffer_P[j]);
+                lineSeries[T3Z].replace(readData->pointBuffer_P[j]);
+
+                lineSeries2[T3X].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T3Y].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T3Z].replace(readData->pointBuffer_P[j]);
+            }
+            if(4==j){
+                lineSeries[T4X].replace(readData->pointBuffer_P[j]);
+                lineSeries[T4Y].replace(readData->pointBuffer_P[j]);
+                lineSeries[T4Z].replace(readData->pointBuffer_P[j]);
+
+                lineSeries2[T4X].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T4Y].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T4Z].replace(readData->pointBuffer_P[j]);
+            }
+            if(5==j){
+                lineSeries[T5X].replace(readData->pointBuffer_P[j]);
+                lineSeries[T5Y].replace(readData->pointBuffer_P[j]);
+                lineSeries[T5Z].replace(readData->pointBuffer_P[j]);
+
+                lineSeries2[T5X].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T5Y].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T5Z].replace(readData->pointBuffer_P[j]);
+            }
+            if(6==j){
+                lineSeries[T6X].replace(readData->pointBuffer_P[j]);
+                lineSeries[T6Y].replace(readData->pointBuffer_P[j]);
+                lineSeries[T6Z].replace(readData->pointBuffer_P[j]);
+
+                lineSeries2[T6X].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T6Y].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T6Z].replace(readData->pointBuffer_P[j]);
+            }
+            if(7==j){
+                lineSeries[T7X].replace(readData->pointBuffer_P[j]);
+                lineSeries[T7Y].replace(readData->pointBuffer_P[j]);
+                lineSeries[T7Z].replace(readData->pointBuffer_P[j]);
+
+                lineSeries2[T7X].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T7Y].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T7Z].replace(readData->pointBuffer_P[j]);
+            }
+            if(8==j){
+                lineSeries[T8X].replace(readData->pointBuffer_P[j]);
+                lineSeries[T8Y].replace(readData->pointBuffer_P[j]);
+                lineSeries[T8Z].replace(readData->pointBuffer_P[j]);
+
+                lineSeries2[T8X].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T8Y].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T8Z].replace(readData->pointBuffer_P[j]);
+            }
+            if(9==j){
+                lineSeries[T9X].replace(readData->pointBuffer_P[j]);
+                lineSeries[T9Y].replace(readData->pointBuffer_P[j]);
+                lineSeries[T9Z].replace(readData->pointBuffer_P[j]);
+
+                lineSeries2[T9X].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T9Y].replace(readData->pointBuffer_P[j]);
+                lineSeries2[T9Z].replace(readData->pointBuffer_P[j]);
+            }
+        }
     }
 }
 
