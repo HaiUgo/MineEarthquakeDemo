@@ -97,12 +97,14 @@ void ReadCSVData::readCSVFile(QString fileName)
     while (!stream.atEnd())
     {
         line = stream.readLine();
+        line = line.trimmed();
         //qDebug()<<"line = "<<line<<'\n';
         if(line.isEmpty()){
-            qDebug()<<"CSV文件读取完毕！"<<'\n';
+            qDebug()<<"CSV FILE HAS READ DONE！"<<'\n';
             break;
         }
         item = line.split(',');                           //将读取的每一行用,分割
+
         date[count] = item.at(0);                         //存储每个事件的日期
         for(int i=0;i<senNum;i++) {
             senChannelZ[count][i] = item.at(6+i*8);       //存储每个事件后三个通道中Z轴的数据
