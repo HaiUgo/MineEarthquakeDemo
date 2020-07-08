@@ -113,7 +113,8 @@ private:
 
     //这里的图表相关的指针其概念和上面的相同，但是因为stackwidget组件不能添加相同对象
     //即添加相同对象后上一个对象的所属指针会被释放掉，因此T1~T9按钮和全部按钮所显示的图表
-    //不可兼得，因此要再另外定义一组对象才能达到所需效果。
+    //不可兼得，因此要再另外定义一组对象。下面定义的指针用于显示全部站台的数据，其数据和每个
+    //站台的数据是相等的。
     QSplineSeries *splineSeries2;      //曲线序列
     QLineSeries *lineSeries2;          //折线序列
     QScatterSeries *scatterSeries2;    //点序列

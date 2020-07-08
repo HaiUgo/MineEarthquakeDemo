@@ -127,9 +127,17 @@ void ReadCSVData::locateCSVData()
     int tempStation[9]={0};                                        //存储站台名称，最多有9个站台
 
     for(int i=0;i<senNum;i++){
-        tempStation[i] = (senChannelNum[0][i]).toInt();  //获取站台名称并存储
+        tempStation[i] = (senChannelNum[0][i]).toInt();            //获取站台名称并存储
         qDebug()<<"tempStation[i]="<<tempStation[i]<<'\n';
     }
+
+    //如果想用实时的话，可以把*pointBuffer的声明类型改为QQueue <int>
+    //然后再在paddingPointBuffer函数中将pointBufferX->append(QPointF(listIndex, parseDataX))
+    //改为pointBufferX->enqueue(parseDataX)同样Y和Z也是如此
+    //加一个定时器，每500ms调用一次paddingPointBuffer，要在paddingPointBuffer设置索引，
+    //当数据超过该索引时停止定时器，即不再执行数据入队操作
+    //另外locateCSVData函数还需要做重构，相应数组的存储操作也需要好好考虑怎么调整
+    //暂不做修改
 
     for(int i=0;i<senNum;i++){
         switch(tempStation[i])                                     //判断是哪一个站台

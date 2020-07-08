@@ -86,6 +86,8 @@ void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
 //运行按钮
 void Widget::startButtonClicked()
 { 
+    ui->startButton->setEnabled(false);                      //运行按钮点击一次后就禁用
+
     ui->axWidget->dynamicCall("DoCommand(const qint32&)",1); //执行控件自定义命令函数，命令的id为2，该值为命令编号，可任取.
     showTable();
 }
@@ -137,7 +139,14 @@ void Widget::showTable()
     model->setHeaderData(3,Qt::Horizontal,tr("定位坐标"));
     model->setHeaderData(4,Qt::Horizontal,tr("能量/J"));
     model->setHeaderData(5,Qt::Horizontal,tr("震级"));
+    ui->tableView_2->verticalHeader()->setVisible(false);     //禁止显示列标头
+   // ui->tableView_2->sortByColumn(0,Qt::AscendingOrder);    //按列排序，升序
     ui->tableView_2->setModel(model);
+
+    QAbstractItemModel *itemModel = ui->tableView_2->model();
+    QModelIndex itemIndex = itemModel->index(0,1);            //定位到事件1，获取其时间
+    QVariant data = itemModel->data(itemIndex);
+    ui->lastestIncidentLabel->setText("最新事件："+data.toString());
 }
 
 //图表初始化
@@ -158,6 +167,9 @@ void Widget::initCharts()
     axisX2 = new QValueAxis[27];
     axisY2 = new QValueAxis[27];
     view2 = new QChartView[27];
+
+    //QMargins margin(10,10,5,5);                           //设置chart rectangle（图表矩形）的边距
+    QRectF recf(20,5,260,50);                            //显示设置plot area（图表区域）的大小
 
     for (int i=0;i<27;i++) {
         splineSeries[i].setColor(QColor(Qt::black));
@@ -199,15 +211,20 @@ void Widget::initCharts()
         splineSeries2[i].setColor(QColor(Qt::black));
         splineSeries2[i].setUseOpenGL(true);
         splineSeries2[i].setPointsVisible(true);
-        scatterSeries2[i].setMarkerSize(8);
+        scatterSeries2[i].setMarkerSize(3);
         lineSeries2[i].setColor(QColor(255,0,0));
 
         chart2[i].legend()->hide();
         chart2[i].addSeries(&splineSeries2[i]);            //为图表添加曲线序列
         chart2[i].addSeries(&scatterSeries2[i]);           //为图表添加点序列
         chart2[i].addSeries(&lineSeries2[i]);
+        chart2[i].setTheme(QChart::ChartThemeDark);
+        //chart2[i].setBackgroundVisible(false);
+        //chart2[i].setMargins(margin);
+        chart2[i].setPlotArea(recf);
 
         axisX2[i].setRange(0, 90000);                     //设置坐标轴范围
+        axisX2[i].setTickCount(10);                       //9区域，10个刻度
         axisY2[i].setRange(-50000, 50000);
 
         chart2[i].addAxis(&axisX2[i], Qt::AlignBottom);    //把坐标轴添加到chart中，第二个参数是设置坐标轴的位置，
@@ -432,6 +449,12 @@ void Widget::timeOutEvent()
 //绘制曲线图
 void Widget::drawSplineWave()
 {
+    //如果用实时的话需要在用drawPoint = pointBuffer[P1X].dequeue()将T1站台X轴数据出队
+    //然后用splineSeries[T1X].replace(axis_x_counts，drawPoint)，其中axis_x_counts调用前要初始化为0
+    //然后调用完执行一次自加操作，其他的站台操作也是如此，共享axis_x_counts
+    //可以定义一个定时器，每10ms替换一次数据
+    //暂不做修改
+
     //可以改成for循环，但是为了方便程序扩充暂时先逐一添加
     splineSeries[T1X].replace(readData->pointBuffer[P1X]);
     splineSeries[T1Y].replace(readData->pointBuffer[P1Y]);
@@ -705,5 +728,4 @@ void Widget::mouseReleaseEvent(QMouseEvent *event)
         isClickingChart = false;
     }
 }
-
 
