@@ -9,6 +9,7 @@ Widget::Widget(QWidget *parent)
     ui->setupUi(this);
 
     filePath = "C:/Users/13696/Desktop/项目参考资料/wave/5moti/yzwu 2020-06-18 04-19-21`28.csv";
+    //filePath = "D:/MicroquakeSystem_LiaoningUniversity/MicroquakeSystem_LiaoningUniversity/data/ConstructionData/3moti/suz 2020-06-15 09-17-48`07.csv";
     originListIndex = 0;         //一定要初始化，否则可能产生随机数
     isStoppingTimer = false;
 
