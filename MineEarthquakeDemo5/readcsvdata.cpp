@@ -142,6 +142,13 @@ void ReadCSVData::locateCSVData()
     //另外locateCSVData函数还需要做重构，相应数组的存储操作也需要好好考虑怎么调整
     //暂不做修改
 
+    //想法2，利用9个队列，1~9队列分别存储T1~T9站台数据，对每个队列按照X、Y、Z、触发位置、站台名的顺序存储
+    //读取时也按照该顺序读取，那么paddingPointBuffer函数入参只有（&pointBuffer[T1]，INDEX）即可
+    //然后将pointBufferX->enqueue(parseDataX)与Y、Z改为
+    //pointBufferT->enqueue(parseDataX);pointBufferT->enqueue(parseDataY);pointBufferT->enqueue(parseDataZ)
+    //同时添加pointBufferT->enqueue(激发位置)；pointBufferT->enqueue(站台名)
+    //暂不做修改
+
     for(int i=0;i<senNum;i++){
         switch(tempStation[i])                                     //判断是哪一个站台
         {
