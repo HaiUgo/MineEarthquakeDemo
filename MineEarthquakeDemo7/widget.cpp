@@ -157,6 +157,9 @@ void Widget::showTable()
 //鼠标双击dataBaseView(数据库视图)序号显示台站以及CAD定位点
 void Widget::dataBaseViewDC(const QModelIndex &index)
 {
+    double *coordinates = new double[3];
+    //ui->axWidget->dynamicCall("SendStringToExecute(StopTwinkeEnt)");
+
     int row = ui->dataBaseView->currentIndex().row();
     qDebug()<<"the selected row is:"<<row;
 
@@ -169,15 +172,37 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
     ui->currentIncidentStation->setText("当前台站："+currentStation);
     qDebug()<<"the current station is :"<<currentStation;
 
-    tempIndex = ui->dataBaseView->model()->index(row,3);             //定位点
+    tempIndex = ui->dataBaseView->model()->index(row,3);             //获取CAD定位点
     data = ui->dataBaseView->model()->data(tempIndex);
-    QString currentCoordinate = data.toString();
-    qDebug()<<"the current coordinate is :"<<currentCoordinate;
+    QStringList list = data.toString().split(",");
+    for(int i=0;i<list.size();i++){
+        coordinates[i] = list.at(i).toDouble();
+    }
+    qDebug()<<"the current coordinate is :"<<coordinates[0]<<" "<<coordinates[1]<<" "<<coordinates[2];
+
+//    MxDrawResbuf param ;
+//    param.AddDouble(coordinates[0]);
+//    param.AddDouble(coordinates[1]);
+
+//    qDebug()<<"param->asVariant:"<<param.asVariant();
+
+   //ui->axWidget->dynamicCall("SendStringToExecuteEx(QString sCmdName, QObject* pParam)","TwinkeEnt",param.asVariant());
+
+    //IDispatch
+   //QAxObject *filter = ui->axWidget->querySubObject("");
+   MxDrawResbuf *filter = new MxDrawResbuf() ;
+   QVariant p = ui->axWidget->dynamicCall("FindEntAtPoint(double dX, double dY, IDispatch* pFilter)",coordinates[0],coordinates[1],filter->asVariant());
+   qDebug()<<"p="<<p;
+
+   QVariant id = ui->axWidget->dynamicCall("DrawPoint(double dX, double dY)",coordinates[0],coordinates[1]);
+   qDebug()<<"id="<<id;
+   qDebug()<<"id="<<id.toLongLong();
+   qlonglong q= id.toLongLong();
+   ui->axWidget->dynamicCall("TwinkeEnt(qlonglong lId)",q);
+
 
     ui->stackedWidget->setCurrentIndex(9);                           //切换到台站波形图显示
 
-//    QSqlRecord record = ui->dataBaseView->model()->record(index.row());
-//    QString str = record.value(列数或列名);
 }
 
 //图表初始化

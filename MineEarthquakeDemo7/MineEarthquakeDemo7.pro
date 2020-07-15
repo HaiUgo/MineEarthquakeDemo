@@ -20,11 +20,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     connectdatabase.cpp \
     main.cpp \
+    mxdrawxlib.cpp \
     readcsvdata.cpp \
     widget.cpp
 
 HEADERS += \
     connectdatabase.h \
+    mxdrawxlib.h \
     parameters.h \
     readcsvdata.h \
     widget.h

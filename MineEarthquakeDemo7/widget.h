@@ -19,7 +19,7 @@
 
 #include "readcsvdata.h"
 #include "connectdatabase.h"
-
+#include "mxdrawxlib.h"
 //T为1-9台站每个曲线图表的XYZ三轴方向，也用作计数
 enum T{
     T1X,T1Y,T1Z,
@@ -32,6 +32,8 @@ enum T{
     T8X,T8Y,T8Z,
     T9X,T9Y,T9Z
 };
+
+using namespace MxDrawXLib;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
