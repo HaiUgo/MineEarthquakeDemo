@@ -9,7 +9,7 @@
 #include <QDebug>
 #include <QSqlQueryModel>
 #include <QFileDialog>
-
+#include <QMap>
 #include <QtCharts>
 #include <QList>
 #include <QSplineSeries>
@@ -62,6 +62,7 @@ private slots:
     void zoomOutClicked();            //缩小按钮
     void restoreButtonClicked();      //还原按钮
     void moveViewButtonClicked();     //移动视区按钮
+    void cancleDynBlinkClicked();     //取消标记
 
     void startButtonClicked();        //运行按钮
     void dailyStatementClicked();     //日报表按钮
@@ -87,6 +88,7 @@ private slots:
 
     void dataBaseViewDC(const QModelIndex &);   //dataBaseView鼠标双击事件
 
+
 private:
     Ui::Widget *ui;
 
@@ -104,6 +106,8 @@ private:
     QString origin;
     int originListSize;               //CSV数据长度
     int originListIndex;              //当前CSV数据索引
+
+    QMap<int,qlonglong> entityId;
 
     QSplineSeries *splineSeries;      //曲线序列
     QLineSeries *lineSeries;          //折线图数据序列

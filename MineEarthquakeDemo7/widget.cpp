@@ -40,6 +40,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->zoomOut,SIGNAL(clicked()),this,SLOT(zoomOutClicked()));
     connect(ui->restoreButton,SIGNAL(clicked()),this,SLOT(restoreButtonClicked()));
     connect(ui->moveViewButton,SIGNAL(clicked()),SLOT(moveViewButtonClicked()));
+    connect(ui->cancelDynBlink,SIGNAL(clicked()),SLOT(cancleDynBlinkClicked()));
 
     connect(ui->dataBaseView,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(dataBaseViewDC(const QModelIndex &)));
 }
@@ -83,6 +84,17 @@ void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
     if(iCommandId == 8){
         // 调用控件移动视区命令
         ui->axWidget->dynamicCall("SendStringToExecute(P)");
+    }
+    if(iCommandId == 9){
+        ui->axWidget->dynamicCall("StopAllTwinkeEnt()");
+        for(int row=0;row<entityId.size();row++)
+            if(entityId.contains(row)){
+                QList<qlonglong> myValues = entityId.values(row);
+                 for (int i=0;i<myValues.size();i++) {
+                     ui->axWidget->dynamicCall("Clear(qlonglong)",myValues.at(i));
+                     qDebug()<<"values="<<myValues.at(i);
+                 }
+            }
     }
 }
 
@@ -130,6 +142,11 @@ void Widget::restoreButtonClicked()
 {
     ui->axWidget->dynamicCall("DoCommand(const qint32&)",7);
 }
+//取消标记
+void Widget::cancleDynBlinkClicked()
+{
+    ui->axWidget->dynamicCall("DoCommand(const qint32&)",9);
+}
 
 //在UI上显示数据库数据
 void Widget::showTable()
@@ -158,8 +175,6 @@ void Widget::showTable()
 void Widget::dataBaseViewDC(const QModelIndex &index)
 {
     double *coordinates = new double[3];
-    //ui->axWidget->dynamicCall("SendStringToExecute(StopTwinkeEnt)");
-
     int row = ui->dataBaseView->currentIndex().row();
     qDebug()<<"the selected row is:"<<row;
 
@@ -180,30 +195,50 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
     }
     qDebug()<<"the current coordinate is :"<<coordinates[0]<<" "<<coordinates[1]<<" "<<coordinates[2];
 
-//    MxDrawResbuf param ;
-//    param.AddDouble(coordinates[0]);
-//    param.AddDouble(coordinates[1]);
-
-//    qDebug()<<"param->asVariant:"<<param.asVariant();
-
-   //ui->axWidget->dynamicCall("SendStringToExecuteEx(QString sCmdName, QObject* pParam)","TwinkeEnt",param.asVariant());
-
-    //IDispatch
-   //QAxObject *filter = ui->axWidget->querySubObject("");
-   MxDrawResbuf *filter = new MxDrawResbuf() ;
-   QVariant p = ui->axWidget->dynamicCall("FindEntAtPoint(double dX, double dY, IDispatch* pFilter)",coordinates[0],coordinates[1],filter->asVariant());
-   qDebug()<<"p="<<p;
-
-   QVariant id = ui->axWidget->dynamicCall("DrawPoint(double dX, double dY)",coordinates[0],coordinates[1]);
-   qDebug()<<"id="<<id;
-   qDebug()<<"id="<<id.toLongLong();
-   qlonglong q= id.toLongLong();
-   ui->axWidget->dynamicCall("TwinkeEnt(qlonglong lId)",q);
+      //下面是获取实体ID，但是该方法失败了，有些参数的用法不明白，如果能直接获取ID的话会比较好
+//    MxDrawResbuf *filter = new MxDrawResbuf() ;
+//    QVariantList params ;
+//    params.append(coordinates[0]);
+//    params.append(coordinates[1]);
+//    params.append(filter->asVariant());
+//    QAxObject * result = ui->axWidget->querySubObject("FindEntAtPoint(double, double, IDispatch*)", params);
+//    qDebug()<<"result="<<result;
+//    qDebug()<<"result="<<result->asVariant();
+//    qDebug()<<"result="<<result->property("ID");
+//    MxDrawEntity e ;
+//    e.ObjectID();
+//    ui->axWidget->dynamicCall("TwinkeEnt(qlonglong)",result->asVariant());
 
 
-    ui->stackedWidget->setCurrentIndex(9);                           //切换到台站波形图显示
+    //上面方法失败了，用的下面的画一个圆形，然后获取其ID，再动态闪烁，效果可以
+    QVariant result = ui->axWidget->dynamicCall("DrawCircle(double, double, double)",coordinates[0],coordinates[1],300);
+    qDebug()<<"id="<<result.toLongLong();
+    qlonglong id= result.toLongLong();
+    ui->axWidget->dynamicCall("TwinkeEnt(qlonglong)",id);
 
+    entityId.insertMulti(row,id);                        //将该圆形实体ID存入容器，方便后期操作
+
+//    if(entityId.contains(row)){
+//        QList<qlonglong> myValues = entityId.values(row);
+//         for (int i=0;i<myValues.size();i++) {
+//             ui->axWidget->dynamicCall("StopTwinkeEnt(qlonglong)",myValues.at(i));
+//             qDebug()<<"values="<<myValues.at(i);
+//         }
+//    }
+
+
+      //下面是生成QT版的com接口说明文档，很有必要阅读
+//    QString doc=ui->axWidget->generateDocumentation();
+//    QFile outFile("c:/Users/13696/Desktop/项目参考资料/debuglog.html");
+//    outFile.open(QIODevice::WriteOnly|QIODevice::Append);
+//    QTextStream ts(&outFile);
+//    ts<<doc<<endl;
+//    outFile.close();
+
+     if(ui->stackedWidget->currentIndex()!=9)
+        ui->stackedWidget->setCurrentIndex(9);                           //切换到台站波形图显示
 }
+
 
 //图表初始化
 void Widget::initCharts()
