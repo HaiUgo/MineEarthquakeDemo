@@ -351,9 +351,7 @@ void ReadCSVData::locateCSVData()
             qDebug()<<"this station is"<<j<<"and its motivated position is "<<tempMotiPos[j][0]<<'\n';  //打印测试站台及其激发位置
             //因为P波到时是一条垂线，所以只需要添加横坐标相同的几个点就好
             pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],0));
-            pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],25000));
             pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],50000));
-            pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],-25000));
             pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],-50000));
         }
     }

@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QDebug>
 #include <QTimer>
-
+#include <QLabel>
 #include "chart.h"
 #include "chartview.h"
 #include "readcsvdata.h"
@@ -43,14 +43,20 @@ private:
     void initCharts();                              //初始化曲线图表
     void showStackedWidgetCharts();                 //将标签和view[T]图表添加到stackWidget的GridLayout布局中
     void drawSplineWave();                          //绘制曲线图
-    //void charViewEventFilter(QEvent *event,QChart *tempChart);   //chartView事件过滤封装函数
-    //bool eventFilter(QObject *obj,QEvent *event);
+    void charViewEventFilter(QEvent *event,QChart *tempChart);   //chartView事件过滤封装函数
+    bool eventFilter(QObject *obj,QEvent *event);
+
+    void handleTheInputData();                      //处理用户手动输入的P波到时数据
+    void repaintPWave(int station,int p);           //重新绘制用户调整P波后的P波红线
     //void mouseMoveEvent(QMouseEvent *event);
    // void mouseReleaseEvent(QMouseEvent *event);
 private slots:
     void displayButtonClick();        //显示波形图按钮
     void stopButtonClick();           //暂停按钮
     void fullChartsButtonClicked();   //显示全部波形按钮
+    void saveModifiedPWaveData();     //保存调整后的P波值
+
+    void slotPointHoverd(const QPointF &point, bool state);   //鼠标移动到chartview某点，可以显示数据
 
     void on_nextPage_clicked();       //下一页
     void on_previousPage_clicked();   //上一页
@@ -65,6 +71,7 @@ private slots:
     void on_T8Button_clicked();
     void on_T9Button_clicked();
 
+    void pageSwithTo9();              //接收widget发来的信号，从而切换相应台站
 private:
     Ui::ShowChart *ui;
 
@@ -102,9 +109,13 @@ private:
     int originListSize;               //CSV数据长度
     int originListIndex;              //当前CSV数据索引
 
-    bool isClickingChart;                           //chart图表鼠标移动事件的开关
-    int xOld;                                       //chart图表鼠标移动的X轴距离
-    int yOld;                                       //chart图表鼠标移动的Y轴距离
+    bool isClickingChart;             //chart图表鼠标移动事件的开关
+    int xOld;                         //chart图表鼠标移动的X轴距离
+    int yOld;                         //chart图表鼠标移动的Y轴距离
+
+    int userInput[2];                 //保存用户选择的台站以及输入的P波激发位置
+
+    QLabel *m_valueLabel;             //用于显示某点数据
 };
 
 

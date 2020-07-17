@@ -11,10 +11,7 @@ Widget::Widget(QWidget *parent)
     db->conDataBase();
 
     showChart = new ShowChart();
-    //ui->verticalLayout_2->addWidget(showChart);
     ui->scrollArea->setWidget(showChart);
-
-
 
     connect(ui->startButton,SIGNAL(clicked()),this,SLOT(startButtonClicked()));
     connect(ui->dailyStatement,SIGNAL(clicked()),this,SLOT(dailyStatementClicked()));
@@ -28,6 +25,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->cancelDynBlink,SIGNAL(clicked()),SLOT(cancleDynBlinkClicked()));
 
     connect(ui->dataBaseView,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(dataBaseViewDC(const QModelIndex &)));
+    connect(this,SIGNAL(pageSwitch9()),showChart,SLOT(pageSwithTo9()));
 }
 
 Widget::~Widget()
@@ -135,7 +133,7 @@ void Widget::showTable()
     model->setHeaderData(4,Qt::Horizontal,tr("能量/J"));
     model->setHeaderData(5,Qt::Horizontal,tr("震级"));
     ui->dataBaseView->verticalHeader()->setVisible(false);     //禁止显示列标头
-   // ui->tableView_2->sortByColumn(0,Qt::AscendingOrder);    //按列排序，升序
+   // ui->tableView_2->sortByColumn(0,Qt::AscendingOrder);     //按列排序，升序
     ui->dataBaseView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->dataBaseView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->dataBaseView->setModel(model);
@@ -193,15 +191,6 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
 
     entityId.insertMulti(row,id);                        //将该圆形实体ID存入容器，方便后期操作
 
-//    if(entityId.contains(row)){
-//        QList<qlonglong> myValues = entityId.values(row);
-//         for (int i=0;i<myValues.size();i++) {
-//             ui->axWidget->dynamicCall("StopTwinkeEnt(qlonglong)",myValues.at(i));
-//             qDebug()<<"values="<<myValues.at(i);
-//         }
-//    }
-
-
       //下面是生成QT版的com接口说明文档，很有必要阅读
 //    QString doc=ui->axWidget->generateDocumentation();
 //    QFile outFile("c:/Users/13696/Desktop/项目参考资料/debuglog.html");
@@ -210,10 +199,7 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
 //    ts<<doc<<endl;
 //    outFile.close();
 
-
-//     if(ui->stackedWidget->currentIndex()!=9)
-//        ui->stackedWidget->setCurrentIndex(9);                           //切换到台站波形图显示
-
+      emit pageSwitch9();
 }
 
 

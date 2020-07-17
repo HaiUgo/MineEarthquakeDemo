@@ -16,10 +16,10 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
+     <x>6</x>
+     <y>3</y>
      <width>727</width>
-     <height>564</height>
+     <height>604</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -142,6 +142,85 @@
        <widget class="QPushButton" name="fulllScreenButton">
         <property name="text">
          <string>全部</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="promptLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>P波到时手动调整</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox">
+        <item>
+         <property name="text">
+          <string>T1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>T2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>T3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>T4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>T5</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>T6</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>T7</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>T8</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>T9</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="intputPWave"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="saveModifiedPWave">
+        <property name="text">
+         <string>确定</string>
         </property>
        </widget>
       </item>

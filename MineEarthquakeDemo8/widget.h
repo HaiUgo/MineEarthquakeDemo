@@ -56,6 +56,7 @@ private:
 
     QMap<int,qlonglong> entityId;
 
-
+signals:
+    void pageSwitch9();
 };
 #endif // WIDGET_H
