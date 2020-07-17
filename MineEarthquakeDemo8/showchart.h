@@ -9,6 +9,7 @@
 #include "chart.h"
 #include "chartview.h"
 #include "readcsvdata.h"
+#include "dynamicwave.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -48,12 +49,11 @@ private:
 
     void handleTheInputData();                      //处理用户手动输入的P波到时数据
     void repaintPWave(int station,int p);           //重新绘制用户调整P波后的P波红线
-    //void mouseMoveEvent(QMouseEvent *event);
-   // void mouseReleaseEvent(QMouseEvent *event);
+
 private slots:
     void displayButtonClick();        //显示波形图按钮
-    void stopButtonClick();           //暂停按钮
-    void fullChartsButtonClicked();   //显示全部波形按钮
+    void dynamicWaveButtonClick();    //显示动态波形图按钮
+    void fullChartsButtonClicked();   //显示全部台站波形按钮
     void saveModifiedPWaveData();     //保存调整后的P波值
 
     void slotPointHoverd(const QPointF &point, bool state);   //鼠标移动到chartview某点，可以显示数据
@@ -72,6 +72,8 @@ private slots:
     void on_T9Button_clicked();
 
     void pageSwithTo9();              //接收widget发来的信号，从而切换相应台站
+
+    void attackClosedDynWaveWindow();  //响应dynamicwave界面发来的的关闭信号
 private:
     Ui::ShowChart *ui;
 
@@ -96,26 +98,18 @@ private:
     ChartView *view2;                  //视图
 
     QVector<QPointF> pointBuffer;     //坐标点缓存
-    QTimer *drawTimer;                //定时器
-    bool isStoppingTimer;             //判断定时器是否开启
 
     ReadCSVData *readData;            //定义一个读取CSV文件数据的对象
 
     int pageSwitchIndex;              //stackWidget页面索引，用于切换当前页面
 
     QString filePath;                 //CSV文件路径
-    QStringList originList;           //CSV数据列表
-    QString origin;
-    int originListSize;               //CSV数据长度
-    int originListIndex;              //当前CSV数据索引
-
-    bool isClickingChart;             //chart图表鼠标移动事件的开关
-    int xOld;                         //chart图表鼠标移动的X轴距离
-    int yOld;                         //chart图表鼠标移动的Y轴距离
 
     int userInput[2];                 //保存用户选择的台站以及输入的P波激发位置
 
     QLabel *m_valueLabel;             //用于显示某点数据
+
+    DynamicWave *dw ;                 //子界面，即动态波形界面
 };
 
 

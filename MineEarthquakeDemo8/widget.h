@@ -50,7 +50,7 @@ private slots:
 private:
     Ui::Widget *ui;
 
-    ShowChart *showChart;
+    ShowChart *showChart;             //子界面，即chartview界面
 
     ConnectDataBase *db;              //定义一个连接数据库的对象
 

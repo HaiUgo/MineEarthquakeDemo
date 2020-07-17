@@ -21,6 +21,7 @@ SOURCES += \
     chart.cpp \
     chartview.cpp \
     connectdatabase.cpp \
+    dynamicwave.cpp \
     main.cpp \
     mxdrawxlib.cpp \
     readcsvdata.cpp \
@@ -31,6 +32,7 @@ HEADERS += \
     chart.h \
     chartview.h \
     connectdatabase.h \
+    dynamicwave.h \
     mxdrawxlib.h \
     parameters.h \
     readcsvdata.h \
@@ -38,6 +40,7 @@ HEADERS += \
     widget.h
 
 FORMS += \
+    dynamicwave.ui \
     showchart.ui \
     widget.ui
 

@@ -9,8 +9,8 @@ ShowChart::ShowChart(QWidget *parent) :
 
     filePath = "C:/Users/13696/Desktop/项目参考资料/wave/5moti/yzwu 2020-06-18 04-19-21`28.csv";
     //filePath = "D:/MicroquakeSystem_LiaoningUniversity/MicroquakeSystem_LiaoningUniversity/data/ConstructionData/3moti/suz 2020-06-15 09-17-48`07.csv";
-    originListIndex = 0;         //一定要初始化，否则可能产生随机数
-    isStoppingTimer = false;
+    dw = new DynamicWave;
+    //dw->setWindowFlags(dw->windowFlags()& ~Qt::WindowCloseButtonHint);
 
     pageSwitchIndex = 0;
 
@@ -30,38 +30,40 @@ ShowChart::ShowChart(QWidget *parent) :
 
     //以下为信号和槽函数，只写了一部分，剩余按钮用的自动关联
     connect(ui->displayButton,SIGNAL(clicked()),this,SLOT(displayButtonClick()));
-    connect(ui->stopButton,SIGNAL(clicked()),this,SLOT(stopButtonClick()));
+    connect(ui->dynamicWaveButton,SIGNAL(clicked()),this,SLOT(dynamicWaveButtonClick()));
     connect(ui->fulllScreenButton,SIGNAL(clicked()),this,SLOT(fullChartsButtonClicked()));
     connect(ui->saveModifiedPWave,SIGNAL(clicked()),this,SLOT(saveModifiedPWaveData()));
     connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::saveModifiedPWaveData);
 
-    connect(&scatterSeries[0], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[1], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[2], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[3], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[4], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[5], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[6], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[7], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[8], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[9], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[10], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[11], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[12], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[13], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[14], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[15], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[16], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[17], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[18], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[19], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[20], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[21], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[22], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[23], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[24], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[25], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&scatterSeries[26], &QScatterSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(dw,SIGNAL(closeDynWaveWindow()),this,SLOT(attackClosedDynWaveWindow()));
+
+    connect(&splineSeries[0], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[1], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[2], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[3], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[4], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[5], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[6], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[7], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[8], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[9], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[10], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[11], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[12], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[13], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[14], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[15], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[16], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[17], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[18], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[19], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[20], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[21], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[22], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[23], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[24], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[25], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&splineSeries[26], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
 }
 
 ShowChart::~ShowChart()
@@ -69,12 +71,23 @@ ShowChart::~ShowChart()
     readData->~ReadCSVData();
     delete readData;
 
-    delete splineSeries;
-    delete scatterSeries;
-    delete axisX;
-    delete axisY;
-    delete chart;
-    delete view;
+    delete dw;
+
+    delete m_valueLabel;
+
+    delete [] splineSeries;
+    delete [] scatterSeries;
+    delete [] axisX;
+    delete [] axisY;
+    delete [] chart;
+    delete [] view;
+
+    delete [] splineSeries2;
+    delete [] scatterSeries2;
+    delete [] axisX2;
+    delete [] axisY2;
+    delete [] chart2;
+    delete [] view2;
 
     delete ui;
 }
@@ -97,6 +110,8 @@ void ShowChart::initCharts()
     axisX2 = new QValueAxis[27];
     axisY2 = new QValueAxis[27];
     view2 = new ChartView[27];
+
+    m_valueLabel = new QLabel(this);
 
     //QMargins margin(10,10,5,5);                           //设置chart rectangle（图表矩形）的边距
     QRectF recf(20,5,260,50);                               //显示设置plot area（图表区域）的大小
@@ -291,6 +306,12 @@ void ShowChart::showStackedWidgetCharts()
 
     ui->stackedWidget->setCurrentIndex(0);
 }
+//响应dynamicwave界面发来的信号
+void ShowChart::attackClosedDynWaveWindow()
+{
+    dw = nullptr;
+    delete dw;
+}
 
 //处理用户输入的P波相关数据
 void ShowChart::handleTheInputData()
@@ -362,26 +383,21 @@ void ShowChart::on_previousPage_clicked()
     ui->stackedWidget->setCurrentIndex(pageSwitchIndex);
 }
 
-//显示按钮，启动定时器
+//显示按钮，绘制波形图
 void ShowChart::displayButtonClick()
 {
-    drawTimer = new QTimer(this);                       //定时任务
-//   connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawSplineWave());
-//    drawTimer->start(10);                                //10ms执行一次
-
     drawSplineWave();
 }
-//暂停按钮，停止定时器
-void ShowChart::stopButtonClick()
+
+//显示动态波形图，
+void ShowChart::dynamicWaveButtonClick()
 {
-    if (QObject::sender() == ui->stopButton) {
-        if (!isStoppingTimer) {
-            drawTimer->stop();
-        } else {
-            drawTimer->start();
-        }
-        isStoppingTimer = !isStoppingTimer;
+    if(dw == nullptr){
+        dw = new DynamicWave;
+        dw->showNormal();
     }
+    else
+        dw->showNormal();
 }
 //全部按钮，显示T1~T9站台全部曲线图信息
 void ShowChart::fullChartsButtonClicked()
@@ -393,15 +409,13 @@ void ShowChart::fullChartsButtonClicked()
 void ShowChart::slotPointHoverd(const QPointF &point, bool state)
 {
     if (state) {
-        m_valueLabel->setText(QString::asprintf("%1.0f", point.x()));
+        m_valueLabel->setText(QString::asprintf("%1.0f,%1.0f", point.x(),point.y()));
         QPoint curPos = mapFromGlobal(QCursor::pos());
         m_valueLabel->move(curPos.x() - m_valueLabel->width() / 2, curPos.y() - m_valueLabel->height() * 1.5);  //移动数值
         m_valueLabel->show();//显示出来
-        qDebug()<<"显示";
     }
     else {
         m_valueLabel->hide();//进行
-        qDebug()<<"隐藏";
     }
 }
 
@@ -409,7 +423,7 @@ void ShowChart::slotPointHoverd(const QPointF &point, bool state)
 void ShowChart::saveModifiedPWaveData()
 {
     handleTheInputData();                              //需要先处理用户输入的数据才可以
-
+    if(userInput[1]>0 && userInput[1]<90000)
     switch(userInput[0]){                              //根据台站号重新绘制P波红线
         case 0:repaintPWave(0,userInput[1]);break;
         case 1:repaintPWave(1,userInput[1]);break;
@@ -461,6 +475,7 @@ void ShowChart::drawSplineWave()
         splineSeries[i].replace(readData->pointBuffer[i]);
        // scatterSeries[i].replace(readData->pointBuffer[i]);
     }
+
     for(int i=0;i<27;i++){
         splineSeries2[i].replace(readData->pointBuffer[i]);
     }
@@ -565,7 +580,7 @@ void ShowChart::charViewEventFilter(QEvent *event,QChart *tempChart)
         QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
         if(mouseEvent->button() & Qt::RightButton)
             tempChart->zoomReset();
-        else if (mouseEvent->button() & Qt::LeftButton)isClickingChart = true;
+        //else if (mouseEvent->button() & Qt::LeftButton)isClickingChart = true;
     }
     else if(event->type()==QEvent::KeyPress){
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
@@ -674,33 +689,4 @@ bool ShowChart::eventFilter(QObject *obj, QEvent *event)
         charViewEventFilter(event,&chart[T9Z]);
     }
     else return QWidget::eventFilter(obj,event);
-
 }
-
-// //鼠标移动事件
-//void ShowChart::mouseMoveEvent(QMouseEvent *event)
-//{
-//    int x, y;
-//    if (isClickingChart) {
-//        if (xOld == 0 && yOld == 0) {
-
-//        } else {
-//            x = event->x() - xOld;
-//            y = event->y() - yOld;
-//            chart->scroll(-x, y);
-//        }
-//        xOld = event->x();
-//        yOld = event->y();
-//        return;
-//    }
-//}
-
-// //鼠标释放事件
-//void ShowChart::mouseReleaseEvent(QMouseEvent *event)
-//{
-//    Q_UNUSED(event)
-//    if (isClickingChart) {
-//        xOld = yOld = 0;
-//        isClickingChart = false;
-//    }
-//}
