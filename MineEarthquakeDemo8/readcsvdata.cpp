@@ -28,6 +28,8 @@ ReadCSVData::~ReadCSVData()
     delete []senChannelNum;
 
     delete pointBuffer;
+
+    delete dynPointBuffer;
 }
 
 //该函数功能为解析文件路径，动态生成存储数组
@@ -76,6 +78,9 @@ void ReadCSVData::parseCSVFileName(QString filePath)
 
     //用于绘制P波到时（红线）
     pointBuffer_P = new QVector<QPointF>[10];
+
+    //存储每个事件触发台站的X，Y，Z轴的数据,用于绘制动态波形
+    dynPointBuffer = new QQueue<double>[27];
 
     qDebug()<<"parsing the csv file completed"<<'\n';
 }
@@ -144,29 +149,41 @@ void ReadCSVData::locateCSVData()
                     if(1==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为1站台
                         //qDebug()<<" case 1:enter paddingPointBuffer"<<'\n';
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX1);
+                        paddingDynPointBuffer(&dynPointBuffer[P1X],&dynPointBuffer[P1Y],&dynPointBuffer[P1Z],INDEX1);
                         //qDebug()<<" case 1:out paddingPointBuffer"<<'\n';
-                        tempMotiPos[tempStation[i]][0] = motiPos[0];            //表示tempStation[i]站台的激发位置，存储在tempMotiPos[i][0]中
+                        tempMotiPos[tempStation[i]][0] = motiPos[0];            //表示tempStation[i]=x站台的激发位置，存储在tempMotiPos[x][0]中
                     }else if(1==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为1站台
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX2);
+                        paddingDynPointBuffer(&dynPointBuffer[P1X],&dynPointBuffer[P1Y],&dynPointBuffer[P1Z],INDEX2);
                         tempMotiPos[tempStation[i]][0] = motiPos[1];               //
                     }else if(1==tempStation[2]){                   //表示读取CSV文件数据时每行的第三个站台为1站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX3);
+                        paddingDynPointBuffer(&dynPointBuffer[P1X],&dynPointBuffer[P1Y],&dynPointBuffer[P1Z],INDEX3);
                         tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(1==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX4);
+                        paddingDynPointBuffer(&dynPointBuffer[P1X],&dynPointBuffer[P1Y],&dynPointBuffer[P1Z],INDEX4);
                         tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(1==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX5);
+                        paddingDynPointBuffer(&dynPointBuffer[P1X],&dynPointBuffer[P1Y],&dynPointBuffer[P1Z],INDEX5);
                         tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(1==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX6);
+                        paddingDynPointBuffer(&dynPointBuffer[P1X],&dynPointBuffer[P1Y],&dynPointBuffer[P1Z],INDEX6);
                         tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(1==tempStation[6]){
-
+                        paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX7);
+                        paddingDynPointBuffer(&dynPointBuffer[P1X],&dynPointBuffer[P1Y],&dynPointBuffer[P1Z],INDEX7);
+                        tempMotiPos[tempStation[i]][0] = motiPos[6];
                     }else if(1==tempStation[7]){
-
+                        paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX8);
+                        paddingDynPointBuffer(&dynPointBuffer[P1X],&dynPointBuffer[P1Y],&dynPointBuffer[P1Z],INDEX8);
+                        tempMotiPos[tempStation[i]][0] = motiPos[7];
                     }else if(1==tempStation[8]){
-
+                        paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX9);
+                        paddingDynPointBuffer(&dynPointBuffer[P1X],&dynPointBuffer[P1Y],&dynPointBuffer[P1Z],INDEX9);
+                        tempMotiPos[tempStation[i]][0] = motiPos[8];
                     }else{
                         qDebug()<<"error, please check!"<<'\n';
                     }
@@ -175,173 +192,323 @@ void ReadCSVData::locateCSVData()
             case 2:
                     if(2==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为2站台,以此类推
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX1);
+                        paddingDynPointBuffer(&dynPointBuffer[P2X],&dynPointBuffer[P2Y],&dynPointBuffer[P2Z],INDEX1);
                         tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(2==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为2站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX2);
+                        paddingDynPointBuffer(&dynPointBuffer[P2X],&dynPointBuffer[P2Y],&dynPointBuffer[P2Z],INDEX2);
                         tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(2==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX3);
+                        paddingDynPointBuffer(&dynPointBuffer[P2X],&dynPointBuffer[P2Y],&dynPointBuffer[P2Z],INDEX3);
                         tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(2==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX4);
+                        paddingDynPointBuffer(&dynPointBuffer[P2X],&dynPointBuffer[P2Y],&dynPointBuffer[P2Z],INDEX4);
                         tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(2==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX5);
+                        paddingDynPointBuffer(&dynPointBuffer[P2X],&dynPointBuffer[P2Y],&dynPointBuffer[P2Z],INDEX5);
                         tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(2==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX6);
+                        paddingDynPointBuffer(&dynPointBuffer[P2X],&dynPointBuffer[P2Y],&dynPointBuffer[P2Z],INDEX6);
                         tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(2==tempStation[6]){
-
+                        paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX7);
+                        paddingDynPointBuffer(&dynPointBuffer[P2X],&dynPointBuffer[P2Y],&dynPointBuffer[P2Z],INDEX7);
+                        tempMotiPos[tempStation[i]][0] = motiPos[6];
                     }else if(2==tempStation[7]){
-
+                        paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX8);
+                        paddingDynPointBuffer(&dynPointBuffer[P2X],&dynPointBuffer[P2Y],&dynPointBuffer[P2Z],INDEX8);
+                        tempMotiPos[tempStation[i]][0] = motiPos[7];
                     }else if(2==tempStation[8]){
-
+                        paddingPointBuffer(&pointBuffer[P2X],&pointBuffer[P2Y],&pointBuffer[P2Z],INDEX9);
+                        paddingDynPointBuffer(&dynPointBuffer[P2X],&dynPointBuffer[P2Y],&dynPointBuffer[P2Z],INDEX9);
+                        tempMotiPos[tempStation[i]][0] = motiPos[8];
                     }else{
                         qDebug()<<"error, please check!"<<'\n';
                     }break;
             case 3:
                     if(3==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为3站台,以此类推
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX1);
+                        paddingDynPointBuffer(&dynPointBuffer[P3X],&dynPointBuffer[P3Y],&dynPointBuffer[P3Z],INDEX1);
                         tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(3==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为3站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX2);
+                        paddingDynPointBuffer(&dynPointBuffer[P3X],&dynPointBuffer[P3Y],&dynPointBuffer[P3Z],INDEX2);
                         tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(3==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX3);
+                        paddingDynPointBuffer(&dynPointBuffer[P3X],&dynPointBuffer[P3Y],&dynPointBuffer[P3Z],INDEX3);
                         tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(3==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX4);
+                        paddingDynPointBuffer(&dynPointBuffer[P3X],&dynPointBuffer[P3Y],&dynPointBuffer[P3Z],INDEX4);
                         tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(3==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX5);
+                        paddingDynPointBuffer(&dynPointBuffer[P3X],&dynPointBuffer[P3Y],&dynPointBuffer[P3Z],INDEX5);
                         tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(3==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX6);
+                        paddingDynPointBuffer(&dynPointBuffer[P3X],&dynPointBuffer[P3Y],&dynPointBuffer[P3Z],INDEX6);
                         tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(3==tempStation[6]){
-
+                        paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX7);
+                        paddingDynPointBuffer(&dynPointBuffer[P3X],&dynPointBuffer[P3Y],&dynPointBuffer[P3Z],INDEX7);
+                        tempMotiPos[tempStation[i]][0] = motiPos[6];
                     }else if(3==tempStation[7]){
-
+                        paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX8);
+                        paddingDynPointBuffer(&dynPointBuffer[P3X],&dynPointBuffer[P3Y],&dynPointBuffer[P3Z],INDEX8);
+                        tempMotiPos[tempStation[i]][0] = motiPos[7];
                     }else if(3==tempStation[8]){
-
+                        paddingPointBuffer(&pointBuffer[P3X],&pointBuffer[P3Y],&pointBuffer[P3Z],INDEX9);
+                        paddingDynPointBuffer(&dynPointBuffer[P3X],&dynPointBuffer[P3Y],&dynPointBuffer[P3Z],INDEX9);
+                        tempMotiPos[tempStation[i]][0] = motiPos[8];
                     }else{
                         qDebug()<<"error, please check!"<<'\n';
                     }break;
             case 4:
                     if(4==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为4站台,以此类推
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX1);
+                        paddingDynPointBuffer(&dynPointBuffer[P4X],&dynPointBuffer[P4Y],&dynPointBuffer[P4Z],INDEX1);
                         tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(4==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为4站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX2);
+                        paddingDynPointBuffer(&dynPointBuffer[P4X],&dynPointBuffer[P4Y],&dynPointBuffer[P4Z],INDEX2);
                         tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(4==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX3);
+                        paddingDynPointBuffer(&dynPointBuffer[P4X],&dynPointBuffer[P4Y],&dynPointBuffer[P4Z],INDEX3);
                         tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(4==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX4);
+                        paddingDynPointBuffer(&dynPointBuffer[P4X],&dynPointBuffer[P4Y],&dynPointBuffer[P4Z],INDEX4);
                         tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(4==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX5);
+                        paddingDynPointBuffer(&dynPointBuffer[P4X],&dynPointBuffer[P4Y],&dynPointBuffer[P4Z],INDEX5);
                         tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(4==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX6);
+                        paddingDynPointBuffer(&dynPointBuffer[P4X],&dynPointBuffer[P4Y],&dynPointBuffer[P4Z],INDEX6);
                         tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(4==tempStation[6]){
-
+                        paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX7);
+                        paddingDynPointBuffer(&dynPointBuffer[P4X],&dynPointBuffer[P4Y],&dynPointBuffer[P4Z],INDEX7);
+                        tempMotiPos[tempStation[i]][0] = motiPos[6];
                     }else if(4==tempStation[7]){
-
+                        paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX8);
+                        paddingDynPointBuffer(&dynPointBuffer[P4X],&dynPointBuffer[P4Y],&dynPointBuffer[P4Z],INDEX8);
+                        tempMotiPos[tempStation[i]][0] = motiPos[7];
                     }else if(4==tempStation[8]){
-
+                        paddingPointBuffer(&pointBuffer[P4X],&pointBuffer[P4Y],&pointBuffer[P4Z],INDEX9);
+                        paddingDynPointBuffer(&dynPointBuffer[P4X],&dynPointBuffer[P4Y],&dynPointBuffer[P4Z],INDEX9);
+                        tempMotiPos[tempStation[i]][0] = motiPos[8];
                     }else{
                         qDebug()<<"error, please check!"<<'\n';
                     }break;
             case 5:
                     if(5==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为5站台,以此类推
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX1);
+                        paddingDynPointBuffer(&dynPointBuffer[P5X],&dynPointBuffer[P5Y],&dynPointBuffer[P5Z],INDEX1);
                         tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(5==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为5站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX2);
+                        paddingDynPointBuffer(&dynPointBuffer[P5X],&dynPointBuffer[P5Y],&dynPointBuffer[P5Z],INDEX2);
                         tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(5==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX3);
+                        paddingDynPointBuffer(&dynPointBuffer[P5X],&dynPointBuffer[P5Y],&dynPointBuffer[P5Z],INDEX3);
                         tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(5==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX4);
+                        paddingDynPointBuffer(&dynPointBuffer[P5X],&dynPointBuffer[P5Y],&dynPointBuffer[P5Z],INDEX4);
                         tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(5==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX5);
+                        paddingDynPointBuffer(&dynPointBuffer[P5X],&dynPointBuffer[P5Y],&dynPointBuffer[P5Z],INDEX5);
                         tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(5==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX6);
+                        paddingDynPointBuffer(&dynPointBuffer[P5X],&dynPointBuffer[P5Y],&dynPointBuffer[P5Z],INDEX6);
                         tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(5==tempStation[6]){
-
+                        paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX7);
+                        paddingDynPointBuffer(&dynPointBuffer[P5X],&dynPointBuffer[P5Y],&dynPointBuffer[P5Z],INDEX7);
+                        tempMotiPos[tempStation[i]][0] = motiPos[6];
                     }else if(5==tempStation[7]){
-
+                        paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX8);
+                        paddingDynPointBuffer(&dynPointBuffer[P5X],&dynPointBuffer[P5Y],&dynPointBuffer[P5Z],INDEX8);
+                        tempMotiPos[tempStation[i]][0] = motiPos[7];
                     }else if(5==tempStation[8]){
-
+                        paddingPointBuffer(&pointBuffer[P5X],&pointBuffer[P5Y],&pointBuffer[P5Z],INDEX9);
+                        paddingDynPointBuffer(&dynPointBuffer[P5X],&dynPointBuffer[P5Y],&dynPointBuffer[P5Z],INDEX9);
+                        tempMotiPos[tempStation[i]][0] = motiPos[8];
                     }else{
                         qDebug()<<"error, please check!"<<'\n';
                     }break;
             case 6:
                     if(6==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为6站台,以此类推
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX1);
+                        paddingDynPointBuffer(&dynPointBuffer[P6X],&dynPointBuffer[P6Y],&dynPointBuffer[P6Z],INDEX1);
                         tempMotiPos[tempStation[i]][0] = motiPos[0];
                     }else if(6==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为6站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX2);
+                        paddingDynPointBuffer(&dynPointBuffer[P6X],&dynPointBuffer[P6Y],&dynPointBuffer[P6Z],INDEX2);
                         tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(6==tempStation[2]){
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX3);
+                        paddingDynPointBuffer(&dynPointBuffer[P6X],&dynPointBuffer[P6Y],&dynPointBuffer[P6Z],INDEX3);
                         tempMotiPos[tempStation[i]][0] = motiPos[2];
                     }else if(6==tempStation[3]){
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX4);
+                        paddingDynPointBuffer(&dynPointBuffer[P6X],&dynPointBuffer[P6Y],&dynPointBuffer[P6Z],INDEX4);
                         tempMotiPos[tempStation[i]][0] = motiPos[3];
                     }else if(6==tempStation[4]){
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX5);
+                        paddingDynPointBuffer(&dynPointBuffer[P6X],&dynPointBuffer[P6Y],&dynPointBuffer[P6Z],INDEX5);
                         tempMotiPos[tempStation[i]][0] = motiPos[4];
                     }else if(6==tempStation[5]){
                         paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX6);
+                        paddingDynPointBuffer(&dynPointBuffer[P6X],&dynPointBuffer[P6Y],&dynPointBuffer[P6Z],INDEX6);
                         tempMotiPos[tempStation[i]][0] = motiPos[5];
                     }else if(6==tempStation[6]){
-
+                        paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX7);
+                        paddingDynPointBuffer(&dynPointBuffer[P6X],&dynPointBuffer[P6Y],&dynPointBuffer[P6Z],INDEX7);
+                        tempMotiPos[tempStation[i]][0] = motiPos[6];
                     }else if(6==tempStation[7]){
-
+                        paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX8);
+                        paddingDynPointBuffer(&dynPointBuffer[P6X],&dynPointBuffer[P6Y],&dynPointBuffer[P6Z],INDEX8);
+                        tempMotiPos[tempStation[i]][0] = motiPos[7];
                     }else if(6==tempStation[8]){
-
+                        paddingPointBuffer(&pointBuffer[P6X],&pointBuffer[P6Y],&pointBuffer[P6Z],INDEX9);
+                        paddingDynPointBuffer(&dynPointBuffer[P6X],&dynPointBuffer[P6Y],&dynPointBuffer[P6Z],INDEX9);
+                        tempMotiPos[tempStation[i]][0] = motiPos[8];
                     }else{
                         qDebug()<<"error, please check!"<<'\n';
                     }break;
             case 7:
-                if(7==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为6站台,以此类推
+                if(7==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为7站台,以此类推
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX1);
+                    paddingDynPointBuffer(&dynPointBuffer[P7X],&dynPointBuffer[P7Y],&dynPointBuffer[P7Z],INDEX1);
                     tempMotiPos[tempStation[i]][0] = motiPos[0];
-                }else if(7==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为6站台，后面以此类推
+                }else if(7==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为7站台，后面以此类推
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX2);
+                    paddingDynPointBuffer(&dynPointBuffer[P7X],&dynPointBuffer[P7Y],&dynPointBuffer[P7Z],INDEX2);
                     tempMotiPos[tempStation[i]][0] = motiPos[1];
                 }else if(7==tempStation[2]){
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX3);
+                    paddingDynPointBuffer(&dynPointBuffer[P7X],&dynPointBuffer[P7Y],&dynPointBuffer[P7Z],INDEX3);
                     tempMotiPos[tempStation[i]][0] = motiPos[2];
                 }else if(7==tempStation[3]){
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX4);
+                    paddingDynPointBuffer(&dynPointBuffer[P7X],&dynPointBuffer[P7Y],&dynPointBuffer[P7Z],INDEX4);
                     tempMotiPos[tempStation[i]][0] = motiPos[3];
                 }else if(7==tempStation[4]){
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX5);
+                    paddingDynPointBuffer(&dynPointBuffer[P7X],&dynPointBuffer[P7Y],&dynPointBuffer[P7Z],INDEX5);
                     tempMotiPos[tempStation[i]][0] = motiPos[4];
                 }else if(7==tempStation[5]){
                     paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX6);
+                    paddingDynPointBuffer(&dynPointBuffer[P7X],&dynPointBuffer[P7Y],&dynPointBuffer[P7Z],INDEX6);
                     tempMotiPos[tempStation[i]][0] = motiPos[5];
                 }else if(7==tempStation[6]){
-
+                    paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX7);
+                    paddingDynPointBuffer(&dynPointBuffer[P7X],&dynPointBuffer[P7Y],&dynPointBuffer[P7Z],INDEX7);
+                    tempMotiPos[tempStation[i]][0] = motiPos[6];
                 }else if(7==tempStation[7]){
-
+                    paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX8);
+                    paddingDynPointBuffer(&dynPointBuffer[P7X],&dynPointBuffer[P7Y],&dynPointBuffer[P7Z],INDEX8);
+                    tempMotiPos[tempStation[i]][0] = motiPos[7];
                 }else if(7==tempStation[8]){
-
+                    paddingPointBuffer(&pointBuffer[P7X],&pointBuffer[P7Y],&pointBuffer[P7Z],INDEX9);
+                    paddingDynPointBuffer(&dynPointBuffer[P7X],&dynPointBuffer[P7Y],&dynPointBuffer[P7Z],INDEX9);
+                    tempMotiPos[tempStation[i]][0] = motiPos[8];
                 }else{
                     qDebug()<<"error, please check!"<<'\n';
                 }break;
             case 8:
+                if(8==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为8站台,以此类推
+                    paddingPointBuffer(&pointBuffer[P8X],&pointBuffer[P8Y],&pointBuffer[P8Z],INDEX1);
+                    paddingDynPointBuffer(&dynPointBuffer[P8X],&dynPointBuffer[P8Y],&dynPointBuffer[P8Z],INDEX1);
+                    tempMotiPos[tempStation[i]][0] = motiPos[0];
+                }else if(8==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为8站台，后面以此类推
+                    paddingPointBuffer(&pointBuffer[P8X],&pointBuffer[P8Y],&pointBuffer[P8Z],INDEX2);
+                    paddingDynPointBuffer(&dynPointBuffer[P8X],&dynPointBuffer[P8Y],&dynPointBuffer[P8Z],INDEX2);
+                    tempMotiPos[tempStation[i]][0] = motiPos[1];
+                }else if(8==tempStation[2]){
+                    paddingPointBuffer(&pointBuffer[P8X],&pointBuffer[P8Y],&pointBuffer[P8Z],INDEX3);
+                    paddingDynPointBuffer(&dynPointBuffer[P8X],&dynPointBuffer[P8Y],&dynPointBuffer[P8Z],INDEX3);
+                    tempMotiPos[tempStation[i]][0] = motiPos[2];
+                }else if(8==tempStation[3]){
+                    paddingPointBuffer(&pointBuffer[P8X],&pointBuffer[P8Y],&pointBuffer[P8Z],INDEX4);
+                    paddingDynPointBuffer(&dynPointBuffer[P8X],&dynPointBuffer[P8Y],&dynPointBuffer[P8Z],INDEX4);
+                    tempMotiPos[tempStation[i]][0] = motiPos[3];
+                }else if(8==tempStation[4]){
+                    paddingPointBuffer(&pointBuffer[P8X],&pointBuffer[P8Y],&pointBuffer[P8Z],INDEX5);
+                    paddingDynPointBuffer(&dynPointBuffer[P8X],&dynPointBuffer[P8Y],&dynPointBuffer[P8Z],INDEX5);
+                    tempMotiPos[tempStation[i]][0] = motiPos[4];
+                }else if(8==tempStation[5]){
+                    paddingPointBuffer(&pointBuffer[P8X],&pointBuffer[P8Y],&pointBuffer[P8Z],INDEX6);
+                    paddingDynPointBuffer(&dynPointBuffer[P8X],&dynPointBuffer[P8Y],&dynPointBuffer[P8Z],INDEX6);
+                    tempMotiPos[tempStation[i]][0] = motiPos[5];
+                }else if(8==tempStation[6]){
+                    paddingPointBuffer(&pointBuffer[P8X],&pointBuffer[P8Y],&pointBuffer[P8Z],INDEX7);
+                    paddingDynPointBuffer(&dynPointBuffer[P8X],&dynPointBuffer[P8Y],&dynPointBuffer[P8Z],INDEX7);
+                    tempMotiPos[tempStation[i]][0] = motiPos[6];
+                }else if(8==tempStation[7]){
+                    paddingPointBuffer(&pointBuffer[P8X],&pointBuffer[P8Y],&pointBuffer[P8Z],INDEX8);
+                    paddingDynPointBuffer(&dynPointBuffer[P8X],&dynPointBuffer[P8Y],&dynPointBuffer[P8Z],INDEX8);
+                    tempMotiPos[tempStation[i]][0] = motiPos[7];
+                }else if(8==tempStation[8]){
+                    paddingPointBuffer(&pointBuffer[P8X],&pointBuffer[P8Y],&pointBuffer[P8Z],INDEX9);
+                    paddingDynPointBuffer(&dynPointBuffer[P8X],&dynPointBuffer[P8Y],&dynPointBuffer[P8Z],INDEX9);
+                    tempMotiPos[tempStation[i]][0] = motiPos[8];
+                }else{
+                    qDebug()<<"error, please check!"<<'\n';
+                }break;
             case 9:
+                if(9==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为6站台,以此类推
+                    paddingPointBuffer(&pointBuffer[P9X],&pointBuffer[P9Y],&pointBuffer[P9Z],INDEX1);
+                    paddingDynPointBuffer(&dynPointBuffer[P9X],&dynPointBuffer[P9Y],&dynPointBuffer[P9Z],INDEX1);
+                    tempMotiPos[tempStation[i]][0] = motiPos[0];
+                }else if(9==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为6站台，后面以此类推
+                    paddingPointBuffer(&pointBuffer[P9X],&pointBuffer[P9Y],&pointBuffer[P9Z],INDEX2);
+                    paddingDynPointBuffer(&dynPointBuffer[P9X],&dynPointBuffer[P9Y],&dynPointBuffer[P9Z],INDEX2);
+                    tempMotiPos[tempStation[i]][0] = motiPos[1];
+                }else if(9==tempStation[2]){
+                    paddingPointBuffer(&pointBuffer[P9X],&pointBuffer[P9Y],&pointBuffer[P9Z],INDEX3);
+                    paddingDynPointBuffer(&dynPointBuffer[P9X],&dynPointBuffer[P9Y],&dynPointBuffer[P9Z],INDEX3);
+                    tempMotiPos[tempStation[i]][0] = motiPos[2];
+                }else if(9==tempStation[3]){
+                    paddingPointBuffer(&pointBuffer[P9X],&pointBuffer[P9Y],&pointBuffer[P9Z],INDEX4);
+                    paddingDynPointBuffer(&dynPointBuffer[P9X],&dynPointBuffer[P9Y],&dynPointBuffer[P9Z],INDEX4);
+                    tempMotiPos[tempStation[i]][0] = motiPos[3];
+                }else if(9==tempStation[4]){
+                    paddingPointBuffer(&pointBuffer[P9X],&pointBuffer[P9Y],&pointBuffer[P9Z],INDEX5);
+                    paddingDynPointBuffer(&dynPointBuffer[P9X],&dynPointBuffer[P9Y],&dynPointBuffer[P9Z],INDEX5);
+                    tempMotiPos[tempStation[i]][0] = motiPos[4];
+                }else if(9==tempStation[5]){
+                    paddingPointBuffer(&pointBuffer[P9X],&pointBuffer[P9Y],&pointBuffer[P9Z],INDEX6);
+                    paddingDynPointBuffer(&dynPointBuffer[P9X],&dynPointBuffer[P9Y],&dynPointBuffer[P9Z],INDEX6);
+                    tempMotiPos[tempStation[i]][0] = motiPos[5];
+                }else if(9==tempStation[6]){
+                    paddingPointBuffer(&pointBuffer[P9X],&pointBuffer[P9Y],&pointBuffer[P9Z],INDEX7);
+                    paddingDynPointBuffer(&dynPointBuffer[P9X],&dynPointBuffer[P9Y],&dynPointBuffer[P9Z],INDEX7);
+                    tempMotiPos[tempStation[i]][0] = motiPos[6];
+                }else if(9==tempStation[7]){
+                    paddingPointBuffer(&pointBuffer[P9X],&pointBuffer[P9Y],&pointBuffer[P9Z],INDEX8);
+                    paddingDynPointBuffer(&dynPointBuffer[P9X],&dynPointBuffer[P9Y],&dynPointBuffer[P9Z],INDEX8);
+                    tempMotiPos[tempStation[i]][0] = motiPos[7];
+                }else if(9==tempStation[8]){
+                    paddingPointBuffer(&pointBuffer[P9X],&pointBuffer[P9Y],&pointBuffer[P9Z],INDEX9);
+                    paddingDynPointBuffer(&dynPointBuffer[P9X],&dynPointBuffer[P9Y],&dynPointBuffer[P9Z],INDEX9);
+                    tempMotiPos[tempStation[i]][0] = motiPos[8];
+                }else{
+                    qDebug()<<"error, please check!"<<'\n';
+                }break;
             default:
                   qDebug()<<"current station"<<tempStation[i]<<'\n';
         }
@@ -386,3 +553,26 @@ void ReadCSVData::paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPoi
     qDebug()<<"paddingPointBuffer successfully!"<<'\n';
 }
 
+//入参传入QQueue<double>的实例化对象
+void ReadCSVData::paddingDynPointBuffer(QQueue<double> *pointBufferX,QQueue<double> *pointBufferY,QQueue<double> *pointBufferZ,int index)
+{
+    double parseDataX;                                        //存储CSV文件中字符值转换为浮点型后的值
+    double parseDataY;
+    double parseDataZ;
+    for(int j=0;j<count;j++){
+        //动态波形不需要显示全部数据，因此只存储部分数据
+        //例如每100行CSV数据中，只存储中间值，即第50行数据
+        //索引标号表示为0...99中，只保留索引为49的一行数据
+        //因此90000行数据只会存储900行数据
+        if(j%49 == 0 && j%2 !=0){
+            parseDataX = senChannelX[j][index].toDouble();        //QString转为Double型
+            parseDataY = senChannelY[j][index].toDouble();
+            parseDataZ = senChannelZ[j][index].toDouble();
+
+            pointBufferX->enqueue(parseDataX);
+            pointBufferY->enqueue(parseDataY);
+            pointBufferZ->enqueue(parseDataZ);
+        }
+    }
+    qDebug()<<"paddingDynPointBuffer successfully!"<<'\n';
+}

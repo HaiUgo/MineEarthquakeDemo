@@ -8,16 +8,21 @@ DynamicWave::DynamicWave(QWidget *parent) :
     ui->setupUi(this);
 
     filePath = "C:/Users/13696/Desktop/项目参考资料/wave/5moti/yzwu 2020-06-18 04-19-21`28.csv";
-    //filePath = "D:/MicroquakeSystem_LiaoningUniversity/MicroquakeSystem_LiaoningUniversity/data/ConstructionData/3moti/suz 2020-06-15 09-17-48`07.csv";
-    originListIndex = 0;         //一定要初始化，否则可能产生随机数
+
+    axis_x_counts = 0;
+    listIndex = 0;
+    queueSize = 0;
     isStoppingTimer = false;
 
-    pageSwitchIndex = 0;
+    readData = new ReadCSVData;
+    readData->parseCSVFileName(filePath);
+    readData->readCSVFile(filePath);
+    readData->locateCSVData();
 
     initDynamicCharts();
 
-    connect(ui->showDynWaveButton,&QPushButton::clicked,this,&DynamicWave::showDynWave);
-    connect(ui->stopDynWaveButton,&QPushButton::clicked,this,&DynamicWave::stopDynWave);
+    connect(ui->showDynWaveButton,SIGNAL(clicked()),this,SLOT(showDynWave()));
+    connect(ui->stopDynWaveButton,SIGNAL(clicked()),this,SLOT(stopDynWave()));
 
 //    connect(&splineSeries[0], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
 //    connect(&splineSeries[1], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
@@ -52,7 +57,7 @@ DynamicWave::~DynamicWave()
 {
     readData->~ReadCSVData();
     delete readData;
-
+    delete pointBufferTemp;
     delete splineSeries;
     delete scatterSeries;
     delete axisX;
@@ -84,6 +89,9 @@ void DynamicWave::initDynamicCharts()
 
     m_valueLabel = new QLabel(this);
 
+    QPen pen;
+    pen.setWidthF(0.5);
+
     QMargins margin(0,0,0,0);                           //设置chart rectangle（图表矩形）的边距
     //QRectF recf(20,5,260,50);                               //显示设置plot area（图表区域）的大小
 
@@ -91,6 +99,7 @@ void DynamicWave::initDynamicCharts()
         splineSeries[i].setColor(QColor(Qt::black));
         splineSeries[i].setUseOpenGL(true);
         splineSeries[i].setPointsVisible(true);
+        splineSeries[i].setPen(pen);
         scatterSeries[i].setMarkerShape(QScatterSeries::MarkerShapeCircle);//圆形的点
         scatterSeries[i].setMarkerSize(2);
         lineSeries[i].setColor(QColor(255,0,0));
@@ -105,7 +114,7 @@ void DynamicWave::initDynamicCharts()
         axisX[i].setTickCount(10);                       //9区域，10个刻度
         axisX[i].setMinorTickCount(1);                   //单位刻度中间再加一个副刻度
 
-        axisY[i].setRange(-50, 50);
+        axisY[i].setRange(-500, 500);
         axisY[i].setTickCount(5);
 
         chart[i].addAxis(&axisX[i], Qt::AlignBottom);      //把坐标轴添加到chart中，第二个参数是设置坐标轴的位置，
@@ -153,7 +162,7 @@ void DynamicWave::initDynamicCharts()
     ui->gridLayout->addWidget(&view[26],8,3);
 }
 
-//显示动态波形
+//停止动态波形
 void DynamicWave::stopDynWave()
 {
     if (QObject::sender() == ui->stopDynWaveButton) {
@@ -166,15 +175,116 @@ void DynamicWave::stopDynWave()
     }
 }
 
-//停止动态波形
+//显示动态波形
 void DynamicWave::showDynWave()
 {
+    queueSize = readData->dynPointBuffer[T1X].size();   //不一定非要写T1X，写其他的也可以，因为队列长度都是一样的
+    qDebug()<<"queueSize="<<queueSize;
+    pointBufferTemp = new QVector<QPointF>;
+    for(int j=0;j<queueSize;j++){
+        pointBufferTemp->append(QPointF(listIndex, 0)); //点坐标集合
+        listIndex++;
+    }
+    //提前添加完点，就不用考虑是否是第一次绘制，只用替换现有点的数据
+    for(int j = 0;j<27;j++)
+        splineSeries[j].replace(*pointBufferTemp);
+
     drawTimer = new QTimer(this);                       //定时任务
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawDynSplineWave()));
-    drawTimer->start(10);
+    drawTimer->start(50);
+    qDebug()<<"start timer";
 }
 
- //鼠标移动事件
+//绘制动态波形图
+void DynamicWave::drawDynSplineWave()
+{
+    double drawPoint = 0;
+
+    //需要先利用readData判断哪些队列有数据，不然无法自动停止定时器，待修改...
+
+    if(readData->dynPointBuffer[T1X].size() != 0){
+        drawPoint = readData->dynPointBuffer[T1X].dequeue()/40;          //将纵坐标原始数据缩小40倍
+        //qDebug()<<"drawPoint = "<<drawPoint<<" T1X"<<'\n';
+        splineSeries[T1X].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T1Y].dequeue()/40;
+        //qDebug()<<"drawPoint = "<<drawPoint<<" T1Y"<<'\n';
+        splineSeries[T1Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T1Z].dequeue()/40;
+        //qDebug()<<"drawPoint = "<<drawPoint<<" T1Z"<<'\n';
+        splineSeries[T1Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+    }else{
+        axis_x_counts = 0;
+        drawTimer->stop();
+        qDebug()<<"stop timer";
+    }
+    if(readData->dynPointBuffer[T2X].size() != 0){
+        drawPoint = readData->dynPointBuffer[T2X].dequeue()/40;          //将纵坐标原始数据缩小40倍
+        splineSeries[T2X].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T2Y].dequeue()/40;
+        splineSeries[T2Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T2Z].dequeue()/40;
+        splineSeries[T2Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+    }
+    if(readData->dynPointBuffer[T3X].size() != 0){
+        drawPoint = readData->dynPointBuffer[T3X].dequeue()/40;          //将纵坐标原始数据缩小40倍
+        splineSeries[T3X].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T3Y].dequeue()/40;
+        splineSeries[T3Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T3Z].dequeue()/40;
+        splineSeries[T3Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+    }
+    if(readData->dynPointBuffer[T4X].size() != 0){
+        drawPoint = readData->dynPointBuffer[T4X].dequeue()/40;          //将纵坐标原始数据缩小40倍
+        splineSeries[T4X].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T4Y].dequeue()/40;
+        splineSeries[T4Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T4Z].dequeue()/40;
+        splineSeries[T4Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+    }
+    if(readData->dynPointBuffer[T5X].size() != 0){
+        drawPoint = readData->dynPointBuffer[T5X].dequeue()/40;          //将纵坐标原始数据缩小40倍
+        splineSeries[T5X].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T5Y].dequeue()/40;
+        splineSeries[T5Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T5Z].dequeue()/40;
+        splineSeries[T5Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+    }
+    if(readData->dynPointBuffer[T6X].size() != 0){
+        drawPoint = readData->dynPointBuffer[T6X].dequeue()/40;          //将纵坐标原始数据缩小40倍
+        splineSeries[T6X].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T6Y].dequeue()/40;
+        splineSeries[T6Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T6Z].dequeue()/40;
+        splineSeries[T6Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+    }
+    if(readData->dynPointBuffer[T7X].size() != 0){
+        drawPoint = readData->dynPointBuffer[T7X].dequeue()/40;          //将纵坐标原始数据缩小40倍
+        splineSeries[T7X].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T7Y].dequeue()/40;
+        splineSeries[T7Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T7Z].dequeue()/40;
+        splineSeries[T7Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+    }
+    if(readData->dynPointBuffer[T8X].size() != 0){
+        drawPoint = readData->dynPointBuffer[T8X].dequeue()/40;          //将纵坐标原始数据缩小40倍
+        splineSeries[T8X].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T8Y].dequeue()/40;
+        splineSeries[T8Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T8Z].dequeue()/40;
+        splineSeries[T8Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+    }
+    if(readData->dynPointBuffer[T9X].size() != 0){
+        drawPoint = readData->dynPointBuffer[T9X].dequeue()/40;          //将纵坐标原始数据缩小40倍
+        splineSeries[T9X].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T9Y].dequeue()/40;
+        splineSeries[T9Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+        drawPoint = readData->dynPointBuffer[T9Z].dequeue()/40;
+        splineSeries[T9Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+    }
+    axis_x_counts ++;
+}
+
+//鼠标移动事件
 void DynamicWave::mouseMoveEvent(QMouseEvent *event)
 {
     int x, y;
@@ -201,3 +311,4 @@ void DynamicWave::mouseReleaseEvent(QMouseEvent *event)
         isClickingChart = false;
     }
 }
+

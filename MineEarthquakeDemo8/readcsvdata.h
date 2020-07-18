@@ -7,6 +7,10 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QPointF>
+#include <QQueue>
+
+#include "dynamicwave.h"
+#include "showchart.h"
 
 enum P{
     P1X,P1Y,P1Z,
@@ -41,6 +45,10 @@ public:
     ReadCSVData();
     ~ReadCSVData();
 
+    friend class DynamicWave;
+    friend class ShowChart;
+
+private:
     int senNum = 0;                          //记录传感器的数量
 
     QString **senChannelZ ;                  //存储每个事件后三个通道中Z轴的数据
@@ -53,6 +61,8 @@ public:
 
     QVector<QPointF> *pointBuffer;           //存储坐标点序列
     QVector<QPointF> *pointBuffer_P;         //用于绘制P波到时
+
+    QQueue<double> *dynPointBuffer;          //存储坐标点序列，用于绘制动态波形
 
     int count=0;                             //记录事件的个数，在CSV文件中表现为行数
     int *motiPos;                            //每个传感器的激发位置
@@ -68,6 +78,8 @@ public:
     void locateCSVData();                    //定位事件站台在CSV文件哪一列，从而定位到该站台X，Y，Z轴以及激发位置在哪一列
     //存储X，Y，Z轴的坐标点
     void paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPointF> *pointBufferY,QVector<QPointF> *pointBufferZ,int index);
+    void paddingDynPointBuffer(QQueue<double> *pointBufferX,QQueue<double> *pointBufferY,QQueue<double> *pointBufferZ,int index);
+
 };
 
 

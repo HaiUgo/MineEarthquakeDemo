@@ -26,6 +26,8 @@ enum T{
     T9X,T9Y,T9Z
 };
 
+class ReadCSVData;
+class DynamicWave;
 
 namespace Ui {
 class ShowChart;
