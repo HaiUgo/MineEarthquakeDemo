@@ -69,6 +69,7 @@ ShowChart::ShowChart(QWidget *parent) :
 ShowChart::~ShowChart()
 {
     readData->~ReadCSVData();
+    dw->~DynamicWave();
     delete readData;
 
     delete dw;
@@ -394,10 +395,10 @@ void ShowChart::dynamicWaveButtonClick()
 {
     if(dw == nullptr){
         dw = new DynamicWave;
-        dw->showNormal();
+        dw->showMaximized();
     }
     else
-        dw->showNormal();
+        dw->showMaximized();
 }
 //全部按钮，显示T1~T9站台全部曲线图信息
 void ShowChart::fullChartsButtonClicked()

@@ -693,15 +693,15 @@ color: rgb(255, 255, 255);</string>
        <item>
         <widget class="QScrollArea" name="scrollArea">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
          <property name="minimumSize">
           <size>
-           <width>900</width>
-           <height>0</height>
+           <width>1000</width>
+           <height>600</height>
           </size>
          </property>
          <property name="widgetResizable">
@@ -712,30 +712,20 @@ color: rgb(255, 255, 255);</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>898</width>
-            <height>499</height>
+            <width>998</width>
+            <height>598</height>
            </rect>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
          </widget>
         </widget>
        </item>
       </layout>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_9">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>5</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>

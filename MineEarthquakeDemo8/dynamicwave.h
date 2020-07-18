@@ -30,8 +30,10 @@ private:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
-    void stopDynWave();
-    void showDynWave();
+    void stopDynWave();                                  //显示波形
+    void showDynWave();                                  //停止显示
+
+    void initDynamicCharts();                            //初始化图表
 protected:
     void closeEvent(QCloseEvent *event);
 
