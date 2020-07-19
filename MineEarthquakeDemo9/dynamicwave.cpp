@@ -51,6 +51,33 @@ DynamicWave::DynamicWave(QWidget *parent) :
     connect(&splineSeries[24], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
     connect(&splineSeries[25], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
     connect(&splineSeries[26], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[0], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[1], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[2], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[3], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[4], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[5], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[6], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[7], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[8], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[9], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[10], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[11], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[12], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[13], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[14], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[15], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[16], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[17], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[18], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[19], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[20], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[21], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[22], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[23], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[24], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[25], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    connect(&lineSeries[26], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
 }
 
 DynamicWave::~DynamicWave()
@@ -70,7 +97,9 @@ DynamicWave::~DynamicWave()
 void DynamicWave::slotPointHoverd(const QPointF &point, bool state)
 {
     if (state) {
-        m_valueLabel->setText(QString::asprintf("%1.0f,%1.0f", point.x(),point.y()));
+        m_valueLabel->raise();
+        m_valueLabel->setWindowFlag(Qt::WindowStaysOnTopHint);
+        m_valueLabel->setText(QString::asprintf("%1.0f,%1.0f", point.x()*100,point.y()*40));   //横坐标*100，纵坐标*40，将数据还原
         QPoint curPos = mapFromGlobal(QCursor::pos());
         m_valueLabel->move(curPos.x() - m_valueLabel->width() / 2, curPos.y() - m_valueLabel->height() * 1.5);  //移动数值
         m_valueLabel->show();//显示出来
@@ -98,7 +127,9 @@ void DynamicWave::initDynamicCharts()
     view = new ChartView [27];
 
     m_valueLabel = new QLabel(this);
-    m_valueLabel->setWindowFlag(Qt::WindowStaysOnTopHint);
+    QPalette pa;
+    pa.setColor(QPalette::WindowText,Qt::red);
+    m_valueLabel->setPalette(pa);
 
     QPen pen;
     pen.setWidthF(0.5);
@@ -206,8 +237,6 @@ void DynamicWave::drawDynSplineWave()
 {
     double drawPoint = 0;
 
-    //需要先利用readData判断哪些队列有数据，不然无法自动停止定时器，待修改...
-
     if(readData->dynPointBuffer[T1X].size() != 0){
         drawPoint = readData->dynPointBuffer[T1X].dequeue()/40;          //将纵坐标原始数据缩小40倍
         //qDebug()<<"drawPoint = "<<drawPoint<<" T1X"<<'\n';
@@ -218,10 +247,24 @@ void DynamicWave::drawDynSplineWave()
         drawPoint = readData->dynPointBuffer[T1Z].dequeue()/40;
         //qDebug()<<"drawPoint = "<<drawPoint<<" T1Z"<<'\n';
         splineSeries[T1Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
-    }else{
-        axis_x_counts = 0;
-        drawTimer->stop();
-        qDebug()<<"stop timer";
+
+        //这里将显示P波到时延时到出队队列数据1/9之后
+        if(axis_x_counts == queueSize/9){
+            //将横坐标缩小100倍
+            lineSeries[T1X]<<QPointF(readData->tempMotiPos[1][0]/100,500)<<QPointF(readData->tempMotiPos[1][0]/100,-500);
+            lineSeries[T1Y]<<QPointF(readData->tempMotiPos[1][0]/100,500)<<QPointF(readData->tempMotiPos[1][0]/100,-500);
+            lineSeries[T1Z]<<QPointF(readData->tempMotiPos[1][0]/100,500)<<QPointF(readData->tempMotiPos[1][0]/100,-500);
+            //lineSeries[T1X].replace(readData->pointBuffer_P[1]);
+            //lineSeries[T1Y].replace(readData->pointBuffer_P[1]);
+            //lineSeries[T1Z].replace(readData->pointBuffer_P[1]);
+            //qDebug()<<"T1 P波";
+        }
+
+        if(readData->dynPointBuffer[T1X].size() == 0){
+            axis_x_counts = 0;
+            drawTimer->stop();
+            qDebug()<<"T1 dequeue over";
+        }
     }
     if(readData->dynPointBuffer[T2X].size() != 0){
         drawPoint = readData->dynPointBuffer[T2X].dequeue()/40;          //将纵坐标原始数据缩小40倍
@@ -230,6 +273,18 @@ void DynamicWave::drawDynSplineWave()
         splineSeries[T2Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
         drawPoint = readData->dynPointBuffer[T2Z].dequeue()/40;
         splineSeries[T2Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+
+        if(axis_x_counts == queueSize/9){
+            lineSeries[T2X]<<QPointF(readData->tempMotiPos[2][0]/100,500)<<QPointF(readData->tempMotiPos[2][0]/100,-500);
+            lineSeries[T2Y]<<QPointF(readData->tempMotiPos[2][0]/100,500)<<QPointF(readData->tempMotiPos[2][0]/100,-500);
+            lineSeries[T2Z]<<QPointF(readData->tempMotiPos[2][0]/100,500)<<QPointF(readData->tempMotiPos[2][0]/100,-500);
+        }
+
+        if(readData->dynPointBuffer[T2X].size() == 0){
+            axis_x_counts = 0;
+            drawTimer->stop();
+            qDebug()<<"T2 dequeue over";
+        }
     }
     if(readData->dynPointBuffer[T3X].size() != 0){
         drawPoint = readData->dynPointBuffer[T3X].dequeue()/40;          //将纵坐标原始数据缩小40倍
@@ -238,6 +293,18 @@ void DynamicWave::drawDynSplineWave()
         splineSeries[T3Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
         drawPoint = readData->dynPointBuffer[T3Z].dequeue()/40;
         splineSeries[T3Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+
+        if(axis_x_counts == queueSize/9){
+            lineSeries[T3X]<<QPointF(readData->tempMotiPos[3][0]/100,500)<<QPointF(readData->tempMotiPos[3][0]/100,-500);
+            lineSeries[T3Y]<<QPointF(readData->tempMotiPos[3][0]/100,500)<<QPointF(readData->tempMotiPos[3][0]/100,-500);
+            lineSeries[T3Z]<<QPointF(readData->tempMotiPos[3][0]/100,500)<<QPointF(readData->tempMotiPos[3][0]/100,-500);
+        }
+
+        if(readData->dynPointBuffer[T3X].size() == 0){
+            axis_x_counts = 0;
+            drawTimer->stop();
+            qDebug()<<"T3 dequeue over";
+        }
     }
     if(readData->dynPointBuffer[T4X].size() != 0){
         drawPoint = readData->dynPointBuffer[T4X].dequeue()/40;          //将纵坐标原始数据缩小40倍
@@ -246,6 +313,18 @@ void DynamicWave::drawDynSplineWave()
         splineSeries[T4Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
         drawPoint = readData->dynPointBuffer[T4Z].dequeue()/40;
         splineSeries[T4Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+
+        if(axis_x_counts == queueSize/9){
+            lineSeries[T4X]<<QPointF(readData->tempMotiPos[4][0]/100,500)<<QPointF(readData->tempMotiPos[4][0]/100,-500);
+            lineSeries[T4Y]<<QPointF(readData->tempMotiPos[4][0]/100,500)<<QPointF(readData->tempMotiPos[4][0]/100,-500);
+            lineSeries[T4Z]<<QPointF(readData->tempMotiPos[4][0]/100,500)<<QPointF(readData->tempMotiPos[4][0]/100,-500);
+        }
+
+        if(readData->dynPointBuffer[T4X].size() == 0){
+            axis_x_counts = 0;
+            drawTimer->stop();
+            qDebug()<<"T4 dequeue over";
+        }
     }
     if(readData->dynPointBuffer[T5X].size() != 0){
         drawPoint = readData->dynPointBuffer[T5X].dequeue()/40;          //将纵坐标原始数据缩小40倍
@@ -254,6 +333,18 @@ void DynamicWave::drawDynSplineWave()
         splineSeries[T5Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
         drawPoint = readData->dynPointBuffer[T5Z].dequeue()/40;
         splineSeries[T5Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+
+        if(axis_x_counts == queueSize/9){
+            lineSeries[T5X]<<QPointF(readData->tempMotiPos[5][0]/100,500)<<QPointF(readData->tempMotiPos[5][0]/100,-500);
+            lineSeries[T5Y]<<QPointF(readData->tempMotiPos[5][0]/100,500)<<QPointF(readData->tempMotiPos[5][0]/100,-500);
+            lineSeries[T5Z]<<QPointF(readData->tempMotiPos[5][0]/100,500)<<QPointF(readData->tempMotiPos[5][0]/100,-500);
+        }
+
+        if(readData->dynPointBuffer[T5X].size() == 0){
+            axis_x_counts = 0;
+            drawTimer->stop();
+            qDebug()<<"T5 dequeue over";
+        }
     }
     if(readData->dynPointBuffer[T6X].size() != 0){
         drawPoint = readData->dynPointBuffer[T6X].dequeue()/40;          //将纵坐标原始数据缩小40倍
@@ -262,6 +353,18 @@ void DynamicWave::drawDynSplineWave()
         splineSeries[T6Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
         drawPoint = readData->dynPointBuffer[T6Z].dequeue()/40;
         splineSeries[T6Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+
+        if(axis_x_counts == queueSize/9){
+            lineSeries[T6X]<<QPointF(readData->tempMotiPos[6][0]/100,500)<<QPointF(readData->tempMotiPos[6][0]/100,-500);
+            lineSeries[T6Y]<<QPointF(readData->tempMotiPos[6][0]/100,500)<<QPointF(readData->tempMotiPos[6][0]/100,-500);
+            lineSeries[T6Z]<<QPointF(readData->tempMotiPos[6][0]/100,500)<<QPointF(readData->tempMotiPos[6][0]/100,-500);
+        }
+
+        if(readData->dynPointBuffer[T6X].size() == 0){
+            axis_x_counts = 0;
+            drawTimer->stop();
+            qDebug()<<"T6 dequeue over";
+        }
     }
     if(readData->dynPointBuffer[T7X].size() != 0){
         drawPoint = readData->dynPointBuffer[T7X].dequeue()/40;          //将纵坐标原始数据缩小40倍
@@ -270,6 +373,18 @@ void DynamicWave::drawDynSplineWave()
         splineSeries[T7Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
         drawPoint = readData->dynPointBuffer[T7Z].dequeue()/40;
         splineSeries[T7Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+
+        if(axis_x_counts == queueSize/9){
+            lineSeries[T7X]<<QPointF(readData->tempMotiPos[7][0]/100,500)<<QPointF(readData->tempMotiPos[7][0]/100,-500);
+            lineSeries[T7Y]<<QPointF(readData->tempMotiPos[7][0]/100,500)<<QPointF(readData->tempMotiPos[7][0]/100,-500);
+            lineSeries[T7Z]<<QPointF(readData->tempMotiPos[7][0]/100,500)<<QPointF(readData->tempMotiPos[7][0]/100,-500);
+        }
+
+        if(readData->dynPointBuffer[T7X].size() == 0){
+            axis_x_counts = 0;
+            drawTimer->stop();
+            qDebug()<<"T7 dequeue over";
+        }
     }
     if(readData->dynPointBuffer[T8X].size() != 0){
         drawPoint = readData->dynPointBuffer[T8X].dequeue()/40;          //将纵坐标原始数据缩小40倍
@@ -278,6 +393,18 @@ void DynamicWave::drawDynSplineWave()
         splineSeries[T8Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
         drawPoint = readData->dynPointBuffer[T8Z].dequeue()/40;
         splineSeries[T8Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+
+        if(axis_x_counts == queueSize/9){
+            lineSeries[T8X]<<QPointF(readData->tempMotiPos[8][0]/100,500)<<QPointF(readData->tempMotiPos[8][0]/100,-500);
+            lineSeries[T8Y]<<QPointF(readData->tempMotiPos[8][0]/100,500)<<QPointF(readData->tempMotiPos[8][0]/100,-500);
+            lineSeries[T8Z]<<QPointF(readData->tempMotiPos[8][0]/100,500)<<QPointF(readData->tempMotiPos[8][0]/100,-500);
+        }
+
+        if(readData->dynPointBuffer[T8X].size() == 0){
+            axis_x_counts = 0;
+            drawTimer->stop();
+            qDebug()<<"T8 dequeue over";
+        }
     }
     if(readData->dynPointBuffer[T9X].size() != 0){
         drawPoint = readData->dynPointBuffer[T9X].dequeue()/40;          //将纵坐标原始数据缩小40倍
@@ -286,6 +413,18 @@ void DynamicWave::drawDynSplineWave()
         splineSeries[T9Y].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
         drawPoint = readData->dynPointBuffer[T9Z].dequeue()/40;
         splineSeries[T9Z].replace(axis_x_counts,QPointF(axis_x_counts,drawPoint));
+
+        if(axis_x_counts == queueSize/9){
+            lineSeries[T9X]<<QPointF(readData->tempMotiPos[9][0]/100,500)<<QPointF(readData->tempMotiPos[9][0]/100,-500);
+            lineSeries[T9Y]<<QPointF(readData->tempMotiPos[9][0]/100,500)<<QPointF(readData->tempMotiPos[9][0]/100,-500);
+            lineSeries[T9Z]<<QPointF(readData->tempMotiPos[9][0]/100,500)<<QPointF(readData->tempMotiPos[9][0]/100,-500);
+        }
+
+        if(readData->dynPointBuffer[T9X].size() == 0){
+            axis_x_counts = 0;
+            drawTimer->stop();
+            qDebug()<<"T9 dequeue over";
+        }
     }
     axis_x_counts ++;
 }

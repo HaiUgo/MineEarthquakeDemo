@@ -388,6 +388,7 @@ void ShowChart::on_previousPage_clicked()
 void ShowChart::displayButtonClick()
 {
     drawSplineWave();
+    ui->displayButton->setEnabled(false);
 }
 
 //显示动态波形图，
