@@ -37,8 +37,6 @@ private:
 
     void charViewEventFilter(QEvent *event,QChart *tempChart);   //chartView事件过滤封装函数
     bool eventFilter(QObject *obj,QEvent *event);
-protected:
-    void closeEvent(QCloseEvent *event);
 
 private:
     Ui::DynamicWave *ui;
@@ -67,13 +65,9 @@ private:
 
 private slots:
     void drawDynSplineWave();            //绘制动态波形
-
     void stopDynWave();                  //显示波形
     void showDynWave();                  //停止显示
-    void slotPointHoverd(const QPointF &point, bool state);   //鼠标移动到chartview某点，可以显示数据
-
-signals:
-    void closeDynWaveWindow();           //关闭dynamicwave界面时候发射信号
+    void slotPointHoverd(const QPointF &point, bool state);   //鼠标移动到chartview某点，可以显示数据    
 };
 
 

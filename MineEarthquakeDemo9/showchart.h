@@ -41,7 +41,6 @@ public:
     explicit ShowChart(QWidget *parent = 0);
     ~ShowChart();
 
-
 private:
     void initCharts();                              //初始化曲线图表
     void showStackedWidgetCharts();                 //将标签和view[T]图表添加到stackWidget的GridLayout布局中
@@ -74,8 +73,9 @@ private slots:
     void on_T9Button_clicked();
 
     void pageSwithTo9();              //接收widget发来的信号，从而切换相应台站
-
-    void attackClosedDynWaveWindow();  //响应dynamicwave界面发来的的关闭信号
+    //void attackClosedDynWaveWindow();  //响应dynamicwave界面发来的的关闭信号
+protected:
+    //void closeEvent(QCloseEvent *event);
 private:
     Ui::ShowChart *ui;
 
@@ -112,6 +112,8 @@ private:
     QLabel *m_valueLabel;             //用于显示某点数据
 
     DynamicWave *dw ;                 //子界面，即动态波形界面
+signals:
+    void closeDynWaveWindow();           //关闭dynamicwave界面时候发射信号
 };
 
 

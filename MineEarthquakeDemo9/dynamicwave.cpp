@@ -82,7 +82,6 @@ DynamicWave::DynamicWave(QWidget *parent) :
 
 DynamicWave::~DynamicWave()
 {
-    readData->~ReadCSVData();
     delete readData;
     delete pointBufferTemp;
     delete splineSeries;
@@ -109,12 +108,6 @@ void DynamicWave::slotPointHoverd(const QPointF &point, bool state)
     }
 }
 
-void DynamicWave::closeEvent(QCloseEvent *event)
-{
-    Q_UNUSED(event)
-    //|窗口关闭之前需要的操作~
-    emit closeDynWaveWindow();
-}
 
 //初始化图表
 void DynamicWave::initDynamicCharts()

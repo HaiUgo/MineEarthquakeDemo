@@ -35,8 +35,7 @@ ShowChart::ShowChart(QWidget *parent) :
     connect(ui->saveModifiedPWave,SIGNAL(clicked()),this,SLOT(saveModifiedPWaveData()));
     connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::saveModifiedPWaveData);
 
-    connect(dw,SIGNAL(closeDynWaveWindow()),this,SLOT(attackClosedDynWaveWindow()));
-
+    //connect(this,&ShowChart::closeDynWaveWindow,this,&ShowChart::attackClosedDynWaveWindow);
     connect(&splineSeries[0], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
     connect(&splineSeries[1], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
     connect(&splineSeries[2], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
@@ -68,8 +67,6 @@ ShowChart::ShowChart(QWidget *parent) :
 
 ShowChart::~ShowChart()
 {
-    readData->~ReadCSVData();
-    dw->~DynamicWave();
     delete readData;
 
     delete dw;
@@ -93,6 +90,10 @@ ShowChart::~ShowChart()
     delete ui;
 }
 
+//void ShowChart::attackClosedDynWaveWindow()
+//{
+//    dw->close();
+//}
 //图表初始化
 void ShowChart::initCharts()
 {
@@ -189,7 +190,13 @@ void ShowChart::initCharts()
         view2[i].installEventFilter(this);                //注册部件事件过滤
     }
 }
-
+//void ShowChart::closeEvent(QCloseEvent *event)
+//{
+//    Q_UNUSED(event)
+//    //|窗口关闭之前需要的操作~
+//    emit closeDynWaveWindow();
+//    qDebug()<<"emit closeDynWaveWindow()";
+//}
 //将标签和view[T]图表添加到stackWidget的GridLayout布局中
 void ShowChart::showStackedWidgetCharts()
 {
@@ -306,12 +313,6 @@ void ShowChart::showStackedWidgetCharts()
     ui->gridLayout_10->addWidget(&view2[T9Z],8,3);
 
     ui->stackedWidget->setCurrentIndex(0);
-}
-//响应dynamicwave界面发来的信号
-void ShowChart::attackClosedDynWaveWindow()
-{
-    dw = nullptr;
-    delete dw;
 }
 
 //处理用户输入的P波相关数据

@@ -10,7 +10,7 @@ Widget::Widget(QWidget *parent)
     db = new ConnectDataBase;
     db->conDataBase();
 
-    showChart = new ShowChart();
+    showChart = new ShowChart(this);
     ui->scrollArea->setWidget(showChart);
 
     connect(ui->startButton,SIGNAL(clicked()),this,SLOT(startButtonClicked()));
@@ -31,7 +31,6 @@ Widget::Widget(QWidget *parent)
 Widget::~Widget()
 {
     db->close();
-    showChart->~ShowChart();
     delete db;
     delete showChart;
     delete ui;
