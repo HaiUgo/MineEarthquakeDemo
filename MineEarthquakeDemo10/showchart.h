@@ -12,6 +12,7 @@
 #include "readcsvdata.h"
 #include "dynamicwave.h"
 #include "param.h"
+#include "drawthread.h"
 QT_CHARTS_USE_NAMESPACE
 
 class ReadCSVData;
@@ -27,6 +28,7 @@ class ShowChart : public QWidget
 public:
     explicit ShowChart(QWidget *parent = 0);
     ~ShowChart();
+    friend class DrawThread;
 private:
     void initCharts();                              //初始化曲线图表
     void showStackedWidgetCharts();                 //将标签和view[T]图表添加到stackWidget的GridLayout布局中

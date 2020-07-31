@@ -19,60 +19,11 @@ DynamicWave::DynamicWave(QWidget *parent) :
     connect(ui->showDynWaveButton,SIGNAL(clicked()),this,SLOT(showDynWave()));
     connect(ui->stopDynWaveButton,SIGNAL(clicked()),this,SLOT(stopDynWave()));
 
-    connect(&splineSeries[0], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[1], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[2], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[3], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[4], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[5], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[6], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[7], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[8], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[9], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[10], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[11], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[12], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[13], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[14], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[15], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[16], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[17], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[18], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[19], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[20], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[21], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[22], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[23], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[24], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[25], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&splineSeries[26], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[0], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[1], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[2], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[3], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[4], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[5], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[6], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[7], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[8], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[9], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[10], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[11], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[12], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[13], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[14], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[15], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[16], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[17], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[18], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[19], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[20], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[21], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[22], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[23], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[24], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[25], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
-    connect(&lineSeries[26], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    for(int i=0;i<27;i++){
+        connect(&splineSeries[i], &QSplineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+        connect(&lineSeries[i], &QLineSeries::hovered, this, &DynamicWave::slotPointHoverd);//用于鼠标移动到点上显示数值
+    }
+
 }
 
 DynamicWave::~DynamicWave()
@@ -106,15 +57,15 @@ void DynamicWave::slotPointHoverd(const QPointF &point, bool state)
 //接收widget发来的信号，从而获取相应CSV文件路径
 void DynamicWave::receiveCSVFilePath2(QString path)
 {
-    readData = new ReadCSVData;
-    readData->parseCSVFileName(path);
-    readData->readCSVFile(path);
-    readData->locateCSVData();
-
     for(int i=0;i<27;i++){
         splineSeries[i].clear();
         lineSeries[i].clear();
     }
+
+    readData = new ReadCSVData;
+    readData->parseCSVFileName(path);
+    readData->readCSVFile(path);
+    readData->locateCSVData();
 }
 //初始化图表
 void DynamicWave::initDynamicCharts()
@@ -228,7 +179,7 @@ void DynamicWave::showDynWave()
 
     drawTimer = new QTimer(this);                       //定时任务
     connect(drawTimer, SIGNAL(timeout()), this, SLOT(drawDynSplineWave()));
-    drawTimer->start(50);
+    drawTimer->start(25);
     qDebug()<<"start timer";
 }
 

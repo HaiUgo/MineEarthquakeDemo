@@ -1,6 +1,7 @@
 #include "widget.h"
 #include "ui_widget.h"
 
+ShowChart *showChart;             //子界面，即chartview界面
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -14,6 +15,11 @@ Widget::Widget(QWidget *parent)
     ui->scrollArea->setWidget(showChart);
     dw = new DynamicWave;
     //dw->setWindowFlags(dw->windowFlags()& ~Qt::WindowCloseButtonHint);
+
+    workThread = new QThread(this);
+    thread = new DrawThread;
+    thread->moveToThread(workThread);
+
     connect(ui->startButton,SIGNAL(clicked()),this,SLOT(startButtonClicked()));
     connect(ui->dailyStatement,SIGNAL(clicked()),this,SLOT(dailyStatementClicked()));
     connect(ui->monthlyStatement,SIGNAL(clicked()),this,SLOT(monthlyStatementClicked()));
@@ -28,10 +34,14 @@ Widget::Widget(QWidget *parent)
 
     connect(ui->dataBaseView,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(dataBaseViewDC(const QModelIndex &)));
     connect(this,SIGNAL(pageSwitch9()),showChart,SLOT(pageSwithTo9()));
-    connect(this,SIGNAL(sendSelectedCSVFile(QString)),showChart,SLOT(receiveCSVFilePath(QString)));
+    //connect(this,SIGNAL(sendSelectedCSVFile(QString)),showChart,SLOT(receiveCSVFilePath(QString)));
 
     connect(this,SIGNAL(sendSelectedCSVFile(QString)),dw,SLOT(receiveCSVFilePath2(QString)));
 
+    connect(workThread,SIGNAL(finished()),thread,SLOT(deleteLater()));
+    connect(workThread,SIGNAL(finished()),workThread,SLOT(deleteLater()));
+    connect(this,SIGNAL(sendSelectedCSVFile(QString)),thread,SLOT(doDrawSplineWork(QString)));
+    workThread->start();
 }
 
 Widget::~Widget()
@@ -41,6 +51,7 @@ Widget::~Widget()
     delete showChart;
     delete dw;
     delete ui;
+
 }
 
 //控件命令按钮
@@ -209,6 +220,8 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
 
     emit sendSelectedCSVFile(filePath);
     emit pageSwitch9();
+
+
 }
 
 

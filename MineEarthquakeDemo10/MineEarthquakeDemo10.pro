@@ -21,6 +21,7 @@ SOURCES += \
     chart.cpp \
     chartview.cpp \
     connectdatabase.cpp \
+    drawthread.cpp \
     dynamicwave.cpp \
     main.cpp \
     mxdrawxlib.cpp \
@@ -32,6 +33,7 @@ HEADERS += \
     chart.h \
     chartview.h \
     connectdatabase.h \
+    drawthread.h \
     dynamicwave.h \
     mxdrawxlib.h \
     param.h \

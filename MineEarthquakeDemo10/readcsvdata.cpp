@@ -89,7 +89,8 @@ void ReadCSVData::parseCSVFileName(QString filePath)
 //而UNIX/Linux采用换行符LF表示下一行，
 //苹果机(MAC OS系统)则采用回车符CR表示下一行
 //由于项目数据的换行符为Macintosh(CR)，而且添加了'\t',所以下面注释掉的readCSVFile(QString fileName)
-//不能直接用readLine读取一行数据，但是适合于Windows格式的数据
+//因为格式差异所以不能按行读取原始CSV文件，但是在windows上用notepad++将CSV文件重新复制保存后可以按行读取
+//因此，下面注释掉的代码适合于Windows格式的数据
 //读取CSV文件数据
 //void ReadCSVData::readCSVFile(QString fileName)
 //{

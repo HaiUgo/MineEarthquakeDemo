@@ -11,7 +11,7 @@
 
 #include "dynamicwave.h"
 #include "showchart.h"
-
+#include "drawthread.h"
 class ReadCSVData;
 
 class ReadCSVData{
@@ -22,6 +22,7 @@ public:
 
     friend class DynamicWave;
     friend class ShowChart;
+    friend class DrawThread;
 private:
 
     int senNum = 0;                          //记录传感器的数量

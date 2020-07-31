@@ -25,7 +25,7 @@ QT_END_NAMESPACE
 class Widget : public QWidget
 {
     Q_OBJECT
-    QThread workThread;
+
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
@@ -51,8 +51,6 @@ private slots:
 private:
     Ui::Widget *ui;
 
-    ShowChart *showChart;             //子界面，即chartview界面
-
 
     ConnectDataBase *db;              //定义一个连接数据库的对象
 
@@ -60,6 +58,8 @@ private:
 
     DynamicWave *dw ;                 //子界面，即动态波形界面
 
+    QThread *workThread;
+    DrawThread *thread;
 signals:
     void pageSwitch9();
     void sendSelectedCSVFile(QString filePath);
