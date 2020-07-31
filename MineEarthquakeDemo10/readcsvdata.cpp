@@ -90,7 +90,7 @@ void ReadCSVData::readCSVFile(QString fileName)
 {  
     QDir dir = QDir::current();
     QFile file(dir.filePath(fileName));
-    qDebug()<<"fileName="<<fileName<<'\n';
+    //qDebug()<<"fileName="<<fileName<<'\n';
     QList<QStringList> data;
     QStringList item;
     QString line ;

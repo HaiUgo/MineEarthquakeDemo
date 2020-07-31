@@ -12,31 +12,6 @@
 #include "dynamicwave.h"
 #include "showchart.h"
 
-enum P{
-    P1X,P1Y,P1Z,
-    P2X,P2Y,P2Z,
-    P3X,P3Y,P3Z,
-    P4X,P4Y,P4Z,
-    P5X,P5Y,P5Z,
-    P6X,P6Y,P6Z,
-    P7X,P7Y,P7Z,
-    P8X,P8Y,P8Z,
-    P9X,P9Y,P9Z,
-};
-
-enum COLUMNINDEX{
-    INDEX1 ,
-    INDEX2 ,
-    INDEX3 ,
-    INDEX4 ,
-    INDEX5 ,
-    INDEX6 ,
-    INDEX7 ,
-    INDEX8 ,
-    INDEX9
-};
-
-
 class ReadCSVData;
 
 class ReadCSVData{
@@ -47,7 +22,6 @@ public:
 
     friend class DynamicWave;
     friend class ShowChart;
-    static QString filePath;
 private:
 
     int senNum = 0;                          //记录传感器的数量

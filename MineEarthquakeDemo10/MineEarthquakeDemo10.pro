@@ -34,6 +34,7 @@ HEADERS += \
     connectdatabase.h \
     dynamicwave.h \
     mxdrawxlib.h \
+    param.h \
     parameters.h \
     readcsvdata.h \
     showchart.h \

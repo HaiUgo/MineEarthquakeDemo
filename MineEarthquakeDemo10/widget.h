@@ -10,12 +10,13 @@
 #include <QSqlQueryModel>
 #include <QFileDialog>
 #include <QMap>
-
+#include <QThread>
 #include "showchart.h"
 #include "connectdatabase.h"
 #include "mxdrawxlib.h"
 
 using namespace MxDrawXLib;
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -24,7 +25,7 @@ QT_END_NAMESPACE
 class Widget : public QWidget
 {
     Q_OBJECT
-
+    QThread workThread;
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
@@ -51,6 +52,7 @@ private:
     Ui::Widget *ui;
 
     ShowChart *showChart;             //子界面，即chartview界面
+
 
     ConnectDataBase *db;              //定义一个连接数据库的对象
 

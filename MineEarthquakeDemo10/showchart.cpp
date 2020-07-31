@@ -449,7 +449,6 @@ void ShowChart::receiveCSVFilePath(QString path)
     readData->parseCSVFileName(path);
     readData->readCSVFile(path);
     readData->locateCSVData();
-    qDebug()<<"the received csv file path is :"<<path;
 
     for(int i=0;i<27;i++){
         splineSeries[i].clear();
@@ -458,6 +457,7 @@ void ShowChart::receiveCSVFilePath(QString path)
         lineSeries2[i].clear();
     }
     drawSplineWave();
+
 }
 //绘制曲线图
 void ShowChart::drawSplineWave()

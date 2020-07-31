@@ -29,6 +29,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->dataBaseView,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(dataBaseViewDC(const QModelIndex &)));
     connect(this,SIGNAL(pageSwitch9()),showChart,SLOT(pageSwithTo9()));
     connect(this,SIGNAL(sendSelectedCSVFile(QString)),showChart,SLOT(receiveCSVFilePath(QString)));
+
     connect(this,SIGNAL(sendSelectedCSVFile(QString)),dw,SLOT(receiveCSVFilePath2(QString)));
 
 }
@@ -206,8 +207,8 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
 //    ts<<doc<<endl;
 //    outFile.close();
 
-      emit sendSelectedCSVFile(filePath);
-      emit pageSwitch9();
+    emit sendSelectedCSVFile(filePath);
+    emit pageSwitch9();
 }
 
 

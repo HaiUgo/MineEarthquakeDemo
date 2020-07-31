@@ -6,29 +6,16 @@
 #include <QDebug>
 #include <QTimer>
 #include <QLabel>
+#include <QThread>
 #include "chart.h"
 #include "chartview.h"
 #include "readcsvdata.h"
 #include "dynamicwave.h"
-
+#include "param.h"
 QT_CHARTS_USE_NAMESPACE
-
-//T为1-9台站每个曲线图表的XYZ三轴方向，也用作计数
-enum T{
-    T1X,T1Y,T1Z,
-    T2X,T2Y,T2Z,
-    T3X,T3Y,T3Z,
-    T4X,T4Y,T4Z,
-    T5X,T5Y,T5Z,
-    T6X,T6Y,T6Z,
-    T7X,T7Y,T7Z,
-    T8X,T8Y,T8Z,
-    T9X,T9Y,T9Z
-};
 
 class ReadCSVData;
 class DynamicWave;
-
 namespace Ui {
 class ShowChart;
 }
@@ -40,7 +27,6 @@ class ShowChart : public QWidget
 public:
     explicit ShowChart(QWidget *parent = 0);
     ~ShowChart();
-
 private:
     void initCharts();                              //初始化曲线图表
     void showStackedWidgetCharts();                 //将标签和view[T]图表添加到stackWidget的GridLayout布局中
@@ -76,6 +62,7 @@ private slots:
     void receiveCSVFilePath(QString path); //接收widget发来的信号，从而获取相应CSV文件路径
 protected:
     //void closeEvent(QCloseEvent *event);
+    void run() ;                      //thread 从run函数执行
 private:
     Ui::ShowChart *ui;
 
