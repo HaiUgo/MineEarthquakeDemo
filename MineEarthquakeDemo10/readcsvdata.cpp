@@ -85,15 +85,61 @@ void ReadCSVData::parseCSVFileName(QString filePath)
     qDebug()<<"parsing the csv file completed"<<'\n';
 }
 
+//说明，Dos和Windows采用回车+换行CR/LF表示下一行，
+//而UNIX/Linux采用换行符LF表示下一行，
+//苹果机(MAC OS系统)则采用回车符CR表示下一行
+//由于项目数据的换行符为Macintosh(CR)，而且添加了'\t',所以下面注释掉的readCSVFile(QString fileName)
+//不能直接用readLine读取一行数据，但是适合于Windows格式的数据
+//读取CSV文件数据
+//void ReadCSVData::readCSVFile(QString fileName)
+//{
+//    QDir dir = QDir::current();
+//    QFile file(dir.filePath(fileName));
+//    //qDebug()<<"fileName="<<fileName<<'\n';
+//    QList<QStringList> data;
+//    QStringList item;
+//    QString line ;
+//    if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
+//        qDebug()<<"open file failed!"<<'\n';
+//        return ;
+//    }
+//    QTextStream stream(&file);
+//    while (!stream.atEnd())
+//    {
+//        line = stream.readLine();
+//        line = line.trimmed();
+//        //qDebug()<<"line = "<<line<<'\n';
+//        if(line.isEmpty()){
+//            qDebug()<<"CSV FILE HAS READ DONE！"<<'\n';
+//            break;
+//        }
+//        //item = line.split(',',QString::SkipEmptyParts);                           //将读取的每一行用,分割
+//        item = line.split(',');
+//        date[count] = item.at(0);                         //存储每个事件的日期
+//        for(int i=0;i<senNum;i++) {
+//            senChannelZ[count][i] = item.at(6+i*8);       //存储每个事件后三个通道中Z轴的数据
+//            senChannelY[count][i] = item.at(5+i*8);       //存储每个事件后三个通道中Y轴的数据
+//            senChannelX[count][i] = item.at(4+i*8);       //存储每个事件后三个通道中X轴的数据
+//            senChannelNum[count][i] = item.at(8+i*8);     //存储每个事件触发台站名称
+//            motiPos[i] = item.at(7+i*8).toInt();          //存储每个传感器波形激发位置
+//            //qDebug()<<"motiPos["<<i<<"] = "<<motiPos[i]<<'\n';
+//        }
+//        count++;
+//    }
+//    file.close();
+//    qDebug()<<"count ="<<count<<'\n';
+//    qDebug()<<"read csv file successfully!"<<'\n';
+//}
+
 //读取CSV文件数据
 void ReadCSVData::readCSVFile(QString fileName)
-{  
+{
     QDir dir = QDir::current();
     QFile file(dir.filePath(fileName));
     //qDebug()<<"fileName="<<fileName<<'\n';
-    QList<QStringList> data;
+    QStringList line;
     QStringList item;
-    QString line ;
+    QString block ;
     if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
         qDebug()<<"open file failed!"<<'\n';
         return ;
@@ -102,33 +148,27 @@ void ReadCSVData::readCSVFile(QString fileName)
 
     while (!stream.atEnd())
     {
-        line = stream.readLine();
-        line = line.trimmed();
-        //qDebug()<<"line = "<<line<<'\n';
-        if(line.isEmpty()){
-            qDebug()<<"CSV FILE HAS READ DONE！"<<'\n';
-            break;
-        }
-        //item = line.split(',',QString::SkipEmptyParts);                           //将读取的每一行用,分割
-        item = line.split(',');
-        date[count] = item.at(0);                         //存储每个事件的日期
-        for(int i=0;i<senNum;i++) {
-            senChannelZ[count][i] = item.at(6+i*8);       //存储每个事件后三个通道中Z轴的数据
-            senChannelY[count][i] = item.at(5+i*8);       //存储每个事件后三个通道中Y轴的数据
-            senChannelX[count][i] = item.at(4+i*8);       //存储每个事件后三个通道中X轴的数据
-            senChannelNum[count][i] = item.at(8+i*8);     //存储每个事件触发台站名称
-            motiPos[i] = item.at(7+i*8).toInt();          //存储每个传感器波形激发位置
-            //qDebug()<<"motiPos["<<i<<"] = "<<motiPos[i]<<'\n';
-        }
-        count++;
+        block = stream.readAll();
+        line = block.split('\t');
     }
+    count = line.size();
     qDebug()<<"count ="<<count<<'\n';
-
+    for(int i=0;i<count-1;i++){
+        item = line.at(i).split(',');
+        date[i] = item.at(0);                         //存储每个事件的日期
+        for(int j=0;j<senNum;j++){
+            senChannelZ[i][j] = item.at(6+j*8);       //存储每个事件后三个通道中Z轴的数据
+            senChannelX[i][j] = item.at(4+j*8);       //存储每个事件后三个通道中X轴的数据
+            senChannelY[i][j] = item.at(5+j*8);       //存储每个事件后三个通道中Y轴的数据
+            senChannelNum[i][j] = item.at(8+j*8);     //存储每个事件触发台站名称
+            motiPos[j] = item.at(7+j*8).toInt();      //存储每个传感器波形激发位置
+            //qDebug()<<"senChannelX[i][j]="<<senChannelX[i][j]<<'\n';
+        }
+        //qDebug()<<"i="<<i<<'\n';
+    }
     file.close();
-
     qDebug()<<"read csv file successfully!"<<'\n';
 }
-
 
 void ReadCSVData::locateCSVData()
 {
