@@ -36,8 +36,8 @@ private:
     void charViewEventFilter(QEvent *event,QChart *tempChart);   //chartView事件过滤封装函数
     bool eventFilter(QObject *obj,QEvent *event);
 
-    void handleTheInputData();                      //处理用户手动输入的P波到时数据
-    void repaintPWave(int station,int p);           //重新绘制用户调整P波后的P波红线
+    void handleTheInputData();                                   //处理用户手动输入的P波到时数据
+    void repaintPWave(int station,int orientation,int p);        //重新绘制用户调整P波后的P波红线
 
 private slots:
 
@@ -59,9 +59,13 @@ private slots:
     void on_T8Button_clicked();
     void on_T9Button_clicked();
 
-    void pageSwithTo9();              //接收widget发来的信号，从而切换相应台站
-    //void attackClosedDynWaveWindow();  //响应dynamicwave界面发来的的关闭信号
-    void receiveCSVFilePath(QString path); //接收widget发来的信号，从而获取相应CSV文件路径
+    void pageSwithTo9();                      //接收widget发来的信号，从而切换相应台站
+    //void attackClosedDynWaveWindow();       //响应dynamicwave界面发来的的关闭信号
+    void receiveCSVFilePath(QString path);    //接收widget发来的信号，从而获取相应CSV文件路径
+
+    void txIsChecked(bool checked);           //QRadioButton：tx,ty,tz的选中状态
+    void tyIsChecked(bool checked);
+    void tzIsChecked(bool checked);
 protected:
     //void closeEvent(QCloseEvent *event);
     void run() ;                      //thread 从run函数执行
@@ -94,12 +98,12 @@ private:
 
     int pageSwitchIndex;              //stackWidget页面索引，用于切换当前页面
 
-    int userInput[2];                 //保存用户选择的台站以及输入的P波激发位置
+    int userInput[3];                 //保存用户选择的台站和方向以及输入的P波激发位置
 
     QLabel *m_valueLabel;             //用于显示某点数据
 
 signals:
-    void closeDynWaveWindow();           //关闭dynamicwave界面时候发射信号
+    void closeDynWaveWindow();        //关闭dynamicwave界面时候发射信号
 };
 
 

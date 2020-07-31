@@ -85,6 +85,7 @@ void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
                      ui->axWidget->dynamicCall("Clear(qlonglong)",myValues.at(i));
                      qDebug()<<"values="<<myValues.at(i);
                  }
+                 entityId.remove(row);
             }
     }
 }

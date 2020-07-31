@@ -25,6 +25,9 @@ ShowChart::ShowChart(QWidget *parent) :
     connect(ui->saveModifiedPWave,SIGNAL(clicked()),this,SLOT(saveModifiedPWaveData()));
     connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::saveModifiedPWaveData);
 
+    connect(ui->tx,SIGNAL(toggled(bool)),this,SLOT(txIsChecked(bool)));
+    connect(ui->ty,SIGNAL(toggled(bool)),this,SLOT(tyIsChecked(bool)));
+    connect(ui->tz,SIGNAL(toggled(bool)),this,SLOT(tzIsChecked(bool)));
     //connect(this,&ShowChart::closeDynWaveWindow,this,&ShowChart::attackClosedDynWaveWindow);
 
     for(int i=0;i<27;i++){
@@ -279,7 +282,31 @@ void ShowChart::showStackedWidgetCharts()
 
     ui->stackedWidget->setCurrentIndex(0);
 }
-
+//处理QRadioButton：X，Y，Z的选中状态
+void ShowChart::txIsChecked(bool checked)
+{
+    if(checked){
+        userInput[1] = 0;
+    }else{
+        userInput[1] = -1;
+    }
+}
+void ShowChart::tyIsChecked(bool checked)
+{
+    if(checked){
+        userInput[1] = 1;
+    }else{
+        userInput[1] = -1;
+    }
+}
+void ShowChart::tzIsChecked(bool checked)
+{
+    if(checked){
+        userInput[1] = 2;
+    }else{
+        userInput[1] = -1;
+    }
+}
 //处理用户输入的P波相关数据
 void ShowChart::handleTheInputData()
 {
@@ -287,7 +314,7 @@ void ShowChart::handleTheInputData()
     QString str = ui->intputPWave->text();
     int pWave = str.toInt();
     userInput[0] = station;
-    userInput[1] = pWave;
+    userInput[2] = pWave;
 }
 
 //T1~T9按钮，用来显示不同站台曲线图
@@ -375,17 +402,17 @@ void ShowChart::slotPointHoverd(const QPointF &point, bool state)
 void ShowChart::saveModifiedPWaveData()
 {
     handleTheInputData();                              //需要先处理用户输入的数据才可以
-    if(userInput[1]>0 && userInput[1]<90000)
+    if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]!=-1)
     switch(userInput[0]){                              //根据台站号重新绘制P波红线
-        case 0:repaintPWave(0,userInput[1]);break;
-        case 1:repaintPWave(1,userInput[1]);break;
-        case 2:repaintPWave(2,userInput[1]);break;
-        case 3:repaintPWave(3,userInput[1]);break;
-        case 4:repaintPWave(4,userInput[1]);break;
-        case 5:repaintPWave(5,userInput[1]);break;
-        case 6:repaintPWave(6,userInput[1]);break;
-        case 7:repaintPWave(7,userInput[1]);break;
-        case 8:repaintPWave(8,userInput[1]);break;
+        case 0:repaintPWave(0,userInput[1],userInput[2]);break;
+        case 1:repaintPWave(1,userInput[1],userInput[2]);break;
+        case 2:repaintPWave(2,userInput[1],userInput[2]);break;
+        case 3:repaintPWave(3,userInput[1],userInput[2]);break;
+        case 4:repaintPWave(4,userInput[1],userInput[2]);break;
+        case 5:repaintPWave(5,userInput[1],userInput[2]);break;
+        case 6:repaintPWave(6,userInput[1],userInput[2]);break;
+        case 7:repaintPWave(7,userInput[1],userInput[2]);break;
+        case 8:repaintPWave(8,userInput[1],userInput[2]);break;
     }
 
     //预留接口，将调整后的P波位置刷新到数据库
@@ -393,24 +420,14 @@ void ShowChart::saveModifiedPWaveData()
 }
 
 //重新绘制用户调整P波后的P波红线
-void ShowChart::repaintPWave(int station,int p)
+void ShowChart::repaintPWave(int station,int orientation,int p)
 {
-    //station*3,station*3+1,station*3+2 分别代表station台站的X，Y，Z方向
-    lineSeries[station*3].clear();
-    lineSeries[station*3+1].clear();
-    lineSeries[station*3+2].clear();
+    //station*3+orientation代表station台站的X/Y/Z方向
+    lineSeries[station*3+orientation].clear();
+    lineSeries2[station*3+orientation].clear();
 
-    lineSeries2[station*3].clear();
-    lineSeries2[station*3+1].clear();
-    lineSeries2[station*3+2].clear();
-
-    lineSeries[station*3] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-    lineSeries[station*3+1] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-    lineSeries[station*3+2] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-
-    lineSeries2[station*3] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-    lineSeries2[station*3+1] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-    lineSeries2[station*3+2] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+    lineSeries[station*3+orientation] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+    lineSeries2[station*3+orientation] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
 }
 
 //接收widget发来的信号，从而切换相应台站
