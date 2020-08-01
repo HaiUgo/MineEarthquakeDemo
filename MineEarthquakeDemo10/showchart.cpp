@@ -8,7 +8,6 @@ ShowChart::ShowChart(QWidget *parent) :
     ui->setupUi(this);
 
     pageSwitchIndex = 0;
-
     initCharts();
     showStackedWidgetCharts();
 
@@ -18,11 +17,13 @@ ShowChart::ShowChart(QWidget *parent) :
     ui->intputPWave->setValidator(validator);
     ui->intputPWave->setMaxLength(5);
 
+    userInput[1] = 2;               //默认计算Z方向
+    ui->comboBox_2->setInsertPolicy(QComboBox::InsertAfterCurrent);
     //以下为信号和槽函数，只写了一部分，剩余按钮用的自动关联
     connect(ui->fulllScreenButton,SIGNAL(clicked()),this,SLOT(fullChartsButtonClicked()));
     connect(ui->saveModifiedPWave,SIGNAL(clicked()),this,SLOT(informationDialog()));
-    connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::refreshModifiedPWaveData);
-
+    connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::getLoactionData);
+    connect(ui->comboBox_2,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&ShowChart::repaintPWave);
     connect(ui->tx,SIGNAL(toggled(bool)),this,SLOT(txIsChecked(bool)));
     connect(ui->ty,SIGNAL(toggled(bool)),this,SLOT(tyIsChecked(bool)));
     connect(ui->tz,SIGNAL(toggled(bool)),this,SLOT(tzIsChecked(bool)));
@@ -283,7 +284,7 @@ void ShowChart::showStackedWidgetCharts()
     ui->stackedWidget->setCurrentIndex(0);
 }
 
-//处理QRadioButton：X，Y，Z的选中状态
+//处理QRadioButton：X，Y，Z的选中状态，即选择P波计算方向
 void ShowChart::txIsChecked(bool checked)
 {
     if(checked){
@@ -322,38 +323,47 @@ void ShowChart::handleTheInputData()
 void ShowChart::on_T1Button_clicked()
 {
     ui->stackedWidget->setCurrentIndex(0);
+    pageSwitchIndex = 0;
 }
 void ShowChart::on_T2Button_clicked()
 {
     ui->stackedWidget->setCurrentIndex(1);
+    pageSwitchIndex = 1;
 }
 void ShowChart::on_T3Button_clicked()
 {
     ui->stackedWidget->setCurrentIndex(2);
+    pageSwitchIndex = 2;
 }
 void ShowChart::on_T4Button_clicked()
 {
     ui->stackedWidget->setCurrentIndex(3);
+    pageSwitchIndex = 3;
 }
 void ShowChart::on_T5Button_clicked()
 {
     ui->stackedWidget->setCurrentIndex(4);
+    pageSwitchIndex = 4;
 }
 void ShowChart::on_T6Button_clicked()
 {
     ui->stackedWidget->setCurrentIndex(5);
+    pageSwitchIndex = 5;
 }
 void ShowChart::on_T7Button_clicked()
 {
     ui->stackedWidget->setCurrentIndex(6);
+    pageSwitchIndex = 6;
 }
 void ShowChart::on_T8Button_clicked()
 {
     ui->stackedWidget->setCurrentIndex(7);
+    pageSwitchIndex = 7;
 }
 void ShowChart::on_T9Button_clicked()
 {
     ui->stackedWidget->setCurrentIndex(8);
+    pageSwitchIndex = 8;
 }
 
 //下一页
@@ -390,7 +400,7 @@ void ShowChart::slotPointHoverd(const QPointF &point, bool state)
     if (state) {
         m_valueLabel->setText(QString::asprintf("%1.0f,%1.0f", point.x(),point.y()));
         QPoint curPos = mapFromGlobal(QCursor::pos());
-        m_valueLabel->move(curPos.x() - m_valueLabel->width() / 2, curPos.y() - m_valueLabel->height() * 1.5);  //移动数值
+        m_valueLabel->move(int(curPos.x() - m_valueLabel->width() / 2), int(curPos.y() - m_valueLabel->height() * 1.5));  //移动数值
         m_valueLabel->show();//显示出来
     }
     else {
@@ -407,11 +417,13 @@ void ShowChart::informationDialog()
     msg.setIcon(QMessageBox::Information);
     msg.addButton(tr("确定"),QMessageBox::AcceptRole);
     msg.addButton(tr("取消"),QMessageBox::RejectRole);
+
     int ret = msg.exec();
 
     if(ret == QMessageBox::AcceptRole){
-        refreshModifiedPWaveData();
-        if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]!=-1)
+        //if(ui->comboBox_2->currentIndex() == 0)
+        //    repaintPWave(0);
+        if(userInput[2]>0 && userInput[2]<90000)
             saveModifiedPWaveData();
         else QMessageBox::warning(this,"警告","请输入有效值",QStringLiteral("确定"));
     }else{
@@ -426,23 +438,42 @@ void ShowChart::saveModifiedPWaveData()
     qDebug()<<"Saving P wave arrival";
 }
 
-//在图表上刷新调整后的P波到时位置，但是不保存
-void ShowChart::refreshModifiedPWaveData()
+//调用定位算法
+void ShowChart::getLoactionData()
 {
-    handleTheInputData();                              //需要先处理用户输入的数据才可以
-    if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]!=-1)
-        repaintPWave(userInput[0],userInput[1],userInput[2]);     //根据台站号重新绘制P波红线
+    handleTheInputData();                                       //需要先处理用户输入的数据才可以
+    if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]==2){  //只有选定Z通道为计算方向时才做处理
+        int value = LocationAlgorithm::locationAlgorithm(userInput[2]); //调用定位算法
+        userInput[2] = value;
+        qDebug()<<"location algorithm value="<<value;
+        ui->comboBox_2->clear();
+        //ui->comboBox_2->addItem(QString::asprintf("%s","定位点"));
+        ui->comboBox_2->addItem(QString::asprintf("%d",value));
+    }
 }
-
-//重新绘制用户调整P波后的P波红线
-void ShowChart::repaintPWave(int station,int orientation,int p)
+//重新绘制用户调整P波激发位置后的P波红线
+void ShowChart::repaintPWave(int value)
 {
-    //station*3+orientation代表station台站的X/Y/Z方向
-    lineSeries[station*3+orientation].clear();
-    lineSeries2[station*3+orientation].clear();
+    Q_UNUSED(value)
+    int p =ui->comboBox_2->currentText().toInt();
+    //删除台站X、Y、Z方向的P波红线
+    lineSeries[userInput[0]*3].clear();
+    lineSeries[userInput[0]*3+1].clear();
+    lineSeries[userInput[0]*3+2].clear();
 
-    lineSeries[station*3+orientation] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-    lineSeries2[station*3+orientation] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+    lineSeries2[userInput[0]*3].clear();
+    lineSeries2[userInput[0]*3+1].clear();
+    lineSeries2[userInput[0]*3+2].clear();
+
+    //绘制调整后的P波红线
+    lineSeries[userInput[0]*3] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+    lineSeries[userInput[0]*3+1] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+    lineSeries[userInput[0]*3+2] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+
+    lineSeries2[userInput[0]*3] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+    lineSeries2[userInput[0]*3+1] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+    lineSeries2[userInput[0]*3+2] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+
 }
 
 //接收widget发来的信号，从而切换相应台站
@@ -687,5 +718,7 @@ bool ShowChart::eventFilter(QObject *obj, QEvent *event)
     if(obj == &view[T9Z]){
         charViewEventFilter(event,&chart[T9Z]);
     }
-    else return QWidget::eventFilter(obj,event);
+    return QWidget::eventFilter(obj,event);
 }
+
+

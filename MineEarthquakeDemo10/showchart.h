@@ -14,6 +14,7 @@
 #include "dynamicwave.h"
 #include "param.h"
 #include "drawthread.h"
+#include "locationalgorithm.h"
 QT_CHARTS_USE_NAMESPACE
 
 class ReadCSVData;
@@ -27,7 +28,7 @@ class ShowChart : public QWidget
     Q_OBJECT
 
 public:
-    explicit ShowChart(QWidget *parent = 0);
+    explicit ShowChart(QWidget *parent = nullptr);
     ~ShowChart();
     friend class DrawThread;
 private:
@@ -38,13 +39,12 @@ private:
     bool eventFilter(QObject *obj,QEvent *event);
 
     void handleTheInputData();                                   //处理用户手动输入的P波到时数据
-    void repaintPWave(int station,int orientation,int p);        //重新绘制用户调整P波后的P波红线
     void saveModifiedPWaveData();                                //将调整后的P波到时位置保存/更新到数据文件中
 
 private slots:
 
     void fullChartsButtonClicked();   //显示全部台站波形按钮
-    void refreshModifiedPWaveData();  //在图表刷新调整后的P波位置，但是不保存到数据文件中
+    void getLoactionData();           //调用定位算法
     void informationDialog();         //消息提示对话框
     void slotPointHoverd(const QPointF &point, bool state);   //鼠标移动到chartview某点，可以显示数据
 
@@ -68,6 +68,8 @@ private slots:
     void txIsChecked(bool checked);           //QRadioButton：tx,ty,tz的选中状态
     void tyIsChecked(bool checked);
     void tzIsChecked(bool checked);
+
+    void repaintPWave(int value);             //重新绘制定位算法调整后的P波红线
 protected:
     //void closeEvent(QCloseEvent *event);
     void run() ;                      //thread 从run函数执行
@@ -100,7 +102,8 @@ private:
 
     int pageSwitchIndex;              //stackWidget页面索引，用于切换当前页面
 
-    int userInput[3];                 //保存用户选择的台站和方向以及输入的P波激发位置
+    int userInput[3];                 //保存用户选择的台站和计算方向以及用户输入的要计算的数值，
+                                      //其中计算方向目前仅计算了z方向的激发位置，所以用户选择XY方向时不做处理
 
     QLabel *m_valueLabel;             //用于显示某点数据
 

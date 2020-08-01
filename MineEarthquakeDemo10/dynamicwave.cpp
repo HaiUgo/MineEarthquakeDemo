@@ -44,7 +44,7 @@ void DynamicWave::slotPointHoverd(const QPointF &point, bool state)
         m_valueLabel->setWindowFlag(Qt::WindowStaysOnTopHint);
         m_valueLabel->setText(QString::asprintf("%1.0f,%1.0f", point.x()*100,point.y()*40));   //横坐标*100，纵坐标*40，将数据还原
         QPoint curPos = mapFromGlobal(QCursor::pos());
-        m_valueLabel->move(curPos.x() - m_valueLabel->width() / 2, curPos.y() - m_valueLabel->height() * 1.5);  //移动数值
+        m_valueLabel->move(int(curPos.x() - m_valueLabel->width() / 2), int(curPos.y() - m_valueLabel->height() * 1.5));  //移动数值
         m_valueLabel->show();//显示出来
     }
     else {

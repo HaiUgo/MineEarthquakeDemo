@@ -657,6 +657,16 @@ color: rgb(255, 255, 255);</string>
          <property name="Theme" stdset="0">
           <number>0</number>
          </property>
+         <property name="ViewColor" stdset="0">
+          <color>
+           <red>0</red>
+           <green>0</green>
+           <blue>0</blue>
+          </color>
+         </property>
+         <property name="Watermark" stdset="0">
+          <string/>
+         </property>
          <property name="sizePolicy" stdset="0">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>

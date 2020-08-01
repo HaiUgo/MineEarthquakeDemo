@@ -35,6 +35,7 @@ HEADERS += \
     connectdatabase.h \
     drawthread.h \
     dynamicwave.h \
+    locationalgorithm.h \
     mxdrawxlib.h \
     param.h \
     parameters.h \
