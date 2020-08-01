@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QLabel>
 #include <QThread>
+#include <QMessageBox>
 #include "chart.h"
 #include "chartview.h"
 #include "readcsvdata.h"
@@ -38,12 +39,13 @@ private:
 
     void handleTheInputData();                                   //处理用户手动输入的P波到时数据
     void repaintPWave(int station,int orientation,int p);        //重新绘制用户调整P波后的P波红线
+    void saveModifiedPWaveData();                                //将调整后的P波到时位置保存/更新到数据文件中
 
 private slots:
 
     void fullChartsButtonClicked();   //显示全部台站波形按钮
-    void saveModifiedPWaveData();     //保存调整后的P波值
-
+    void refreshModifiedPWaveData();  //在图表刷新调整后的P波位置，但是不保存到数据文件中
+    void informationDialog();         //消息提示对话框
     void slotPointHoverd(const QPointF &point, bool state);   //鼠标移动到chartview某点，可以显示数据
 
     void on_nextPage_clicked();       //下一页

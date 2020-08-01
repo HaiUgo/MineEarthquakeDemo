@@ -26,6 +26,7 @@ void DrawThread::doDrawSplineWork(QString path)
     readData->parseCSVFileName(path);
     readData->readCSVFile(path);
     readData->locateCSVData();
+    qDebug()<<"readData = "<<readData<<'\n';
 
     for(int i=0;i<27;i++){
         showChart->splineSeries[i].replace(readData->pointBuffer[i]);

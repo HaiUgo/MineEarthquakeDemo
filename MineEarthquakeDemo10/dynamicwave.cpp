@@ -12,8 +12,6 @@ DynamicWave::DynamicWave(QWidget *parent) :
     queueSize = 0;
     isStoppingTimer = false;
 
-    readData = new ReadCSVData;
-
     initDynamicCharts();
 
     connect(ui->showDynWaveButton,SIGNAL(clicked()),this,SLOT(showDynWave()));

@@ -7,8 +7,6 @@ ShowChart::ShowChart(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //filePath = "D:/MicroquakeSystem_LiaoningUniversity/MicroquakeSystem_LiaoningUniversity/data/ConstructionData/3moti/suz 2020-06-15 09-17-48`07.csv";
-
     pageSwitchIndex = 0;
 
     initCharts();
@@ -22,8 +20,8 @@ ShowChart::ShowChart(QWidget *parent) :
 
     //以下为信号和槽函数，只写了一部分，剩余按钮用的自动关联
     connect(ui->fulllScreenButton,SIGNAL(clicked()),this,SLOT(fullChartsButtonClicked()));
-    connect(ui->saveModifiedPWave,SIGNAL(clicked()),this,SLOT(saveModifiedPWaveData()));
-    connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::saveModifiedPWaveData);
+    connect(ui->saveModifiedPWave,SIGNAL(clicked()),this,SLOT(informationDialog()));
+    connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::refreshModifiedPWaveData);
 
     connect(ui->tx,SIGNAL(toggled(bool)),this,SLOT(txIsChecked(bool)));
     connect(ui->ty,SIGNAL(toggled(bool)),this,SLOT(tyIsChecked(bool)));
@@ -139,8 +137,8 @@ void ShowChart::initCharts()
         //chart2[i].setMargins(margin);
         chart2[i].setPlotArea(recf);
 
-        axisX2[i].setRange(0, 90000);                     //设置坐标轴范围
-        axisX2[i].setTickCount(10);                       //9区域，10个刻度
+        axisX2[i].setRange(0, 90000);                      //设置坐标轴范围
+        axisX2[i].setTickCount(10);                        //9区域，10个刻度
         axisY2[i].setRange(-50000, 50000);
 
         chart2[i].addAxis(&axisX2[i], Qt::AlignBottom);    //把坐标轴添加到chart中，第二个参数是设置坐标轴的位置，
@@ -158,6 +156,7 @@ void ShowChart::initCharts()
         view2[i].installEventFilter(this);                //注册部件事件过滤
     }
 }
+
 //void ShowChart::closeEvent(QCloseEvent *event)
 //{
 //    Q_UNUSED(event)
@@ -165,6 +164,7 @@ void ShowChart::initCharts()
 //    emit closeDynWaveWindow();
 //    qDebug()<<"emit closeDynWaveWindow()";
 //}
+
 //将标签和view[T]图表添加到stackWidget的GridLayout布局中
 void ShowChart::showStackedWidgetCharts()
 {
@@ -282,6 +282,7 @@ void ShowChart::showStackedWidgetCharts()
 
     ui->stackedWidget->setCurrentIndex(0);
 }
+
 //处理QRadioButton：X，Y，Z的选中状态
 void ShowChart::txIsChecked(bool checked)
 {
@@ -377,7 +378,6 @@ void ShowChart::on_previousPage_clicked()
     ui->stackedWidget->setCurrentIndex(pageSwitchIndex);
 }
 
-
 //全部按钮，显示T1~T9站台全部曲线图信息
 void ShowChart::fullChartsButtonClicked()
 {
@@ -398,25 +398,40 @@ void ShowChart::slotPointHoverd(const QPointF &point, bool state)
     }
 }
 
-//保存调整后的P波到时位置
+//消息提示对话框
+void ShowChart::informationDialog()
+{
+    QMessageBox msg(this);
+    msg.setWindowTitle(tr("提示"));
+    msg.setText(tr("点击确定将调整后的P波到时位置更新到数据文件中"));
+    msg.setIcon(QMessageBox::Information);
+    msg.addButton(tr("确定"),QMessageBox::AcceptRole);
+    msg.addButton(tr("取消"),QMessageBox::RejectRole);
+    int ret = msg.exec();
+
+    if(ret == QMessageBox::AcceptRole){
+        refreshModifiedPWaveData();
+        if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]!=-1)
+            saveModifiedPWaveData();
+        else QMessageBox::warning(this,"警告","请输入有效值",QStringLiteral("确定"));
+    }else{
+        qDebug()<<"Saving P wave arrival operation is cancelled ";
+        return;
+    }
+}
+
+//将调整后的P波到时位置保存/更新到数据文件中
 void ShowChart::saveModifiedPWaveData()
+{
+    qDebug()<<"Saving P wave arrival";
+}
+
+//在图表上刷新调整后的P波到时位置，但是不保存
+void ShowChart::refreshModifiedPWaveData()
 {
     handleTheInputData();                              //需要先处理用户输入的数据才可以
     if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]!=-1)
-    switch(userInput[0]){                              //根据台站号重新绘制P波红线
-        case 0:repaintPWave(0,userInput[1],userInput[2]);break;
-        case 1:repaintPWave(1,userInput[1],userInput[2]);break;
-        case 2:repaintPWave(2,userInput[1],userInput[2]);break;
-        case 3:repaintPWave(3,userInput[1],userInput[2]);break;
-        case 4:repaintPWave(4,userInput[1],userInput[2]);break;
-        case 5:repaintPWave(5,userInput[1],userInput[2]);break;
-        case 6:repaintPWave(6,userInput[1],userInput[2]);break;
-        case 7:repaintPWave(7,userInput[1],userInput[2]);break;
-        case 8:repaintPWave(8,userInput[1],userInput[2]);break;
-    }
-
-    //预留接口，将调整后的P波位置刷新到数据库
-    //bool flushDataBase();
+        repaintPWave(userInput[0],userInput[1],userInput[2]);     //根据台站号重新绘制P波红线
 }
 
 //重新绘制用户调整P波后的P波红线
