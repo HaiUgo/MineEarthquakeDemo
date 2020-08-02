@@ -53,18 +53,6 @@ void DynamicWave::slotPointHoverd(const QPointF &point, bool state)
     }
 }
 
-//接收widget发来的信号，从而获取相应CSV文件路径
-void DynamicWave::redrawDynSplineWave()
-{
-    for(int i=0;i<27;i++){
-        splineSeries[i].clear();
-        lineSeries[i].clear();
-    }
-}
-void DynamicWave::receiveCSVFilePath2(QString path)
-{
-    filePath = path;
-}
 //初始化图表
 void DynamicWave::initDynamicCharts()
 {
@@ -186,7 +174,18 @@ void DynamicWave::showDynWave()
     drawTimer->start(25);
     qDebug()<<"start timer";
 }
-
+//接收widget发来的信号，从而获取相应CSV文件路径
+void DynamicWave::redrawDynSplineWave()
+{
+    for(int i=0;i<27;i++){
+        splineSeries[i].clear();
+        lineSeries[i].clear();
+    }
+}
+void DynamicWave::receiveCSVFilePath2(QString path)
+{
+    filePath = path;
+}
 //绘制动态波形图
 void DynamicWave::drawDynSplineWave()
 {
