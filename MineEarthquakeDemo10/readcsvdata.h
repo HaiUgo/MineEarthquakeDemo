@@ -14,10 +14,14 @@
 #include "drawthread.h"
 class ReadCSVData;
 
-class ReadCSVData{
-
+//想调用QObject中的槽函数deleteLater()自动删除实例化的ReadCSVData对象，所以继承了QObject类
+//但是感觉对象仍然没有释放掉，内存消耗仍然很大，其中connect的关联在子线程drawthread的doDrawSplineWork函数中
+//connect(readData,SIGNAL(destroyed()),readData,SLOT(deleteLater()));
+//总的来说是设计缺陷
+class ReadCSVData:public QObject{
+    Q_OBJECT
 public:
-    ReadCSVData();
+    ReadCSVData(QObject *parent = nullptr);
     ~ReadCSVData();
 
     friend class DynamicWave;

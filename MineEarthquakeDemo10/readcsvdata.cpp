@@ -1,6 +1,7 @@
 #include "readcsvdata.h"
 
-ReadCSVData::ReadCSVData()
+ReadCSVData::ReadCSVData(QObject *parent):
+    QObject(parent)
 {
 
 }
@@ -38,7 +39,7 @@ void ReadCSVData::parseCSVFileName(QString filePath)
     QStringList fileSplits = filePath.split('/');
     QString sensorNumber = fileSplits[fileSplits.length()-1].split(' ')[0];
     senNum = sensorNumber.length();
-    qDebug()<<"senNum="<<senNum<<'\n';
+    qDebug()<<"senNum="<<senNum;
     //存储每个传感器波形的激发位置，在CSV文件中表现为第H列，P列，X列...以此类推
     motiPos = new int[senNum];
 
@@ -82,7 +83,7 @@ void ReadCSVData::parseCSVFileName(QString filePath)
     //存储每个事件触发台站的X，Y，Z轴的数据,用于绘制动态波形
     dynPointBuffer = new QQueue<double>[27];
 
-    qDebug()<<"parsing the csv file completed"<<'\n';
+    qDebug()<<"parsing the csv file completed";
 }
 
 //说明，Dos和Windows采用回车+换行CR/LF表示下一行，
@@ -142,7 +143,7 @@ void ReadCSVData::readCSVFile(QString fileName)
     QStringList item;
     QString block ;
     if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
-        qDebug()<<"open file failed!"<<'\n';
+        qDebug()<<"open file failed!";
         return ;
     }
     QTextStream stream(&file);
@@ -153,7 +154,7 @@ void ReadCSVData::readCSVFile(QString fileName)
         line = block.split('\t');
     }
     count = line.size();
-    qDebug()<<"count ="<<count<<'\n';
+    qDebug()<<"count ="<<count;
     for(int i=0;i<count-1;i++){
         item = line.at(i).split(',');
         date[i] = item.at(0);                         //存储每个事件的日期
@@ -168,7 +169,7 @@ void ReadCSVData::readCSVFile(QString fileName)
         //qDebug()<<"i="<<i<<'\n';
     }
     file.close();
-    qDebug()<<"read csv file successfully!"<<'\n';
+    qDebug()<<"read csv file successfully!";
 }
 
 void ReadCSVData::locateCSVData()
@@ -177,14 +178,13 @@ void ReadCSVData::locateCSVData()
 
     for(int i=0;i<senNum;i++){
         tempStation[i] = (senChannelNum[0][i]).toInt();            //获取站台名称并存储
-        qDebug()<<"tempStation[i]="<<tempStation[i]<<'\n';
+        //qDebug()<<"tempStation[i]="<<tempStation[i]<<'\n';
     }
 
     for(int i=0;i<senNum;i++){
         switch(tempStation[i])                                     //判断是哪一个站台
         {
-            //因为CSV文件中站台名称并不是从小到大排序的，
-            //所以必须要定位到该站台在哪一列，从而才能够定位到该站台X，Y，Z轴以及激发位置在哪一列
+            //因为CSV文件中站名称是无序的，所以必须要定位到该站台在哪一列，从而才能够定位到该站台X，Y，Z轴以及激发位置在哪一列
             case 1:
                     //qDebug()<<"start case 1"<<'\n';
                     if(1==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为1站台
@@ -556,14 +556,14 @@ void ReadCSVData::locateCSVData()
     }
     for(int j=0;j<10;j++){
         if(tempMotiPos[j][0]!=0){
-            qDebug()<<"this station is"<<j<<"and its motivated position is "<<tempMotiPos[j][0]<<'\n';  //打印测试站台及其激发位置
+            qDebug()<<"this station is"<<j<<"and its motivated position is "<<tempMotiPos[j][0];  //打印测试站台及其激发位置
             //因为P波到时是一条垂线，所以只需要添加横坐标相同的几个点就好
             pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],0));
             pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],50000));
             pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],-50000));
         }
     }
-    qDebug()<<"locateCSVData successfully!"<<'\n';
+    qDebug()<<"locateCSVData successfully!";
 }
 
 //入参传入QVector<QPointF>的实例化对象
@@ -591,7 +591,7 @@ void ReadCSVData::paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPoi
         listIndex++;
         //qDebug()<<"leave internal paddingPointBuffer"<<'\n';
     }
-    qDebug()<<"paddingPointBuffer successfully!"<<'\n';
+    qDebug()<<"paddingPointBuffer successfully!";
 }
 
 //入参传入QQueue<double>的实例化对象
@@ -615,5 +615,5 @@ void ReadCSVData::paddingDynPointBuffer(QQueue<double> *pointBufferX,QQueue<doub
             pointBufferZ->enqueue(parseDataZ);
         }
     }
-    qDebug()<<"paddingDynPointBuffer successfully!"<<'\n';
+    qDebug()<<"paddingDynPointBuffer successfully!";
 }

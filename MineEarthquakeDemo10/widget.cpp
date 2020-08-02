@@ -42,6 +42,8 @@ Widget::Widget(QWidget *parent)
     connect(workThread,SIGNAL(finished()),workThread,SLOT(deleteLater()));
     connect(this,SIGNAL(sendSelectedCSVFile(QString)),thread,SLOT(doDrawSplineWork(QString)));
     workThread->start();
+
+    qDebug()<<"UI widget ThreadId:"<<QThread::currentThreadId();
 }
 
 Widget::~Widget()

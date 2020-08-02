@@ -27,6 +27,7 @@ DynamicWave::DynamicWave(QWidget *parent) :
 DynamicWave::~DynamicWave()
 {
     delete readData;
+    readData =nullptr;
     delete pointBufferTemp;
     delete splineSeries;
     delete axisX;
@@ -64,6 +65,7 @@ void DynamicWave::receiveCSVFilePath2(QString path)
     readData->parseCSVFileName(path);
     readData->readCSVFile(path);
     readData->locateCSVData();
+    connect(readData,SIGNAL(destroyed()),readData,SLOT(deleteLater()));
 }
 //初始化图表
 void DynamicWave::initDynamicCharts()

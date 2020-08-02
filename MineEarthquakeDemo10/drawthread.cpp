@@ -9,6 +9,7 @@ DrawThread::DrawThread(QObject *parent):
 DrawThread::~DrawThread()
 {
     delete readData;
+    readData = nullptr;
 }
 
 void DrawThread::doDrawSplineWork(QString path)
@@ -26,7 +27,7 @@ void DrawThread::doDrawSplineWork(QString path)
     readData->parseCSVFileName(path);
     readData->readCSVFile(path);
     readData->locateCSVData();
-    qDebug()<<"readData = "<<readData<<'\n';
+    qDebug()<<"readData = "<<readData;
 
     for(int i=0;i<27;i++){
         showChart->splineSeries[i].replace(readData->pointBuffer[i]);
@@ -123,6 +124,7 @@ void DrawThread::doDrawSplineWork(QString path)
             }
         }
     }
+    connect(readData,SIGNAL(destroyed()),readData,SLOT(deleteLater()));
 
     qDebug()<<"ThreadID:"<<QThread::currentThreadId();
 }
