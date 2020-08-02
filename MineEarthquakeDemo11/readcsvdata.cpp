@@ -6,32 +6,32 @@ ReadCSVData::ReadCSVData()
 }
 
 //删除野指针，避免内存泄漏
-//ReadCSVData::~ReadCSVData()
-//{
-//    delete motiPos;
-//    delete date;
+ReadCSVData::~ReadCSVData()
+{
+    delete motiPos;
+    delete date;
 
-//    for( int i = 0 ; i < 90000 ; i ++ )
-//        delete []senChannelZ[i] ;
-//    delete []senChannelZ;
+    for( int i = 0 ; i < 90000 ; i ++ )
+        delete []senChannelZ[i] ;
+    delete []senChannelZ;
 
-//    for( int i = 0 ; i < 90000 ; i ++ )
-//        delete []senChannelY[i] ;
-//    delete []senChannelY;
+    for( int i = 0 ; i < 90000 ; i ++ )
+        delete []senChannelY[i] ;
+    delete []senChannelY;
 
-//    for( int i = 0 ; i < 90000 ; i ++ )
-//        delete []senChannelX[i] ;
-//    delete []senChannelX;
+    for( int i = 0 ; i < 90000 ; i ++ )
+        delete []senChannelX[i] ;
+    delete []senChannelX;
 
-//    for( int i = 0 ; i < 90000 ; i ++ )
-//        delete []senChannelNum[i] ;
-//    delete []senChannelNum;
+    for( int i = 0 ; i < 90000 ; i ++ )
+        delete []senChannelNum[i] ;
+    delete []senChannelNum;
 
-//    delete pointBuffer;
-//    delete dynPointBuffer;
-//    delete pointBuffer_P;
+    delete pointBuffer;
+    delete dynPointBuffer;
+    delete pointBuffer_P;
 
-//}
+}
 
 QMutex ReadCSVData::m_Mutex;
 QSharedPointer<ReadCSVData> ReadCSVData::m_instance;
@@ -55,18 +55,6 @@ QSharedPointer<ReadCSVData>& ReadCSVData::getInstance()
     return m_instance;
 }
 
-//双检查锁，但是会造成reorder不安全
-//ReadCSVData* ReadCSVData::m_instance=nullptr; //初始化
-
-//ReadCSVData* ReadCSVData::getInstance() {
-//    if(m_instance==nullptr){
-//        Lock lock;
-//        if (m_instance == nullptr) {
-//            m_instance = new ReadCSVData();
-//        }
-//    }
-//    return m_instance;
-//}
 
 //该函数功能为解析文件路径，动态生成存储数组
 void ReadCSVData::parseCSVFileName(QString filePath)

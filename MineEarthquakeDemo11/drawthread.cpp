@@ -118,5 +118,4 @@ void DrawThread::doDrawSplineWork()
         }
     }
     qDebug()<<"ThreadID:"<<QThread::currentThreadId();
-
 }

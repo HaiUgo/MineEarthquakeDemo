@@ -13,18 +13,16 @@
 
 #include "param.h"
 
-
-
-class ReadCSVData;
-
-
 class ReadCSVData{
 
 private:
     ReadCSVData();
     ReadCSVData(const ReadCSVData&){}
 public:
+    ~ReadCSVData();
+public:
     static QSharedPointer<ReadCSVData>& getInstance();       //返回m_instance
+
     static QString FILEPATH;
 
     static int tempMotiPos[10][1];           //存储具体站台名称及其激发位置，站台标号为1-9对应tempMotiPos[1][0]~[9][0]
@@ -53,7 +51,6 @@ public:
     void locateCSVData();                    //定位事件站台在CSV文件哪一列，从而定位到该站台X，Y，Z轴以及激发位置在哪一列
     void paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPointF> *pointBufferY,QVector<QPointF> *pointBufferZ,int index);
     void paddingDynPointBuffer(QQueue<double> *pointBufferX,QQueue<double> *pointBufferY,QQueue<double> *pointBufferZ,int index);
-
 private:
     static QSharedPointer<ReadCSVData> m_instance;
     static QMutex m_Mutex;
