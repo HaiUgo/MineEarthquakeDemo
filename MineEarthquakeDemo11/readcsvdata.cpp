@@ -211,6 +211,9 @@ void ReadCSVData::locateCSVData()
 {
     int tempStation[9]={0};                                        //存储站台名称，最多有9个站台
 
+    for(int i=0;i<10;i++)
+        tempMotiPos[i][0]=0;
+
     for(int i=0;i<senNum;i++){
         tempStation[i] = (senChannelNum[0][i]).toInt();            //获取站台名称并存储
         //qDebug()<<"tempStation[i]="<<tempStation[i]<<'\n';
