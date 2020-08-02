@@ -5,6 +5,7 @@ ReadCSVData::ReadCSVData(QObject *parent):
 {
 
 }
+int ReadCSVData::tempMotiPos[10][1] = {{0}};
 
 //删除野指针，避免内存泄漏
 ReadCSVData::~ReadCSVData()

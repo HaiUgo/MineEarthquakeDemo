@@ -28,7 +28,7 @@ ShowChart::ShowChart(QWidget *parent) :
     connect(ui->ty,SIGNAL(toggled(bool)),this,SLOT(tyIsChecked(bool)));
     connect(ui->tz,SIGNAL(toggled(bool)),this,SLOT(tzIsChecked(bool)));
     //connect(this,&ShowChart::closeDynWaveWindow,this,&ShowChart::attackClosedDynWaveWindow);
-
+    connect(this,SIGNAL(saveModifiedPWave()),this,SLOT(saveModifiedPWaveData()));
     for(int i=0;i<27;i++){
         connect(&splineSeries[i], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
     }
@@ -423,8 +423,10 @@ void ShowChart::informationDialog()
     if(ret == QMessageBox::AcceptRole){
         //if(ui->comboBox_2->currentIndex() == 0)
         //    repaintPWave(0);
-        if(userInput[2]>0 && userInput[2]<90000)
-            saveModifiedPWaveData();
+        if(currentLocation>0 && currentLocation<90000){
+            emit saveModifiedPWave();
+            qDebug()<<"emit savaModifiedPWave";
+        }
         else QMessageBox::warning(this,"警告","请输入有效值",QStringLiteral("确定"));
     }else{
         qDebug()<<"Saving P wave arrival operation is cancelled ";
@@ -435,7 +437,33 @@ void ShowChart::informationDialog()
 //将调整后的P波到时位置保存/更新到数据文件中
 void ShowChart::saveModifiedPWaveData()
 {
-    qDebug()<<"Saving P wave arrival";
+    QString value =QString::number(currentLocation);
+    QString station = QString::number(userInput[0]+1);
+    QString motiPositon = QString::number(ReadCSVData::tempMotiPos[userInput[0]+1][0]) ;
+    QFile file(filePath);
+    if(!file.open(QIODevice::ReadOnly)){
+        qDebug() << "Cannot open file for Reading";
+        return ;
+    }
+    QTextStream in(&file);
+    QString block = in.readAll();
+    file.close();
+
+    if(!file.open(QIODevice::WriteOnly)){
+        qDebug() << "Cannot open file for Writing";
+        return;
+    }
+    QString newStr = value +","+ station;
+    QString oldStr =motiPositon +","+ station;
+    qDebug()<<"newStr ="<<newStr<<" "<<"oldStr = "<<oldStr;
+    if(block.contains(oldStr, Qt::CaseInsensitive))
+    {
+        //block.replace(QRegExp("USER=.*"),QString("wor"));
+        block.replace(QString(oldStr),QString(newStr));
+        qDebug()<<"writed";
+    }
+    file.write(block.toUtf8());
+    file.close();
 }
 
 //调用定位算法
@@ -444,7 +472,6 @@ void ShowChart::getLoactionData()
     handleTheInputData();                                       //需要先处理用户输入的数据才可以
     if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]==2){  //只有选定Z通道为计算方向时才做处理
         int value = LocationAlgorithm::locationAlgorithm(userInput[2]); //调用定位算法
-        userInput[2] = value;
         qDebug()<<"location algorithm value="<<value;
         ui->comboBox_2->clear();
         //ui->comboBox_2->addItem(QString::asprintf("%s","定位点"));
@@ -455,7 +482,8 @@ void ShowChart::getLoactionData()
 void ShowChart::repaintPWave(int value)
 {
     Q_UNUSED(value)
-    int p =ui->comboBox_2->currentText().toInt();
+    currentLocation =ui->comboBox_2->currentText().toInt();
+    qDebug()<<"currentLocation="<<currentLocation;
     //删除台站X、Y、Z方向的P波红线
     lineSeries[userInput[0]*3].clear();
     lineSeries[userInput[0]*3+1].clear();
@@ -466,13 +494,13 @@ void ShowChart::repaintPWave(int value)
     lineSeries2[userInput[0]*3+2].clear();
 
     //绘制调整后的P波红线
-    lineSeries[userInput[0]*3] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-    lineSeries[userInput[0]*3+1] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-    lineSeries[userInput[0]*3+2] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+    lineSeries[userInput[0]*3] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
+    lineSeries[userInput[0]*3+1] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
+    lineSeries[userInput[0]*3+2] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
 
-    lineSeries2[userInput[0]*3] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-    lineSeries2[userInput[0]*3+1] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
-    lineSeries2[userInput[0]*3+2] << QPointF(p, 0)<<QPointF(p, 50000)<<QPointF(p, -50000);
+    lineSeries2[userInput[0]*3] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
+    lineSeries2[userInput[0]*3+1] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
+    lineSeries2[userInput[0]*3+2] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
 
 }
 
@@ -481,6 +509,10 @@ void ShowChart::pageSwithTo9()
 {
     if(ui->stackedWidget->currentIndex()!=9)
         ui->stackedWidget->setCurrentIndex(9);         //切换到台站波形图显示
+}
+void ShowChart::receiveCSVFilePath0(QString path)
+{
+    filePath = path;
 }
 //接收widget发来的信号，从而获取相应CSV文件路径
 void ShowChart::receiveCSVFilePath(QString path)

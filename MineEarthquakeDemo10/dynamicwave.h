@@ -61,14 +61,14 @@ private:
     QVector<QPointF> *pointBufferTemp;   //用于提前添加坐标点（listIndex,0），然后才可以出队列数据替换现有的数据
     int listIndex;
     int queueSize;                       //表示台站某一方向的队列数据的长度
-
+    QString filePath;
 private slots:
     void drawDynSplineWave();            //绘制动态波形
     void stopDynWave();                  //显示波形
     void showDynWave();                  //停止显示
     void slotPointHoverd(const QPointF &point, bool state);   //鼠标移动到chartview某点，可以显示数据
-    void receiveCSVFilePath2(QString path); //接收widget发来的信号，从而获取相应CSV文件路径
-
+    void redrawDynSplineWave();
+    void receiveCSVFilePath2(QString path);
 };
 
 

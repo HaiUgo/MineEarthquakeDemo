@@ -54,18 +54,16 @@ void DynamicWave::slotPointHoverd(const QPointF &point, bool state)
 }
 
 //接收widget发来的信号，从而获取相应CSV文件路径
-void DynamicWave::receiveCSVFilePath2(QString path)
+void DynamicWave::redrawDynSplineWave()
 {
     for(int i=0;i<27;i++){
         splineSeries[i].clear();
         lineSeries[i].clear();
     }
-
-    readData = new ReadCSVData;
-    readData->parseCSVFileName(path);
-    readData->readCSVFile(path);
-    readData->locateCSVData();
-    connect(readData,SIGNAL(destroyed()),readData,SLOT(deleteLater()));
+}
+void DynamicWave::receiveCSVFilePath2(QString path)
+{
+    filePath = path;
 }
 //初始化图表
 void DynamicWave::initDynamicCharts()
@@ -166,6 +164,12 @@ void DynamicWave::stopDynWave()
 //显示动态波形
 void DynamicWave::showDynWave()
 {
+    readData = new ReadCSVData;
+    readData->parseCSVFileName(filePath);
+    readData->readCSVFile(filePath);
+    readData->locateCSVData();
+    connect(readData,SIGNAL(destroyed()),readData,SLOT(deleteLater()));
+
     queueSize = readData->dynPointBuffer[T1X].size();   //不一定非要写T1X，写其他的也可以，因为队列长度都是一样的
     qDebug()<<"queueSize="<<queueSize;
     pointBufferTemp = new QVector<QPointF>;

@@ -1,7 +1,7 @@
 #ifndef PARAM_H
 #define PARAM_H
 
-
+#include <QString>
 enum P{
     P1X,P1Y,P1Z,
     P2X,P2Y,P2Z,

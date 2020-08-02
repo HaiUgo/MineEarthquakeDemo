@@ -39,7 +39,6 @@ private:
     bool eventFilter(QObject *obj,QEvent *event);
 
     void handleTheInputData();                                   //处理用户手动输入的P波到时数据
-    void saveModifiedPWaveData();                                //将调整后的P波到时位置保存/更新到数据文件中
 
 private slots:
 
@@ -64,12 +63,14 @@ private slots:
     void pageSwithTo9();                      //接收widget发来的信号，从而切换相应台站
     //void attackClosedDynWaveWindow();       //响应dynamicwave界面发来的的关闭信号
     void receiveCSVFilePath(QString path);    //接收widget发来的信号，从而获取相应CSV文件路径
-
+    void receiveCSVFilePath0(QString path);
     void txIsChecked(bool checked);           //QRadioButton：tx,ty,tz的选中状态
     void tyIsChecked(bool checked);
     void tzIsChecked(bool checked);
 
     void repaintPWave(int value);             //重新绘制定位算法调整后的P波红线
+    void saveModifiedPWaveData();             //将调整后的P波到时位置保存/更新到数据文件中
+
 protected:
     //void closeEvent(QCloseEvent *event);
     void run() ;                      //thread 从run函数执行
@@ -107,8 +108,11 @@ private:
 
     QLabel *m_valueLabel;             //用于显示某点数据
 
+    int currentLocation;              //保存用户选定的由定位算法计算得到的当前值
+    QString filePath;
 signals:
     void closeDynWaveWindow();        //关闭dynamicwave界面时候发射信号
+    void saveModifiedPWave();         //对话框中点击确定发送信号
 };
 
 

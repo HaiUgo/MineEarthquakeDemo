@@ -31,7 +31,6 @@ public:
     ~Widget();
 
     void showTable();                               //在UI上显示数据库列表
-
 private slots:
     void on_axWidget_ImplementCommandEvent(int iCommandId);      //axWidget控件命令
 
@@ -63,5 +62,6 @@ private:
 signals:
     void pageSwitch9();
     void sendSelectedCSVFile(QString filePath);
+    void reSelectedCSVFile();
 };
 #endif // WIDGET_H

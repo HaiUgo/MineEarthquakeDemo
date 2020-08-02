@@ -1,6 +1,9 @@
 #include "widget.h"
 #include "ui_widget.h"
 
+//说明：不应该将ShowChart定义为一个全局对象，但是考虑到子线程无法实例化界面对象，而且需要通过子线程调用
+//ShowChart中的绘制波形图的方法来提高效率（虽然加了子线程，但是效率和之前相比并没有明显提高），这是一种拿
+//安全性换取高效和简便性的做法。
 ShowChart *showChart;             //子界面，即chartview界面
 
 Widget::Widget(QWidget *parent)
@@ -36,8 +39,9 @@ Widget::Widget(QWidget *parent)
     connect(this,SIGNAL(pageSwitch9()),showChart,SLOT(pageSwithTo9()));
     //connect(this,SIGNAL(sendSelectedCSVFile(QString)),showChart,SLOT(receiveCSVFilePath(QString)));
 
+    connect(this,SIGNAL(reSelectedCSVFile()),dw,SLOT(redrawDynSplineWave()));
     connect(this,SIGNAL(sendSelectedCSVFile(QString)),dw,SLOT(receiveCSVFilePath2(QString)));
-
+    connect(this,SIGNAL(sendSelectedCSVFile(QString)),showChart,SLOT(receiveCSVFilePath0(QString)));
     connect(workThread,SIGNAL(finished()),thread,SLOT(deleteLater()));
     connect(workThread,SIGNAL(finished()),workThread,SLOT(deleteLater()));
     connect(this,SIGNAL(sendSelectedCSVFile(QString)),thread,SLOT(doDrawSplineWork(QString)));
@@ -181,10 +185,10 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
 {
     double *coordinates = new double[3];
     int row = ui->dataBaseView->currentIndex().row();
-    qDebug()<<"the selected row is:"<<row;
+    //qDebug()<<"the selected row is:"<<row;
 
     QString str = ui->dataBaseView->model()->data(index).toString();
-    qDebug()<<"the selected str is :"<<str;
+    //qDebug()<<"the selected str is :"<<str;
 
     QModelIndex tempIndex =ui->dataBaseView->model()->index(row,2);  //选中行第三列的内容，即台站名称
     QVariant data =ui->dataBaseView->model()->data(tempIndex);
@@ -204,10 +208,9 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
     data = ui->dataBaseView->model()->data(tempIndex);
     QString filePath = data.toString();
     qDebug()<<"the current csv file path is :"<<filePath;
-
     //画一个圆形，然后获取其ID，再动态闪烁，效果可以
     QVariant result = ui->axWidget->dynamicCall("DrawCircle(double, double, double)",coordinates[0],coordinates[1],300);
-    qDebug()<<"id="<<result.toLongLong();
+    //qDebug()<<"id="<<result.toLongLong();
     qlonglong id= result.toLongLong();
     ui->axWidget->dynamicCall("TwinkeEnt(qlonglong)",id);
 
@@ -221,9 +224,9 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
 //    ts<<doc<<endl;
 //    outFile.close();
 
-    emit sendSelectedCSVFile(filePath);
     emit pageSwitch9();
-
+    emit sendSelectedCSVFile(filePath);  
+    emit reSelectedCSVFile();
 
 }
 

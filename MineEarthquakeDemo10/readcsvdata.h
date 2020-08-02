@@ -27,6 +27,8 @@ public:
     friend class DynamicWave;
     friend class ShowChart;
     friend class DrawThread;
+    static int tempMotiPos[10][1];           //存储具体站台名称及其激发位置，站台标号为1-9对应tempMotiPos[1][0]~[9][0]
+
 private:
 
     int senNum = 0;                          //记录传感器的数量
@@ -46,7 +48,6 @@ private:
 
     int count=0;                             //记录事件的个数，在CSV文件中表现为行数
     int *motiPos;                            //每个传感器的激发位置
-    int tempMotiPos[10][1] ={{0}};           //存储具体站台名称及其激发位置，站台标号为1-9对应tempMotiPos[1][0]~[9][0]
 
     const int startTime = 3;                 //开始的截取时间，激发位置前面5s
     const int endTime = 15;                  //结束的截取时间，激发位置后面10s
