@@ -603,6 +603,19 @@ color: rgb(255, 255, 255);</string>
            </property>
           </widget>
          </item>
+         <item>
+          <spacer name="horizontalSpacer_9">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </item>
        <item>
@@ -717,20 +730,32 @@ color: rgb(255, 255, 255);</string>
          </property>
          <property name="minimumSize">
           <size>
-           <width>1000</width>
-           <height>600</height>
+           <width>750</width>
+           <height>625</height>
           </size>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
          </property>
          <property name="widgetResizable">
           <bool>true</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
          </property>
          <widget class="QWidget" name="scrollAreaWidgetContents">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>998</width>
-            <height>598</height>
+            <width>1000</width>
+            <height>623</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -738,6 +763,12 @@ color: rgb(255, 255, 255);</string>
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>1000</width>
+            <height>600</height>
+           </size>
           </property>
          </widget>
         </widget>

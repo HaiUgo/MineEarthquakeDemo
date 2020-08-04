@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>726</width>
+    <width>745</width>
     <height>622</height>
    </rect>
   </property>
@@ -21,8 +21,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>720</width>
-    <height>614</height>
+    <width>745</width>
+    <height>622</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -35,6 +35,24 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="sizeConstraint">
+    <enum>QLayout::SetDefaultConstraint</enum>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <property name="sizeConstraint">
@@ -42,6 +60,13 @@
      </property>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>切换台站</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QPushButton" name="T1Button">
          <property name="text">

@@ -6,6 +6,9 @@
 //安全性换取高效和简便性的做法。
 ShowChart *showChart;             //子界面，即chartview界面
 
+//定义一个全局的状态栏，这样在子界面中也可以使用
+QStatusBar *globalStatusBar;
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
@@ -18,6 +21,10 @@ Widget::Widget(QWidget *parent)
     ui->scrollArea->setWidget(showChart);
     dw = new DynamicWave;
     //dw->setWindowFlags(dw->windowFlags()& ~Qt::WindowCloseButtonHint);
+
+    globalStatusBar = new QStatusBar(this);
+    layout()->addWidget(globalStatusBar);
+    globalStatusBar->showMessage(tr("欢迎来到矿山高频微震地面台网监控系统！"));
 
     readData = ReadCSVData::getInstance();
 
@@ -64,6 +71,7 @@ void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
     if(iCommandId == 1){
         // 调用控件打开dwg文件命令。
         ui->axWidget->dynamicCall("OpenDwgFile(const QString&)","C:\\Users\\13696\\Desktop\\项目参考资料\\红阳三矿20200713lh.dwg");
+        globalStatusBar->showMessage("打开矿区图：C:\\Users\\13696\\Desktop\\项目参考资料\\红阳三矿20200713lh.dwg");
     }
     if(iCommandId == 5){
         // 调用控件缩放命令。
@@ -223,6 +231,7 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
 //    QTextStream ts(&outFile);
 //    ts<<doc<<endl;
 //    outFile.close();
+    globalStatusBar->showMessage(tr("读取文件：")+filePath);
 
     readData->parseCSVFileName(ReadCSVData::FILEPATH);
     readData->readCSVFile(ReadCSVData::FILEPATH);

@@ -32,6 +32,7 @@ ShowChart::ShowChart(QWidget *parent) :
     connect(this,SIGNAL(saveModifiedPWave()),this,SLOT(saveModifiedPWaveData()));
     for(int i=0;i<27;i++){
         connect(&splineSeries[i], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
+        connect(&lineSeries[i], &QLineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
     }
 }
 
@@ -81,7 +82,7 @@ void ShowChart::initCharts()
     m_valueLabel = new QLabel(this);
 
     //QMargins margin(10,10,5,5);                           //设置chart rectangle（图表矩形）的边距
-    QRectF recf(20,5,260,50);                               //显示设置plot area（图表区域）的大小
+    QRectF recf(5,5,220,50);                               //显示设置plot area（图表区域）的大小
 
     for (int i=0;i<27;i++) {
         splineSeries[i].setColor(QColor(Qt::black));
@@ -137,7 +138,7 @@ void ShowChart::initCharts()
         chart2[i].setPlotArea(recf);
 
         axisX2[i].setRange(0, 90000);                      //设置坐标轴范围
-        axisX2[i].setTickCount(10);                        //9区域，10个刻度
+        axisX2[i].setTickCount(10);
         axisY2[i].setRange(-50000, 50000);
 
         chart2[i].addAxis(&axisX2[i], Qt::AlignBottom);    //把坐标轴添加到chart中，第二个参数是设置坐标轴的位置，
@@ -427,6 +428,7 @@ void ShowChart::informationDialog()
         }
         else QMessageBox::warning(this,"警告","请输入有效值",QStringLiteral("确定"));
     }else{
+        globalStatusBar->showMessage(tr("更新操作已取消！"));
         qDebug()<<"Saving P wave arrival operation is cancelled ";
         return;
     }
@@ -451,6 +453,7 @@ void ShowChart::saveModifiedPWaveData()
         qDebug() << "Cannot open file for Writing";
         return;
     }
+
     QString newStr = value +","+ station;
     QString oldStr =motiPositon +","+ station;
     qDebug()<<"newStr ="<<newStr<<" "<<"oldStr = "<<oldStr;
@@ -458,10 +461,15 @@ void ShowChart::saveModifiedPWaveData()
     {
         //block.replace(QRegExp("USER=.*"),QString("wor"));
         block.replace(QString(oldStr),QString(newStr));
-        qDebug()<<"writed";
+        file.write(block.toUtf8());
+        file.close();
+        globalStatusBar->showMessage(tr("数据")+newStr+tr(" 已更新到：")+ReadCSVData::FILEPATH);
+        qDebug()<<"writed successfully!";
+    }else {
+        file.write(block.toUtf8());
+        file.close();
+        globalStatusBar->showMessage(tr("数据")+newStr+tr(" 更新到：")+ReadCSVData::FILEPATH+tr(" 失败！请刷新！"));
     }
-    file.write(block.toUtf8());
-    file.close();
 }
 
 //调用定位算法

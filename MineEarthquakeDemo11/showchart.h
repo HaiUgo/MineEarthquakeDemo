@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QThread>
 #include <QMessageBox>
+#include <QStatusBar>
 #include "chart.h"
 #include "chartview.h"
 #include "readcsvdata.h"
@@ -18,6 +19,7 @@
 
 QT_CHARTS_USE_NAMESPACE
 
+extern QStatusBar *globalStatusBar;
 class ReadCSVData;
 class DynamicWave;
 

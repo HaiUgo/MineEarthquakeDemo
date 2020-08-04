@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QMap>
 #include <QThread>
+#include <QStatusBar>
 #include "showchart.h"
 #include "connectdatabase.h"
 #include "mxdrawxlib.h"
