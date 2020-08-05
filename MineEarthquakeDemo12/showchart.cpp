@@ -28,7 +28,6 @@ ShowChart::ShowChart(QWidget *parent) :
     connect(ui->tx,SIGNAL(toggled(bool)),this,SLOT(txIsChecked(bool)));
     connect(ui->ty,SIGNAL(toggled(bool)),this,SLOT(tyIsChecked(bool)));
     connect(ui->tz,SIGNAL(toggled(bool)),this,SLOT(tzIsChecked(bool)));
-    //connect(this,&ShowChart::closeDynWaveWindow,this,&ShowChart::attackClosedDynWaveWindow);
     connect(this,SIGNAL(saveModifiedPWave()),this,SLOT(saveModifiedPWaveData()));
     for(int i=0;i<27;i++){
         connect(&splineSeries[i], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
@@ -38,22 +37,8 @@ ShowChart::ShowChart(QWidget *parent) :
 
 ShowChart::~ShowChart()
 {
-    delete m_valueLabel;
-    delete [] splineSeries;
-    delete [] scatterSeries;
-    delete [] axisX;
-    delete [] axisY;
-    delete [] chart;
-    delete [] view;
-
-    delete [] splineSeries2;
-    delete [] scatterSeries2;
-    delete [] axisX2;
-    delete [] axisY2;
-    delete [] chart2;
-    delete [] view2;
-
     delete ui;
+    qDebug()<<"ShowChart::~ShowChart()";
 }
 
 //图表初始化

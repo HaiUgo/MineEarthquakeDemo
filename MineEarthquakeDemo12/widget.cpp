@@ -50,15 +50,18 @@ Widget::Widget(QWidget *parent)
     connect(this,SIGNAL(sendSelectedCSVFile()),thread,SLOT(doDrawSplineWork()));
     workThread->start();
 
-    qDebug()<<"UI widget ThreadId:"<<QThread::currentThreadId();
+    qDebug()<<"Widget ThreadId:"<<QThread::currentThreadId();
 }
 
 Widget::~Widget()
 {
+    //QT对象树机制
     db->close();
     delete db;
-    delete showChart;
+    delete thread;
     delete ui;
+
+    qDebug()<<"Widget::~Widget()";
 }
 
 //控件命令按钮

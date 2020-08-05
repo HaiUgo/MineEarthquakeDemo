@@ -12,11 +12,11 @@ void ConnectDataBase::conDataBase()
     db.open();
     //测试连接
     if(!db.open()){
-        qDebug()<<"the connection to database is failed"<<'\n';
+        qDebug()<<"the connection to database is failed";
         return ;
     }
     else{
-         qDebug()<<"the connection to database is successful"<<'\n';
+         qDebug()<<"the connection to database is successful";
     }
 }
 
@@ -24,4 +24,5 @@ void ConnectDataBase::conDataBase()
 void ConnectDataBase::close()
 {
     db.close();
+    qDebug()<<"ConnectDataBase::close()";
 }

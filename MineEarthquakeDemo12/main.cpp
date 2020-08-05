@@ -8,7 +8,5 @@ int main(int argc, char *argv[])
     Widget w;
     w.showMaximized();
 
-//    ShowChart showChart;
-//    showChart.show();
     return a.exec();
 }

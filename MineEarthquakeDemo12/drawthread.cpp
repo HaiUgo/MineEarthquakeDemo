@@ -8,7 +8,7 @@ DrawThread::DrawThread(QObject *parent):
 
 DrawThread::~DrawThread()
 {
-
+    qDebug()<<"DrawThread::~DrawThread()";
 }
 
 void DrawThread::doDrawSplineWork()
@@ -118,4 +118,8 @@ void DrawThread::doDrawSplineWork()
         }
     }
     qDebug()<<"ThreadID:"<<QThread::currentThreadId();
+
+    QThread::msleep(1500);
+    delete[] readData->pointBuffer;
+    delete[] readData->pointBuffer_P;
 }

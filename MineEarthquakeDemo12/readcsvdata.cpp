@@ -5,31 +5,9 @@ ReadCSVData::ReadCSVData()
 
 }
 
-//删除野指针，避免内存泄漏
 ReadCSVData::~ReadCSVData()
 {
-    delete motiPos;
-    delete date;
-
-    for( int i = 0 ; i < 90000 ; i ++ )
-        delete []senChannelZ[i] ;
-    delete []senChannelZ;
-
-    for( int i = 0 ; i < 90000 ; i ++ )
-        delete []senChannelY[i] ;
-    delete []senChannelY;
-
-    for( int i = 0 ; i < 90000 ; i ++ )
-        delete []senChannelX[i] ;
-    delete []senChannelX;
-
-    for( int i = 0 ; i < 90000 ; i ++ )
-        delete []senChannelNum[i] ;
-    delete []senChannelNum;
-
-    delete pointBuffer;
-    delete pointBuffer_P;
-
+    qDebug()<<"ReadCSVData::~ReadCSVData()";
 }
 
 QMutex ReadCSVData::m_Mutex;
@@ -102,6 +80,14 @@ void ReadCSVData::parseCSVFileName(QString filePath)
     //用于绘制P波到时（红线）
     pointBuffer_P = new QVector<QPointF>[10];
 
+    qDebug()<<"motiPos:"<<motiPos;
+    qDebug()<<"date:"<<date;
+    qDebug()<<"senChannelZ:"<<senChannelZ;
+    qDebug()<<"senChannelY:"<<senChannelY;
+    qDebug()<<"senChannelX:"<<senChannelX;
+    qDebug()<<"senChannelNum:"<<senChannelNum;
+    qDebug()<<"pointBuffer:"<<pointBuffer;
+    qDebug()<<"pointBuffer_P:"<<pointBuffer_P;
     qDebug()<<"parsing the csv file completed";
 }
 
@@ -504,6 +490,23 @@ void ReadCSVData::locateCSVData()
             pointBuffer_P[j].append(QPointF(tempMotiPos[j][0],-50000));
         }
     }
+
+    //删除野指针，避免内存泄漏
+    delete[] motiPos;
+    delete[] date;
+    for( int i = 0 ; i < 90000 ; i ++ )
+        delete []senChannelZ[i] ;
+    delete []senChannelZ;
+    for( int i = 0 ; i < 90000 ; i ++ )
+        delete []senChannelY[i] ;
+    delete []senChannelY;
+    for( int i = 0 ; i < 90000 ; i ++ )
+        delete []senChannelX[i] ;
+    delete []senChannelX;
+    for( int i = 0 ; i < 90000 ; i ++ )
+        delete []senChannelNum[i] ;
+    delete []senChannelNum;
+
     qDebug()<<"locateCSVData successfully!";
 }
 
@@ -515,22 +518,16 @@ void ReadCSVData::paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPoi
     double parseDataY;
     double parseDataZ;
     for(int j=0;j<count;j++){
-        //qDebug()<<"enter internal paddingPointBuffer!"<<'\n';
         parseDataX = senChannelX[j][index].toDouble();        //QString转为float型
-        //qDebug()<<"senChannelX[j][index]="<<senChannelX[j][index]<<'\n';
         //qDebug()<<"parseDataX="<<parseDataX<<'\n';
         parseDataY = senChannelY[j][index].toDouble();
-        //qDebug()<<"senChannelY[j][index]="<<senChannelY[j][index]<<'\n';
         //qDebug()<<"parseDataY="<<parseDataY<<'\n';
         parseDataZ = senChannelZ[j][index].toDouble();
-        //qDebug()<<"senChannelZ[j][index]="<<senChannelZ[j][index]<<'\n';
         //qDebug()<<"parseDataZ="<<parseDataZ<<'\n';
-        //qDebug()<<" between paddingPointBuffer !"<<'\n';
         pointBufferX->append(QPointF(listIndex, parseDataX)); //点坐标集合
         pointBufferY->append(QPointF(listIndex, parseDataY));
         pointBufferZ->append(QPointF(listIndex, parseDataZ));
         listIndex++;
-        //qDebug()<<"leave internal paddingPointBuffer"<<'\n';
     }
     qDebug()<<"paddingPointBuffer successfully!";
 }
