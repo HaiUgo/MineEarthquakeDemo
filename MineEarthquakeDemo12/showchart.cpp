@@ -12,14 +12,18 @@ ShowChart::ShowChart(QWidget *parent) :
     showStackedWidgetCharts();
 
     ui->stackedWidget->setCurrentIndex(9);
-    //对P波手动输入框做限制，只能输入数字，长度为5
+
+    //对输入框做限制，只能输入数字，长度为5
     QRegExp regx("[0-9]+$");
     QValidator *validator=new QRegExpValidator(regx,this);
     ui->intputPWave->setValidator(validator);
     ui->intputPWave->setMaxLength(5);
 
-    userInput[1] = 2;               //默认计算Z方向
+    //默认计算Z方向
+    userInput[1] = 2;
+
     ui->comboBox_2->setInsertPolicy(QComboBox::InsertAfterCurrent);
+
     //以下为信号和槽函数，只写了一部分，剩余按钮用的自动关联
     connect(ui->fulllScreenButton,SIGNAL(clicked()),this,SLOT(fullChartsButtonClicked()));
     connect(ui->saveModifiedPWave,SIGNAL(clicked()),this,SLOT(informationDialog()));
@@ -74,14 +78,14 @@ void ShowChart::initCharts()
         lineSeries[i].setColor(QColor(255,0,0));
 
         chart[i].legend()->hide();
-        chart[i].addSeries(&splineSeries[i]);            //为图表添加曲线序列
-        chart[i].addSeries(&lineSeries[i]);              //为图标添加折线序列
-        chart[i].addSeries(&scatterSeries[i]);           //为图表添加点序列
+        chart[i].addSeries(&splineSeries[i]);              //为图表添加曲线序列
+        chart[i].addSeries(&lineSeries[i]);                //为图标添加折线序列
+        chart[i].addSeries(&scatterSeries[i]);             //为图表添加点序列
 
-        axisX[i].setRange(0, 90000);                     //设置坐标轴范围
-        axisX[i].setTitleText("time(0.2millisecs)");     //标题
-        axisX[i].setTickCount(10);                       //9区域，10个刻度
-        axisX[i].setMinorTickCount(1);                   //单位刻度中间再加一个副刻度
+        axisX[i].setRange(0, 90000);                       //设置坐标轴范围
+        axisX[i].setTitleText("time(0.2millisecs)");       //标题
+        axisX[i].setTickCount(10);                         //9区域，10个刻度
+        axisX[i].setMinorTickCount(1);                     //单位刻度中间再加一个副刻度
 
         axisY[i].setRange(-50000, 50000);
         axisY[i].setTitleText("accelerated speed");
@@ -133,7 +137,6 @@ void ShowChart::initCharts()
         lineSeries2[i].attachAxis(&axisY2[i]);
 
         view2[i].setChart(&chart2[i]);
-        //view2[i].setRubberBand(QChartView::RectangleRubberBand);
         view2[i].installEventFilter(this);                //注册部件事件过滤
     }
 }
@@ -281,6 +284,7 @@ void ShowChart::tzIsChecked(bool checked)
         userInput[1] = -1;
     }
 }
+
 //处理用户输入的P波相关数据
 void ShowChart::handleTheInputData()
 {
@@ -367,6 +371,7 @@ void ShowChart::fullChartsButtonClicked()
     ui->stackedWidget->setCurrentIndex(9);
 }
 
+//鼠标悬停到波形图上显示该出坐标点
 void ShowChart::slotPointHoverd(const QPointF &point, bool state)
 {
     if (state) {
@@ -393,8 +398,6 @@ void ShowChart::informationDialog()
     int ret = msg.exec();
 
     if(ret == QMessageBox::AcceptRole){
-        //if(ui->comboBox_2->currentIndex() == 0)
-        //    repaintPWave(0);
         if(currentLocation>0 && currentLocation<90000){
             emit saveModifiedPWave();
             qDebug()<<"emit savaModifiedPWave";
@@ -448,22 +451,23 @@ void ShowChart::saveModifiedPWaveData()
 //调用定位算法
 void ShowChart::getLoactionData()
 {
-    handleTheInputData();                                       //需要先处理用户输入的数据才可以
-    if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]==2){  //只有选定Z通道为计算方向时才做处理
+    handleTheInputData();                                               //需要先处理用户输入的数据才可以
+    if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]==2){         //只有选定Z通道为计算方向并且输入数据不超范围时才做处理
         int value = LocationAlgorithm::locationAlgorithm(userInput[2]); //调用定位算法
         qDebug()<<"location algorithm value="<<value;
         ui->comboBox_2->clear();
-        //ui->comboBox_2->addItem(QString::asprintf("%s","定位点"));
         ui->comboBox_2->addItem(QString::asprintf("%d",value));
     }
 }
+
 //重新绘制用户调整P波激发位置后的P波红线
 void ShowChart::repaintPWave(int value)
 {
     Q_UNUSED(value)
     currentLocation =ui->comboBox_2->currentText().toInt();
     qDebug()<<"currentLocation="<<currentLocation;
-    //删除台站X、Y、Z方向的P波红线
+
+    //删除台站X、Y、Z方向的旧P波红线
     lineSeries[userInput[0]*3].clear();
     lineSeries[userInput[0]*3+1].clear();
     lineSeries[userInput[0]*3+2].clear();
@@ -472,7 +476,7 @@ void ShowChart::repaintPWave(int value)
     lineSeries2[userInput[0]*3+1].clear();
     lineSeries2[userInput[0]*3+2].clear();
 
-    //绘制调整后的P波红线
+    //绘制调整后的新P波红线
     lineSeries[userInput[0]*3] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
     lineSeries[userInput[0]*3+1] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
     lineSeries[userInput[0]*3+2] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
@@ -614,7 +618,8 @@ void ShowChart::drawSplineWave()
 void ShowChart::charViewEventFilter(QEvent *event,QChart *tempChart)
 {
     if(event->type()==QEvent::Wheel){
-        QWheelEvent *wheelEvent = static_cast<QWheelEvent*>(event); //将event强制转换为发生的事件的类型
+        //将event强制转换为发生的事件的类型
+        QWheelEvent *wheelEvent = static_cast<QWheelEvent*>(event);
         if(wheelEvent->delta()>0)tempChart->zoom(1.2);
         else tempChart->zoom(10.0/11);
     }

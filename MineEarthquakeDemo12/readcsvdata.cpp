@@ -10,9 +10,11 @@ ReadCSVData::~ReadCSVData()
     qDebug()<<"ReadCSVData::~ReadCSVData()";
 }
 
+
 QMutex ReadCSVData::m_Mutex;
 QSharedPointer<ReadCSVData> ReadCSVData::m_instance;
 
+//初始化
 QString ReadCSVData::FILEPATH = "";
 
 int ReadCSVData::count = 0;
@@ -21,6 +23,7 @@ int ReadCSVData::senNum = 0;
 
 int ReadCSVData::tempMotiPos[10][1] = {{0}};
 
+//返回单例
 QSharedPointer<ReadCSVData>& ReadCSVData::getInstance()
 {
     if (m_instance.isNull())
@@ -192,7 +195,8 @@ void ReadCSVData::locateCSVData()
     for(int i=0;i<senNum;i++){
         switch(tempStation[i])                                     //判断是哪一个站台
         {
-            //因为CSV文件中站名称是无序的，所以必须要定位到该站台在哪一列，从而才能够定位到该站台X，Y，Z轴以及激发位置在哪一列
+            //因为CSV文件中台站及其对应XYZ通道的数据的存储位置（表现在CSV文件中的列数据）是不固定的，
+            //所以使用前必须要定位到该台站在哪一列，从而才能够定位到该站台X，Y，Z轴以及激发位置在哪一列
             case 1:
                     //qDebug()<<"start case 1"<<'\n';
                     if(1==tempStation[0]){                         //表示读取CSV文件数据时每行的第一个站台为1站台
@@ -202,7 +206,7 @@ void ReadCSVData::locateCSVData()
                         tempMotiPos[tempStation[i]][0] = motiPos[0];            //表示tempStation[i]=x站台的激发位置，存储在tempMotiPos[x][0]中
                     }else if(1==tempStation[1]){                   //表示读取CSV文件数据时每行的第二个站台为1站台
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX2);
-                        tempMotiPos[tempStation[i]][0] = motiPos[1];               //
+                        tempMotiPos[tempStation[i]][0] = motiPos[1];
                     }else if(1==tempStation[2]){                   //表示读取CSV文件数据时每行的第三个站台为1站台，后面以此类推
                         paddingPointBuffer(&pointBuffer[P1X],&pointBuffer[P1Y],&pointBuffer[P1Z],INDEX3);
                         tempMotiPos[tempStation[i]][0] = motiPos[2];
@@ -513,8 +517,8 @@ void ReadCSVData::locateCSVData()
 //入参传入QVector<QPointF>的实例化对象
 void ReadCSVData::paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPointF> *pointBufferY,QVector<QPointF> *pointBufferZ,int index)
 {
-    int listIndex = 0; 	                                     //可以理解为横坐标，因为横坐标就是每个事件（也就是CSV文件中的一行数据）
-    double parseDataX;                                        //存储CSV文件中字符值转换为浮点型后的值
+    int listIndex = 0; 	                                      //可以理解为横坐标，因为横坐标就是每个事件（也就是CSV文件中的一行数据）
+    double parseDataX;
     double parseDataY;
     double parseDataZ;
     for(int j=0;j<count;j++){
@@ -524,7 +528,7 @@ void ReadCSVData::paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPoi
         //qDebug()<<"parseDataY="<<parseDataY<<'\n';
         parseDataZ = senChannelZ[j][index].toDouble();
         //qDebug()<<"parseDataZ="<<parseDataZ<<'\n';
-        pointBufferX->append(QPointF(listIndex, parseDataX)); //点坐标集合
+        pointBufferX->append(QPointF(listIndex, parseDataX)); //点坐标添加到缓存中
         pointBufferY->append(QPointF(listIndex, parseDataY));
         pointBufferZ->append(QPointF(listIndex, parseDataZ));
         listIndex++;

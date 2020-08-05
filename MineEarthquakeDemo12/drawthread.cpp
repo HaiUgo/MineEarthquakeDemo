@@ -28,7 +28,6 @@ void DrawThread::doDrawSplineWork()
     }
     for(int i=0;i<27;i++){
         showChart->splineSeries[i].replace(readData->pointBuffer[i]);
-       // scatterSeries[i].replace(readData->pointBuffer[i]);
     }
 
     //根据tempMotiPos[j][0]获取站台及激发位置，然后将其绘制到图表中（P波到时）
@@ -43,7 +42,7 @@ void DrawThread::doDrawSplineWork()
                 showChart->lineSeries2[T1Y].replace(readData->pointBuffer_P[j]);
                 showChart->lineSeries2[T1Z].replace(readData->pointBuffer_P[j]);
             }
-            if(2==j){
+            if(2==j){                                 //如果站台是2站台，则将P波到时绘制到T2的XYZ轴曲线图表中，以此类推
                 showChart->lineSeries[T2X].replace(readData->pointBuffer_P[j]);
                 showChart->lineSeries[T2Y].replace(readData->pointBuffer_P[j]);
                 showChart->lineSeries[T2Z].replace(readData->pointBuffer_P[j]);
@@ -119,7 +118,9 @@ void DrawThread::doDrawSplineWork()
     }
     qDebug()<<"ThreadID:"<<QThread::currentThreadId();
 
-    QThread::msleep(1500);
+    QThread::msleep(1500);                             //睡眠1500ms
+
+    //释放内存空间
     delete[] readData->pointBuffer;
     delete[] readData->pointBuffer_P;
 }

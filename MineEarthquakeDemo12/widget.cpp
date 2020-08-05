@@ -4,7 +4,7 @@
 //说明：不应该将ShowChart定义为一个全局对象，但是考虑到子线程无法实例化界面对象，而且需要通过子线程调用
 //ShowChart中的绘制波形图的方法来提高效率（虽然加了子线程，但是效率和之前相比并没有明显提高），这是一种拿
 //安全性换取高效和简便性的做法。
-ShowChart *showChart;             //子界面，即chartview界面
+ShowChart *showChart;
 
 //定义一个全局的状态栏，这样在子界面中也可以使用
 QStatusBar *globalStatusBar;
@@ -151,7 +151,7 @@ void Widget::cancleDynBlinkClicked()
     ui->axWidget->dynamicCall("DoCommand(const qint32&)",9);
 }
 
-//在UI上显示数据库数据
+//在主界面上显示数据库数据
 void Widget::showTable()
 {
     //QStandardItemModel* m_list_item_model = NULL;
@@ -164,14 +164,14 @@ void Widget::showTable()
     model->setHeaderData(3,Qt::Horizontal,tr("定位坐标"));
     model->setHeaderData(4,Qt::Horizontal,tr("能量/J"));
     model->setHeaderData(5,Qt::Horizontal,tr("震级"));
-    ui->dataBaseView->verticalHeader()->setVisible(false);     //禁止显示列标头
-   // ui->tableView_2->sortByColumn(0,Qt::AscendingOrder);     //按列排序，升序
+    ui->dataBaseView->verticalHeader()->setVisible(false);          //禁止显示列标头
+   // ui->tableView_2->sortByColumn(0,Qt::AscendingOrder);          //按列排序，升序
     ui->dataBaseView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->dataBaseView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->dataBaseView->setModel(model);
 
     QAbstractItemModel *itemModel = ui->dataBaseView->model();
-    QModelIndex itemIndex = itemModel->index(0,1);            //定位到事件1，获取其时间
+    QModelIndex itemIndex = itemModel->index(0,1);                  //定位到事件1，获取其时间
     QVariant data = itemModel->data(itemIndex);
     ui->lastestIncidentLabel->setText("最新事件："+data.toString());
 }
@@ -207,12 +207,12 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
     ReadCSVData::FILEPATH = filePath;
     qDebug()<<"the current csv file path is :"<<ReadCSVData::FILEPATH;
 
-    //画一个圆形，然后获取其ID，再动态闪烁，效果可以
+    //画一个圆形，然后获取其ID，再动态闪烁
     QVariant result = ui->axWidget->dynamicCall("DrawCircle(double, double, double)",coordinates[0],coordinates[1],300);
     //qDebug()<<"id="<<result.toLongLong();
     qlonglong id= result.toLongLong();
     ui->axWidget->dynamicCall("TwinkeEnt(qlonglong)",id);
-    entityId.insertMulti(row,id);                        //将该圆形实体ID存入容器，方便后期操作
+    entityId.insertMulti(row,id);                                   //将该圆形实体ID存入容器，方便后期操作
 
       //下面是生成QT版的com接口说明文档，很有必要阅读
 //    QString doc=ui->axWidget->generateDocumentation();
@@ -221,6 +221,7 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
 //    QTextStream ts(&outFile);
 //    ts<<doc<<endl;
 //    outFile.close();
+
     globalStatusBar->showMessage(tr("读取文件：")+filePath);
 
     readData->parseCSVFileName(ReadCSVData::FILEPATH);
