@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/image">
+        <file>images/lnu.jpg</file>
+    </qresource>
+</RCC>
