@@ -45,7 +45,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->moveViewButton,SIGNAL(clicked()),SLOT(moveViewButtonClicked()));
     connect(ui->cancelDynBlink,SIGNAL(clicked()),SLOT(cancleDynBlinkClicked()));
     connect(ui->databaseSoureComboBox,QOverload<const QString &>::of(&QComboBox::currentIndexChanged),this,&Widget::reSelectDataBaseSource);
-
+    connect(ui->refreshCurrentDataTable,SIGNAL(clicked()),SLOT(refreshCurrentDataTable()));
     connect(ui->dataBaseView,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(dataBaseViewDC(const QModelIndex &)));
     connect(this,SIGNAL(pageSwitch9()),showChart,SLOT(pageSwithTo9()));
     //connect(this,SIGNAL(sendSelectedCSVFile(QString)),showChart,SLOT(receiveCSVFilePath(QString)));
@@ -69,13 +69,11 @@ Widget::~Widget()
     qDebug()<<"Widget::~Widget()";
 }
 
-//重新选择数据库
-void Widget::reSelectDataBaseSource(QString value)
+//刷新当前数据表
+void Widget::refreshCurrentDataTable()
 {
-    qDebug()<<"currentDataBase="<<value;
-    currentDataBase = value;
     //sqlModel->setTable(value);
-    if(value == "mine_quack_3_results"){
+    if(currentDataBase == "mine_quack_3_results"){
         //sqlModel->select();
         sqlModel->setQuery("select * from "+currentDataBase);
         sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
@@ -96,8 +94,7 @@ void Widget::reSelectDataBaseSource(QString value)
         QVariant data = itemModel->data(itemIndex);
         ui->lastestIncidentLabel->setText("最新事件："+data.toString());
     }
-    if(value == "mine_quack_5_results"){
-        //sqlModel->select();
+    if(currentDataBase == "mine_quack_5_results"){
         sqlModel->setQuery("select * from "+currentDataBase);
         sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
         sqlModel->setHeaderData(1,Qt::Horizontal,tr("类型"));
@@ -119,6 +116,13 @@ void Widget::reSelectDataBaseSource(QString value)
         QVariant data = itemModel->data(itemIndex);
         ui->lastestIncidentLabel->setText("最新事件："+data.toString());
     }
+}
+
+//重新选择数据表
+void Widget::reSelectDataBaseSource(QString value)
+{
+    currentDataBase = value;
+    refreshCurrentDataTable();
 }
 
 //控件命令按钮
@@ -242,6 +246,8 @@ void Widget::showTable()
 void Widget::dataBaseViewDC(const QModelIndex &index)
 {
     int row = ui->dataBaseView->currentIndex().row();
+
+
     QString str = ui->dataBaseView->model()->data(index).toString();
     QModelIndex tempIndex;
     QVariant data;
@@ -281,6 +287,11 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
         ReadCSVData::FILEPATH = filePath;
         qDebug()<<"the current csv file path is :"<<ReadCSVData::FILEPATH;
     }
+
+    LocationAlgorithm::SQLTABLE = currentDataBase;
+    tempIndex = ui->dataBaseView->model()->index(row,0);                 //获取数据库事件ID
+    LocationAlgorithm::EVENTID  =ui->dataBaseView->model()->data(tempIndex).toInt();
+
 
     //画一个圆形，然后获取其ID，再动态闪烁
     QVariant result = ui->axWidget->dynamicCall("DrawCircle(double, double, double)",coordinates[0],coordinates[1],300);

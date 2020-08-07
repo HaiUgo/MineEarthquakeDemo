@@ -51,7 +51,8 @@ private slots:
     void monthlyStatementClicked();                              //月报表按钮
     void helpButtonClicked();                                    //帮助按钮
     void dataBaseViewDC(const QModelIndex &);                    //dataBaseView鼠标双击事件
-    void reSelectDataBaseSource(QString value);                  //重新选择数据库
+    void reSelectDataBaseSource(QString value);                  //重新选择数据表
+    void refreshCurrentDataTable();                              //刷新当前数据表
 private:
     Ui::Widget *ui;
 
@@ -65,7 +66,7 @@ private:
     QSqlQueryModel * sqlModel;                                  //sql模型
     //QSqlTableModel *sqlModel;
 
-    double coordinates[3];                                       //X,Y,Z坐标
+    double coordinates[3];                                       //矿区图X,Y,Z坐标
     QString currentDataBase;                                     //当前数据表名
 
     QVector<qlonglong> rowCount;                                 //记录用户在数据库视图上操作了哪些行事件

@@ -424,8 +424,11 @@ void ShowChart::updatePSOandPwaveData()
 {
     saveModifiedPWaveData();
 
-    globalStatusBar->showMessage(tr("新的定位值已更新到数据库中！"));
+    ConnectDataBase::updateDataBase(LocationAlgorithm::SQLTABLE,LocationAlgorithm::EVENTID,
+                                    LocationAlgorithm::XRESULT.toDouble(),LocationAlgorithm::YRESULT.toDouble(),
+                                    LocationAlgorithm::ZRESULT.toDouble(),LocationAlgorithm::TRESULT.toDouble());
 
+    globalStatusBar->showMessage(tr("新的定位值已更新到当前数据表！")+tr(" 新数据已更新到：")+ReadCSVData::FILEPATH);
 }
 //将输入的的P波到时位置保存/更新到CSV数据文件中
 void ShowChart::saveModifiedPWaveData()
@@ -470,7 +473,6 @@ void ShowChart::getLoactionData()
 {
     handleTheInputData();                                               //需要先处理用户输入的数据才可以
     if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]==2){         //只有选定Z通道为计算方向并且输入数据不超范围时才做处理
-        //int value = LocationAlgorithm::locationAlgorithm(userInput[2]); //调用定位算法
         LocationAlgorithm::psoAlgorithm();
         qDebug()<<"location algorithm value="<<LocationAlgorithm::XRESULT<<" "<<LocationAlgorithm::YRESULT
                <<" "<<LocationAlgorithm::ZRESULT<<" "<<LocationAlgorithm::TRESULT;

@@ -26,3 +26,23 @@ void ConnectDataBase::close()
     db.close();
     qDebug()<<"ConnectDataBase::close()";
 }
+
+void ConnectDataBase::updateDataBase(QString table,int id,double xData,double yData,double zData,double Parrival)
+{
+    QSqlQuery query;
+    if(table == "mine_quack_5_results"){
+        query.prepare("update mine_quack_5_results  set xData=?,yData=?,zData=?,Parrival=? where id =?");
+    }else if(table == "mine_quack_3_results"){
+        query.prepare("update mine_quack_3_results  set xData=?,yData=?,zData=?,Parrival=? where id =?");
+    }else {
+        qDebug()<<"database table not found!";
+        return;
+    }
+    //query.addBindValue(table);
+    query.addBindValue(xData);
+    query.addBindValue(yData);
+    query.addBindValue(zData);
+    query.addBindValue(Parrival);
+    query.addBindValue(id);
+    if(query.exec())qDebug()<<"update "<<table<<" at "<<id<<"successed";
+}

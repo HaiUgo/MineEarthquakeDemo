@@ -707,6 +707,13 @@ color: rgb(255, 255, 255);</string>
            </item>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="refreshCurrentDataTable">
+           <property name="text">
+            <string>刷新表</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

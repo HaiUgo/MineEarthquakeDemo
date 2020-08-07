@@ -15,6 +15,7 @@
 #include <QThread>
 #include <QMessageBox>
 #include <QStatusBar>
+#include "connectdatabase.h"
 #include "chart.h"
 #include "chartview.h"
 #include "readcsvdata.h"

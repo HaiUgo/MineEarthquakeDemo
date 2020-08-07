@@ -21,6 +21,10 @@ QString LocationAlgorithm::ZRESULT = "";
 
 QString LocationAlgorithm::TRESULT = "";
 
+int LocationAlgorithm::EVENTID = 0;
+
+QString LocationAlgorithm::SQLTABLE = "";
+
 void LocationAlgorithm::psoAlgorithm()
 {
     QLibrary myLib("pso.dll");
