@@ -269,11 +269,30 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>20</height>
+          </size>
+         </property>
          <item>
           <property name="text">
            <string>定位点</string>
           </property>
          </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="locationAlgorithmButton">
+         <property name="text">
+          <string>定位</string>
+         </property>
         </widget>
        </item>
        <item>

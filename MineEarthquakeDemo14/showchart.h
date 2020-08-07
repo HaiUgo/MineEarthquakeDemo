@@ -76,9 +76,9 @@ private slots:
     void tyIsChecked(bool checked);
     void tzIsChecked(bool checked);
 
-    void repaintPWave(int value);                                 //重新绘制定位算法调整后的P波红线
-    void saveModifiedPWaveData();                                 //将调整后的P波到时位置保存/更新到数据文件中
-
+    void repaintPWave();                                          //重新绘制P波红线
+    void saveModifiedPWaveData();                                 //将输入的P波到时位置更新到CSV数据文件中
+    void updatePSOandPwaveData();                                 //将P波到时位置更新到CSV数据文件中以及将定位算法得到得值更新到数据库中
 private:
     Ui::ShowChart *ui;
 
@@ -112,9 +112,9 @@ private:
                                                                    //其中计算方向目前仅计算了z方向的激发位置，所以用户选择XY方向时不做处理
     QLabel *m_valueLabel;                                          //用于显示某点数据
 
-    int currentLocation;                                           //保存用户选定的由定位算法计算得到的当前值
 signals:
-    void saveModifiedPWave();                                      //对话框中点击确定发送信号
+    void saveModifiedPWave();                                      //对话框中点击修改按钮发送信号
+    void updatePSOandPwave();                                      //对话框中点击更新按钮发送信号
 };
 
 

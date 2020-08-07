@@ -52,3 +52,26 @@ RESOURCES += \
     myicons.qrc
 
 DISTFILES +=
+
+
+# .h文件搜索路径
+INCLUDEPATH += $$quote(C:/Program Files/MATLAB/R2018b/extern/include)
+INCLUDEPATH += $$quote(C:/Program Files/MATLAB/R2018b/extern/include/win64)
+
+# 用到的MATLAB 的.lib库文件 及其搜索路径
+INCLUDEPATH += $$quote(C:/Program Files/MATLAB/R2018b/extern/lib/win64/microsoft)
+DEPENDPATH += $$quote(C:/Program Files/MATLAB/R2018b/extern/lib/win64/microsoft)
+
+LIBS += -L$$quote(C:/Program Files/MATLAB/R2018b/extern/lib/win64/microsoft/) -llibmex
+LIBS += -L$$quote(C:/Program Files/MATLAB/R2018b/extern/lib/win64/microsoft/) -llibmx
+LIBS += -L$$quote(C:/Program Files/MATLAB/R2018b/extern/lib/win64/microsoft/) -llibmat
+LIBS += -L$$quote(C:/Program Files/MATLAB/R2018b/extern/lib/win64/microsoft/) -llibeng
+LIBS += -L$$quote(C:/Program Files/MATLAB/R2018b/extern/lib/win64/microsoft/) -lmclmcr
+LIBS += -L$$quote(C:/Program Files/MATLAB/R2018b/extern/lib/win64/microsoft/) -lmclmcrrt
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/include/ -lpso
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/include/ -lpso
+else:unix: LIBS += -L$$PWD/include/ -lpso
+
+INCLUDEPATH += $$PWD/include
+DEPENDPATH += $$PWD/include

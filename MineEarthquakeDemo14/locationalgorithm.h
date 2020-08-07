@@ -9,16 +9,22 @@
 
 #include <QString>
 #include <cstdlib>
+#include <QLibrary>
+#include <QDebug>
 
+#include "pso.h"
 class LocationAlgorithm{
 public:
     LocationAlgorithm();
     ~LocationAlgorithm();
-    static int locationAlgorithm(int value);            //随机函数
-
+    static void psoAlgorithm();                         //粒子群算法
 public:
-    static const int WAVEVELOCITY = 3850;               //系统速度，波速
+    static const int WAVEVELOCITY ;               //系统速度，波速
 
+    static QString XRESULT;
+    static QString YRESULT;
+    static QString ZRESULT;
+    static QString TRESULT;
 };
 
 

@@ -27,12 +27,14 @@ ShowChart::ShowChart(QWidget *parent) :
     //以下为信号和槽函数，只写了一部分，剩余按钮用的自动关联
     connect(ui->fulllScreenButton,SIGNAL(clicked()),this,SLOT(fullChartsButtonClicked()));
     connect(ui->saveModifiedPWave,SIGNAL(clicked()),this,SLOT(informationDialog()));
-    connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::getLoactionData);
-    connect(ui->comboBox_2,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&ShowChart::repaintPWave);
+    connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::repaintPWave);
+    connect(ui->locationAlgorithmButton,SIGNAL(clicked()),this,SLOT(getLoactionData()));
+    //connect(ui->comboBox_2,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&ShowChart::repaintPWave);
     connect(ui->tx,SIGNAL(toggled(bool)),this,SLOT(txIsChecked(bool)));
     connect(ui->ty,SIGNAL(toggled(bool)),this,SLOT(tyIsChecked(bool)));
     connect(ui->tz,SIGNAL(toggled(bool)),this,SLOT(tzIsChecked(bool)));
     connect(this,SIGNAL(saveModifiedPWave()),this,SLOT(saveModifiedPWaveData()));
+    connect(this,SIGNAL(updatePSOandPwave()),this,SLOT(updatePSOandPwaveData()));
     for(int i=0;i<27;i++){
         connect(&splineSeries[i], &QSplineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
         connect(&lineSeries[i], &QLineSeries::hovered, this, &ShowChart::slotPointHoverd);//用于鼠标移动到点上显示数值
@@ -390,30 +392,45 @@ void ShowChart::informationDialog()
 {
     QMessageBox msg(this);
     msg.setWindowTitle(tr("提示"));
-    msg.setText(tr("点击确定将调整后的P波到时位置更新到数据文件中"));
+    msg.setText(tr("点击更新将校正后的定位以及P波位置更新到数据库和数据文件中，点击修改只更新P波位置到数据文件"));
     msg.setIcon(QMessageBox::Information);
-    msg.addButton(tr("确定"),QMessageBox::AcceptRole);
-    msg.addButton(tr("取消"),QMessageBox::RejectRole);
+//    msg.addButton(tr("确定"),QMessageBox::AcceptRole);
+//    msg.addButton(tr("取消"),QMessageBox::RejectRole);
 
-    int ret = msg.exec();
+    QPushButton *updataAllButton = msg.addButton(tr("更新"), QMessageBox::ActionRole);
+    QPushButton *updataCSVButton = msg.addButton(tr("修改"),QMessageBox::ActionRole);
+    QPushButton *abortButton = msg.addButton(tr("取消"),QMessageBox::RejectRole);
 
-    if(ret == QMessageBox::AcceptRole){
-        if(currentLocation>0 && currentLocation<90000){
+    msg.exec();
+
+    if (msg.clickedButton() == updataAllButton) {
+        emit updatePSOandPwave();
+        qDebug()<<"emit updatePSOandPwave";
+    } else if (msg.clickedButton() == updataCSVButton) {
+        if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]==2){
             emit saveModifiedPWave();
             qDebug()<<"emit savaModifiedPWave";
         }
         else QMessageBox::warning(this,"警告","请输入有效值",QStringLiteral("确定"));
-    }else{
+    }else {
         globalStatusBar->showMessage(tr("更新操作已取消！"));
-        qDebug()<<"Saving P wave arrival operation is cancelled ";
+        qDebug()<<"updata locations and P wave arrival operation is cancelled ";
         return;
     }
-}
 
-//将调整后的P波到时位置保存/更新到数据文件中
+}
+//将输入的P波到时更新到CSV数据文件中以及将定位算法得到的值更新到数据库中
+void ShowChart::updatePSOandPwaveData()
+{
+    saveModifiedPWaveData();
+
+    globalStatusBar->showMessage(tr("新的定位值已更新到数据库中！"));
+
+}
+//将输入的的P波到时位置保存/更新到CSV数据文件中
 void ShowChart::saveModifiedPWaveData()
 {
-    QString value =QString::number(currentLocation);
+    QString value =QString::number(userInput[2]);
     QString station = QString::number(userInput[0]+1);
     QString motiPositon = QString::number(ReadCSVData::TEMPMOTIPOS[userInput[0]+1]) ;
     QFile file(ReadCSVData::FILEPATH);
@@ -453,20 +470,23 @@ void ShowChart::getLoactionData()
 {
     handleTheInputData();                                               //需要先处理用户输入的数据才可以
     if(userInput[2]>0 && userInput[2]<90000 &&userInput[1]==2){         //只有选定Z通道为计算方向并且输入数据不超范围时才做处理
-        int value = LocationAlgorithm::locationAlgorithm(userInput[2]); //调用定位算法
-        qDebug()<<"location algorithm value="<<value;
+        //int value = LocationAlgorithm::locationAlgorithm(userInput[2]); //调用定位算法
+        LocationAlgorithm::psoAlgorithm();
+        qDebug()<<"location algorithm value="<<LocationAlgorithm::XRESULT<<" "<<LocationAlgorithm::YRESULT
+               <<" "<<LocationAlgorithm::ZRESULT<<" "<<LocationAlgorithm::TRESULT;
         ui->comboBox_2->clear();
-        ui->comboBox_2->addItem(QString::asprintf("%d",value));
+        QString result = "X:"+LocationAlgorithm::XRESULT+" Y:"+LocationAlgorithm::YRESULT+
+                " Z:"+LocationAlgorithm::ZRESULT+" T:"+LocationAlgorithm::TRESULT;
+        //ui->comboBox_2->addItem(QString::asprintf("%s",value));
+        ui->comboBox_2->addItem(result);
+        globalStatusBar->showMessage(tr("计算后得到的定位点为：")+result);
     }
 }
 
 //重新绘制用户调整P波激发位置后的P波红线
-void ShowChart::repaintPWave(int value)
+void ShowChart::repaintPWave()
 {
-    Q_UNUSED(value)
-    currentLocation =ui->comboBox_2->currentText().toInt();
-    qDebug()<<"currentLocation="<<currentLocation;
-
+    handleTheInputData();
     //删除台站X、Y、Z方向的旧P波红线
     lineSeries[userInput[0]*3].clear();
     lineSeries[userInput[0]*3+1].clear();
@@ -477,13 +497,13 @@ void ShowChart::repaintPWave(int value)
     lineSeries2[userInput[0]*3+2].clear();
 
     //绘制调整后的新P波红线
-    lineSeries[userInput[0]*3] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
-    lineSeries[userInput[0]*3+1] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
-    lineSeries[userInput[0]*3+2] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
+    lineSeries[userInput[0]*3] << QPointF(userInput[2], 0)<<QPointF(userInput[2], 50000)<<QPointF(userInput[2], -50000);
+    lineSeries[userInput[0]*3+1] << QPointF(userInput[2], 0)<<QPointF(userInput[2], 50000)<<QPointF(userInput[2], -50000);
+    lineSeries[userInput[0]*3+2] << QPointF(userInput[2], 0)<<QPointF(userInput[2], 50000)<<QPointF(userInput[2], -50000);
 
-    lineSeries2[userInput[0]*3] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
-    lineSeries2[userInput[0]*3+1] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
-    lineSeries2[userInput[0]*3+2] << QPointF(currentLocation, 0)<<QPointF(currentLocation, 50000)<<QPointF(currentLocation, -50000);
+    lineSeries2[userInput[0]*3] << QPointF(userInput[2], 0)<<QPointF(userInput[2], 50000)<<QPointF(userInput[2], -50000);
+    lineSeries2[userInput[0]*3+1] << QPointF(userInput[2], 0)<<QPointF(userInput[2], 50000)<<QPointF(userInput[2], -50000);
+    lineSeries2[userInput[0]*3+2] << QPointF(userInput[2], 0)<<QPointF(userInput[2], 50000)<<QPointF(userInput[2], -50000);
 
 }
 
