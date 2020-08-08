@@ -22,7 +22,7 @@ ShowChart::ShowChart(QWidget *parent) :
     //默认计算Z方向
     userInput[1] = 2;
 
-    ui->comboBox_2->setInsertPolicy(QComboBox::InsertAfterCurrent);
+    //ui->comboBox_2->setInsertPolicy(QComboBox::InsertAfterCurrent);
 
     //以下为信号和槽函数，只写了一部分，剩余按钮用的自动关联
     connect(ui->fulllScreenButton,SIGNAL(clicked()),this,SLOT(fullChartsButtonClicked()));
@@ -476,14 +476,14 @@ void ShowChart::getLoactionData()
         LocationAlgorithm::psoAlgorithm();
         qDebug()<<"location algorithm value="<<LocationAlgorithm::XRESULT<<" "<<LocationAlgorithm::YRESULT
                <<" "<<LocationAlgorithm::ZRESULT<<" "<<LocationAlgorithm::TRESULT;
-        ui->comboBox_2->clear();
+        //ui->comboBox_2->clear();
         QString result = "X:"+LocationAlgorithm::XRESULT+" Y:"+LocationAlgorithm::YRESULT+
                 " Z:"+LocationAlgorithm::ZRESULT+" T:"+LocationAlgorithm::TRESULT;
         //ui->comboBox_2->addItem(QString::asprintf("%s",value));
-        ui->comboBox_2->addItem(result);
+        //ui->comboBox_2->addItem(result);
+        ui->locationResultLabel->setText(result);
         globalStatusBar->showMessage(tr("计算后得到的定位点为：")+result);
     }
-    LocationAlgorithm::test();
 }
 
 //重新绘制用户调整P波激发位置后的P波红线

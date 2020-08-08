@@ -250,7 +250,7 @@ void Widget::showTable()
     sqlModel->setHeaderData(11,Qt::Horizontal,tr("路径"));
     sqlModel->setHeaderData(12,Qt::Horizontal,tr("传感器"));
 
-    ui->dataBaseView->verticalHeader()->setVisible(false);          //禁止显示列标头
+    ui->dataBaseView->verticalHeader()->setVisible(false);            //禁止显示列标头
     //ui->dataBaseView->sortByColumn(0,Qt::DescendingOrder);          //按找事件序号降序排序
     ui->dataBaseView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->dataBaseView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -268,7 +268,6 @@ void Widget::showTable()
 void Widget::dataBaseViewDC(const QModelIndex &index)
 {
     int row = ui->dataBaseView->currentIndex().row();
-
 
     QString str = ui->dataBaseView->model()->data(index).toString();
     QModelIndex tempIndex;

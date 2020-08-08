@@ -27,7 +27,6 @@ public:
     LocationAlgorithm();
     ~LocationAlgorithm();
     static void psoAlgorithm();                         //粒子群算法
-    static void test();
 public:
     static const char ALLPANFU[10];                     //所有的盘符名
 

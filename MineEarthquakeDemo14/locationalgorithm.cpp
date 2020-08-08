@@ -64,44 +64,6 @@ const double LocationAlgorithm::SHUANGYASHAN_SENSORINFO[][3] = {
     { 44442327, 5180765, 93.3 }
 };
 
-void LocationAlgorithm::psoAlgorithm()
-{
-    QLibrary myLib("pso.dll");
-    typedef bool MW_CALL_CONV(*Fun)(int,class mwArray const &,class mwArray const &,class mwArray const &,class mwArray const &,class mwArray const &,class mwArray const &);
-    Fun myFunc = Fun(myLib.resolve("?PSO@@YAXHAEAVmwArray@@000AEBV1@1@Z"));
-
-    if(!psoInitialize())
-    {
-        qDebug()<<"could not initialize psodll\n";
-        exit(0);
-    }
-
-    double vect[]={
-        41517290.037,41519304.125,41519926.476,41520207.356,41518060.298,
-        4599537.326,4595913.485,4597275.978,4597983.404,4594304.927,
-        24.565,23.921,20.705,22.661,21.926,
-        0,0.08,0.08999,0.099999,0.23
-    };
-
-    mwArray coordinates(5,4,mxDOUBLE_CLASS); //输入值
-    mwArray v(1,1,mxDOUBLE_CLASS);
-
-    mwArray x(1,1,mxDOUBLE_CLASS);           //输出值
-    mwArray y(1,1,mxDOUBLE_CLASS);
-    mwArray z(1,1,mxDOUBLE_CLASS);
-    mwArray t(1,1,mxDOUBLE_CLASS);
-
-    //coordinates(5,4) = vect;
-    coordinates.SetData(vect,20);             //将C++的一维数组存储到 MATLAB的二维数组
-    v(1,1)=WAVEVELOCITY;
-
-    myFunc(4,x,y,z,t,coordinates,v);
-
-    XRESULT=x.ToString();
-    YRESULT=y.ToString();
-    ZRESULT=z.ToString();
-    TRESULT=t.ToString();
-}
 
 //算法流程：
 //先获取数据库事件行的盘符，比如盘符UYW
@@ -125,12 +87,8 @@ void LocationAlgorithm::psoAlgorithm()
 //第二个矩阵的值为波速，是一个常量值，为3850
 //输出结果为重定位后的x,y,z坐标以及p波到时
 
-void LocationAlgorithm::test()
+void LocationAlgorithm::psoAlgorithm()
 {
-//    char *ch;
-//    QByteArray byteArray = ReadCSVData::PANFU.toLatin1();
-//    ch=byteArray.data();
-
     QString str = ReadCSVData::PANFU;
     QChar ch;
 
@@ -158,6 +116,8 @@ void LocationAlgorithm::test()
     baseLinePWave = baseLine/5000;                         // 基准/频率
     qDebug()<<"baseline = "<<baseLine<<"baselineIndex = "<<baseLineIndex<<" baseLinePWave"<<baseLinePWave;
 
+    //目前仅添加了红阳的坐标点，后续也可以添加其他区域，在ConnectDataBase::WHICHREGION中
+    //已经获取到了当前区域，所以可以直接加个if语句做一下判断，就可以调用不同区域的坐标值了
     for(int i=0;i<str.size();i++){                         //按照盘符名依次获取台站名及台站的红线位置
         ch =str.at(i);
         station = ReadCSVData::TEMPSTATION[i];
@@ -213,7 +173,59 @@ void LocationAlgorithm::test()
             else coordinates<<motiposPWave;
         }
     }
+//    for(int i=0;i<coordinates.size();i++){
+//        qDebug()<<coordinates.at(i);
+//    }
+
+    double toArray[4*str.size()];                                //将QVector转成数组
     for(int i=0;i<coordinates.size();i++){
-        qDebug()<<coordinates.at(i);
+        toArray[i] = coordinates.at(i);
+        qDebug()<<"toArray["<<i<<"]="<<toArray[i];
     }
+    double adjustToArray[4*str.size()];                         //将toArray调成按列存储，即调整成matlab列向量形式
+    for(int i=0,k=0;i<4*str.size();k++)
+        for(int j=0;j<str.size();j++)
+            adjustToArray[i++] = toArray[k+j*4];
+    //比如这个vect[]数组输入到Matlab，按列读取正好
+    //    double vect[]={
+    //        41517290.037,41519304.125,41519926.476,41520207.356,41518060.298,
+    //        4599537.326,4595913.485,4597275.978,4597983.404,4594304.927,
+    //        24.565,23.921,20.705,22.661,21.926,
+    //        0,0.08,0.08999,0.099999,0.23
+    //    };
+
+
+    for(int i=0;i<4*str.size();i++)
+        qDebug()<<"adjustToArray["<<i<<"]="<<adjustToArray[i];
+
+    //下面是调用MatLab编译好的粒子群算法
+    QLibrary myLib("pso.dll");
+    typedef bool MW_CALL_CONV(*Fun)(int,class mwArray const &,class mwArray const &,class mwArray const &,class mwArray const &,class mwArray const &,class mwArray const &);
+    Fun myFunc = Fun(myLib.resolve("?PSO@@YAXHAEAVmwArray@@000AEBV1@1@Z"));
+
+    if(!psoInitialize())                                  //必须要初始化成功
+    {
+        qDebug()<<"could not initialize psodll\n";
+        exit(0);
+    }
+
+    mwArray coor(str.size(),4,mxDOUBLE_CLASS);            //输入值
+    mwArray v(1,1,mxDOUBLE_CLASS);
+
+    mwArray x(1,1,mxDOUBLE_CLASS);                        //输出值
+    mwArray y(1,1,mxDOUBLE_CLASS);
+    mwArray z(1,1,mxDOUBLE_CLASS);
+    mwArray t(1,1,mxDOUBLE_CLASS);
+
+    //coor(5,4) = vect;
+    coor.SetData(adjustToArray,4*str.size());             //将C++的一维数组存储到 MATLAB的二维数组
+    v(1,1)=WAVEVELOCITY;
+
+    myFunc(4,x,y,z,t,coor,v);
+
+    XRESULT=x.ToString();
+    YRESULT=y.ToString();
+    ZRESULT=z.ToString();
+    TRESULT=t.ToString();
 }
+
