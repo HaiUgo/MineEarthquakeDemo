@@ -25,6 +25,8 @@ int ReadCSVData::SENNUM = 0;
 
 int ReadCSVData::TEMPMOTIPOS[10] = {0};
 
+int ReadCSVData::TEMPSTATION[10] = {0};
+
 //返回单例
 QSharedPointer<ReadCSVData>& ReadCSVData::getInstance()
 {
@@ -184,13 +186,15 @@ void ReadCSVData::readCSVFile(QString fileName)
 
 void ReadCSVData::locateCSVData()
 {
-    int tempStation[9]={0};                                        //存储站台名称，最多有9个站台
+    int tempStation[9]={0};                                        //按照CSV文件中站台顺序存储站台名称，最多有9个站台
 
-    for(int i=0;i<10;i++)
+    for(int i=0;i<10;i++){
         TEMPMOTIPOS[i]=0;
-
+        TEMPSTATION[i]=0;
+    }
     for(int i=0;i<SENNUM;i++){
         tempStation[i] = (senChannelNum[0][i]).toInt();            //获取站台名称并存储
+        TEMPSTATION[i] = (senChannelNum[0][i]).toInt();
         qDebug()<<"tempStation[i]="<<tempStation[i];
     }
 

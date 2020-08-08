@@ -32,6 +32,7 @@ public:
     static QString FILEPATH;                 //CSV文件的文件路径
     static QString PANFU;                    //CSV文件中的盘符名
     static int TEMPMOTIPOS[10];              //存储具体站台名称及其激发位置，比如TEMPMOTIPOS[1]表示台站T1的激发位置
+    static int TEMPSTATION[10];              //按照CSV文件中站台顺序存储站台名称
     static int SENNUM ;                      //记录传感器的数量
     static int COUNT ;                       //记录事件的个数，在CSV文件中表现为行数
 

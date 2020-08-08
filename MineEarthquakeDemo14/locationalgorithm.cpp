@@ -103,11 +103,117 @@ void LocationAlgorithm::psoAlgorithm()
     TRESULT=t.ToString();
 }
 
+//算法流程：
+//先获取数据库事件行的盘符，比如盘符UYW
+//然后获取盘符U、Y、W对应的坐标（盘符对应的坐标是固定的），假设对应的坐标为：
+//U：41519304.125,4595913.485,23.921
+//Y：41517290.037,4599537.326,24.565
+//W：41518060.298,4594304.927,21.926
+//然后获取各盘符对应台站的红线位置，盘符UYW的顺序和csv文件名是一样的，比如uyw 2020xxxx.csv
+//该uyw 2020xxxx.csv文件中包含了台站名及其激发位置(红线位置)，
+//比如U、Y、W分别对应的台站及其激发位置为(3,11000)、(2,11520)、(4,12000)，其中这个顺序必须要对应
+//然后在这些位置中选择最小的作为基准，选择基准：11000
+//然后分别求出P波到时，计算公式为：红线位置/频率，即11000/5000,11520/5000,12000/5000
+//等于：2.2，2.304，2.4
+//然后用2.304-2.2,2.4-2.2，再将2.2变为0.0,
+//这样调整后的值就成了0.0，0.104,0.2
+//然后就可以调用粒子群算法，算法的输入值为两个矩阵
+//第一个矩阵的值为上面求出来的
+// [41519304.125,4595913.485,23.921,0.0;
+//  41517290.037,4599537.326,24.565,0.104;
+//  41518060.298,4594304.927,21.926,0.2;]
+//第二个矩阵的值为波速，是一个常量值，为3850
+//输出结果为重定位后的x,y,z坐标以及p波到时
 
 void LocationAlgorithm::test()
 {
+//    char *ch;
+//    QByteArray byteArray = ReadCSVData::PANFU.toLatin1();
+//    ch=byteArray.data();
 
-    char*  ch;
-    QByteArray byteArray = ReadCSVData::PANFU.toLatin1();
-    ch=byteArray.data();
+    QString str = ReadCSVData::PANFU;
+    QChar ch;
+
+    int station;                                           //台站名，比如3或者2或者5等
+    int motipos;                                           //台站对应的红线位置，比如3对应11520
+    double motiposPWave;                                   //保存 激发位置/频率-基准/频率 得到的相对位置
+    int baseLine;                                          //将红线位置中最小的那个作为基准
+    int baseLineIndex;                                     //基准在数组中的索引
+    double baseLinePWave;                                  //保存由基准求出的相对位置
+
+    QVector<double> coordinates;                           //存储盘符对应的坐标和计算后的P波相对位置
+
+    QVector<int> data;
+    for(int i=0;i<10;i++){                                 //只保留非零值
+        if(ReadCSVData::TEMPMOTIPOS[i]!=0)
+            data.append(ReadCSVData::TEMPMOTIPOS[i]);
+    }
+
+    //在这些非零值中求出最小值作为基准
+   // QVector<int>::iterator min = std::min_element(std::begin(data),std::end(data));
+    auto min = std::min_element(std::begin(data), std::end(data));
+    baseLine = *min;
+    auto positionmin = std::distance(std::begin(data),min);
+    baseLineIndex = int(positionmin);
+    baseLinePWave = baseLine/5000;                         // 基准/频率
+    qDebug()<<"baseline = "<<baseLine<<"baselineIndex = "<<baseLineIndex<<" baseLinePWave"<<baseLinePWave;
+
+    for(int i=0;i<str.size();i++){                         //按照盘符名依次获取台站名及台站的红线位置
+        ch =str.at(i);
+        station = ReadCSVData::TEMPSTATION[i];
+        motipos = ReadCSVData::TEMPMOTIPOS[station];
+        motiposPWave = motipos/WAVEVELOCITY - baseLinePWave;
+        qDebug()<<"panfu:"<<ch<<" motipos:"<<motipos<<" motiposPWave:"<<motiposPWave;
+        if(ch == 's'){
+            //.append(HONGYANG_SENSORINFO[0][0]);
+            coordinates<<HONGYANG_SENSORINFO[0][0]<<HONGYANG_SENSORINFO[0][1]<<HONGYANG_SENSORINFO[0][2];
+
+            //因为基准的相对位置应该是0.0，不是基准的应该存储motiposPWave
+            if(i == baseLineIndex) coordinates<<0.0;
+            else coordinates<<motiposPWave;
+        }
+        if(ch == 't'){
+            coordinates<<HONGYANG_SENSORINFO[1][0]<<HONGYANG_SENSORINFO[1][1]<<HONGYANG_SENSORINFO[1][2];
+            if(i == baseLineIndex) coordinates<<0.0;
+            else coordinates<<motiposPWave;
+        }
+        if(ch == 'u'){
+            coordinates<<HONGYANG_SENSORINFO[2][0]<<HONGYANG_SENSORINFO[2][1]<<HONGYANG_SENSORINFO[2][2];
+            if(i == baseLineIndex) coordinates<<0.0;
+            else coordinates<<motiposPWave;
+        }
+        if(ch == 'w'){
+            coordinates<<HONGYANG_SENSORINFO[3][0]<<HONGYANG_SENSORINFO[3][1]<<HONGYANG_SENSORINFO[3][2];
+            if(i == baseLineIndex) coordinates<<0.0;
+            else coordinates<<motiposPWave;
+        }
+        if(ch == 'x'){
+            coordinates<<HONGYANG_SENSORINFO[4][0]<<HONGYANG_SENSORINFO[4][1]<<HONGYANG_SENSORINFO[4][2];
+            if(i == baseLineIndex) coordinates<<0.0;
+            else coordinates<<motiposPWave;
+        }
+        if(ch == 'y'){
+            coordinates<<HONGYANG_SENSORINFO[5][0]<<HONGYANG_SENSORINFO[5][1]<<HONGYANG_SENSORINFO[5][2];
+            if(i == baseLineIndex) coordinates<<0.0;
+            else coordinates<<motiposPWave;
+        }
+        if(ch == 'z'){
+            coordinates<<HONGYANG_SENSORINFO[6][0]<<HONGYANG_SENSORINFO[6][1]<<HONGYANG_SENSORINFO[6][2];
+            if(i == baseLineIndex) coordinates<<0.0;
+            else coordinates<<motiposPWave;
+        }
+        if(ch == 'v'){
+            coordinates<<HONGYANG_SENSORINFO[7][0]<<HONGYANG_SENSORINFO[7][1]<<HONGYANG_SENSORINFO[7][2];
+            if(i == baseLineIndex) coordinates<<0.0;
+            else coordinates<<motiposPWave;
+        }
+        if(ch == 'r'){
+            coordinates<<HONGYANG_SENSORINFO[8][0]<<HONGYANG_SENSORINFO[8][1]<<HONGYANG_SENSORINFO[8][2];
+            if(i == baseLineIndex) coordinates<<0.0;
+            else coordinates<<motiposPWave;
+        }
+    }
+    for(int i=0;i<coordinates.size();i++){
+        qDebug()<<coordinates.at(i);
+    }
 }

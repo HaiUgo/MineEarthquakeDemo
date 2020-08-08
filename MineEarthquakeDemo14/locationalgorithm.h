@@ -11,9 +11,10 @@
 #include <cstdlib>
 #include <QLibrary>
 #include <QDebug>
-
+#include <QVector>
 #include "pso.h"
 #include "readcsvdata.h"
+
 
 typedef struct PANFU_Y{
     double x=41519926.476;
@@ -26,7 +27,7 @@ public:
     LocationAlgorithm();
     ~LocationAlgorithm();
     static void psoAlgorithm();                         //粒子群算法
-    void test();
+    static void test();
 public:
     static const char ALLPANFU[10];                     //所有的盘符名
 

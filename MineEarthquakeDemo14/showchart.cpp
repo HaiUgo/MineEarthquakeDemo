@@ -483,12 +483,17 @@ void ShowChart::getLoactionData()
         ui->comboBox_2->addItem(result);
         globalStatusBar->showMessage(tr("计算后得到的定位点为：")+result);
     }
+    LocationAlgorithm::test();
 }
 
 //重新绘制用户调整P波激发位置后的P波红线
 void ShowChart::repaintPWave()
 {
     handleTheInputData();
+
+    //在这里记录一下用户调整的P波红线，后面重定位算法用的到
+    ReadCSVData::TEMPMOTIPOS[userInput[0]+1] = userInput[2];
+
     //删除台站X、Y、Z方向的旧P波红线
     lineSeries[userInput[0]*3].clear();
     lineSeries[userInput[0]*3+1].clear();
