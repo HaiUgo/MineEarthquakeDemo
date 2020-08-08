@@ -424,7 +424,7 @@ void ShowChart::updatePSOandPwaveData()
 {
     saveModifiedPWaveData();
 
-    ConnectDataBase::updateDataBase(LocationAlgorithm::SQLTABLE,LocationAlgorithm::EVENTID,
+    ConnectDataBase::updateDataBase(ConnectDataBase::SQLTABLE,ConnectDataBase::EVENTID,
                                     LocationAlgorithm::XRESULT.toDouble(),LocationAlgorithm::YRESULT.toDouble(),
                                     LocationAlgorithm::ZRESULT.toDouble(),LocationAlgorithm::TRESULT.toDouble());
 

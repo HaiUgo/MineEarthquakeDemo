@@ -53,6 +53,7 @@ private slots:
     void dataBaseViewDC(const QModelIndex &);                    //dataBaseView鼠标双击事件
     void reSelectDataBaseSource(QString value);                  //重新选择数据表
     void refreshCurrentDataTable();                              //刷新当前数据表
+    void selectWhichRegion(int index);                           //选择哪一个区域，比如红阳，大同，平顶山等
 private:
     Ui::Widget *ui;
 
@@ -68,6 +69,8 @@ private:
 
     double coordinates[3];                                       //矿区图X,Y,Z坐标
     QString currentDataBase;                                     //当前数据表名
+
+    int whichRegion ;                                            //表示选择的哪一个地方，是红阳还是大同等
 
     QVector<qlonglong> rowCount;                                 //记录用户在数据库视图上操作了哪些行事件
     QVector<qlonglong>::iterator iter;

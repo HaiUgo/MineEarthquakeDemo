@@ -1,5 +1,12 @@
 #include "connectdatabase.h"
 
+
+int ConnectDataBase::EVENTID = 0;
+
+QString ConnectDataBase::SQLTABLE = "";
+
+int ConnectDataBase::WHICHREGION = 0;
+
 //连接数据库
 void ConnectDataBase::conDataBase()
 {

@@ -17,6 +17,8 @@ Widget::Widget(QWidget *parent)
     db = new ConnectDataBase;
     db->conDataBase();
 
+    whichRegion = 0;
+
     showChart = new ShowChart(this);
     ui->scrollArea->setWidget(showChart);
 
@@ -44,6 +46,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->restoreButton,SIGNAL(clicked()),this,SLOT(restoreButtonClicked()));
     connect(ui->moveViewButton,SIGNAL(clicked()),SLOT(moveViewButtonClicked()));
     connect(ui->cancelDynBlink,SIGNAL(clicked()),SLOT(cancleDynBlinkClicked()));
+    connect(ui->whichRegion,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&Widget::selectWhichRegion);
     connect(ui->databaseSoureComboBox,QOverload<const QString &>::of(&QComboBox::currentIndexChanged),this,&Widget::reSelectDataBaseSource);
     connect(ui->refreshCurrentDataTable,SIGNAL(clicked()),SLOT(refreshCurrentDataTable()));
     connect(ui->dataBaseView,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(dataBaseViewDC(const QModelIndex &)));
@@ -67,6 +70,14 @@ Widget::~Widget()
     delete ui;
 
     qDebug()<<"Widget::~Widget()";
+}
+
+//选择哪一个区域
+void Widget::selectWhichRegion(int index)
+{
+    ConnectDataBase::WHICHREGION = index;
+    whichRegion = index;
+    ui->axWidget->dynamicCall("DoCommand(const qint32&)",1);
 }
 
 //刷新当前数据表
@@ -130,8 +141,19 @@ void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
 {
     if(iCommandId == 1){
         // 调用控件打开dwg文件命令。
-        ui->axWidget->dynamicCall("OpenDwgFile(const QString&)","C:\\Users\\13696\\Desktop\\项目参考资料\\红阳三矿20200713lh.dwg");
-        globalStatusBar->showMessage("打开矿区图：C:\\Users\\13696\\Desktop\\项目参考资料\\红阳三矿20200713lh.dwg");
+        if(0 == whichRegion){
+            ui->axWidget->dynamicCall("OpenDwgFile(const QString&)","C:\\Users\\13696\\Desktop\\项目参考资料\\红阳三矿20200713lh.dwg");
+            globalStatusBar->showMessage("打开矿区图：C:\\Users\\13696\\Desktop\\项目参考资料\\红阳三矿20200713lh.dwg");
+        }
+        if(1 == whichRegion){
+            globalStatusBar->showMessage("大同.dwg");
+        }
+        if(2 == whichRegion){
+            globalStatusBar->showMessage("平顶山.dwg");
+        }
+        if(3 == whichRegion){
+            globalStatusBar->showMessage(tr("双鸭山.dwg"));
+        }
     }
     if(iCommandId == 5){
         // 调用控件缩放命令。
@@ -288,9 +310,9 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
         qDebug()<<"the current csv file path is :"<<ReadCSVData::FILEPATH;
     }
 
-    LocationAlgorithm::SQLTABLE = currentDataBase;
+    ConnectDataBase::SQLTABLE = currentDataBase;
     tempIndex = ui->dataBaseView->model()->index(row,0);                 //获取数据库事件ID
-    LocationAlgorithm::EVENTID  =ui->dataBaseView->model()->data(tempIndex).toInt();
+    ConnectDataBase::EVENTID  =ui->dataBaseView->model()->data(tempIndex).toInt();
 
 
     //画一个圆形，然后获取其ID，再动态闪烁

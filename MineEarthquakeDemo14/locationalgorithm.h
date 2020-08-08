@@ -13,12 +13,23 @@
 #include <QDebug>
 
 #include "pso.h"
+#include "readcsvdata.h"
+
+typedef struct PANFU_Y{
+    double x=41519926.476;
+    double y=4597275.978;
+    double z=20.705;
+}Y;
+
 class LocationAlgorithm{
 public:
     LocationAlgorithm();
     ~LocationAlgorithm();
     static void psoAlgorithm();                         //粒子群算法
+    void test();
 public:
+    static const char ALLPANFU[10];                     //所有的盘符名
+
     static const int WAVEVELOCITY ;                     //系统速度，波速
 
     static QString XRESULT;                             //经算法调整后的X坐标
@@ -26,8 +37,10 @@ public:
     static QString ZRESULT;                             //经算法调整后的Z坐标
     static QString TRESULT;                             //经算法调整后的P波
 
-    static int EVENTID;                                 //表示数据库中哪个事件要被修改
-    static QString SQLTABLE;                            //表示数据库中的哪个表
+    static const double DATONG_SENSORINFO[][3] ;
+    static const double HONGYANG_SENSORINFO[][3] ;
+    static const double PINDINGSHAN_SENSORINFO[][3] ;
+    static const double SHUANGYASHAN_SENSORINFO[][3] ;
 };
 
 
