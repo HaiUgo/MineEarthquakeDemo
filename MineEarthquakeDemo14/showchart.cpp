@@ -29,7 +29,7 @@ ShowChart::ShowChart(QWidget *parent) :
     connect(ui->saveModifiedPWave,SIGNAL(clicked()),this,SLOT(informationDialog()));
     connect(ui->intputPWave,&QLineEdit::returnPressed,this,&ShowChart::repaintPWave);
     connect(ui->locationAlgorithmButton,SIGNAL(clicked()),this,SLOT(getLoactionData()));
-    //connect(ui->comboBox_2,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&ShowChart::repaintPWave);
+    connect(ui->comboBox,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&ShowChart::getCurrentMotipos);
     connect(ui->tx,SIGNAL(toggled(bool)),this,SLOT(txIsChecked(bool)));
     connect(ui->ty,SIGNAL(toggled(bool)),this,SLOT(tyIsChecked(bool)));
     connect(ui->tz,SIGNAL(toggled(bool)),this,SLOT(tzIsChecked(bool)));
@@ -287,6 +287,13 @@ void ShowChart::tzIsChecked(bool checked)
     }
 }
 
+//获取当前台站的激发位置
+void ShowChart::getCurrentMotipos(int value)
+{
+    QString motiPositon = QString::number(ReadCSVData::TEMPMOTIPOS[value+1]) ;
+    ui->locationResultLabel->setText(motiPositon);
+}
+
 //处理用户输入的P波相关数据
 void ShowChart::handleTheInputData()
 {
@@ -481,7 +488,7 @@ void ShowChart::getLoactionData()
                 " Z:"+LocationAlgorithm::ZRESULT+" T:"+LocationAlgorithm::TRESULT;
         //ui->comboBox_2->addItem(QString::asprintf("%s",value));
         //ui->comboBox_2->addItem(result);
-        ui->locationResultLabel->setText(result);
+        //ui->locationResultLabel->setText(result);
         globalStatusBar->showMessage(tr("计算后得到的定位点为：")+result);
     }
 }

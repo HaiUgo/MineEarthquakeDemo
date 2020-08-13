@@ -76,7 +76,7 @@ private slots:
     void txIsChecked(bool checked);                               //QRadioButton：tx,ty,tz的选中状态
     void tyIsChecked(bool checked);
     void tzIsChecked(bool checked);
-
+    void getCurrentMotipos(int value);                            //获取当前台站的激发位置
     void repaintPWave();                                          //重新绘制P波红线
     void saveModifiedPWaveData();                                 //将输入的P波到时位置更新到CSV数据文件中
     void updatePSOandPwaveData();                                 //将P波到时位置更新到CSV数据文件中以及将定位算法得到得值更新到数据库中

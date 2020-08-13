@@ -86,7 +86,155 @@ const double LocationAlgorithm::SHUANGYASHAN_SENSORINFO[][3] = {
 //  41518060.298,4594304.927,21.926,0.2;]
 //第二个矩阵的值为波速，是一个常量值，为3850
 //输出结果为重定位后的x,y,z坐标以及p波到时
+//注：上面的算法流程中忘记减去XYZ的坐标了，在第四列减去最小值之后，前三列也应该减去，
+//所以下面的算法弃用
 
+
+//void LocationAlgorithm::psoAlgorithm()
+//{
+//    QString str = ReadCSVData::PANFU;
+//    QChar ch;
+
+//    int station;                                           //台站名，比如3或者2或者5等
+//    int motipos;                                           //台站对应的红线位置，比如3对应11520
+//    double motiposPWave;                                   //保存 激发位置/频率-基准/频率 得到的相对位置
+//    int baseLine;                                          //将红线位置中最小的那个作为基准
+//    int baseLineIndex;                                     //基准在数组中的索引
+//    double baseLinePWave;                                  //保存由基准求出的相对位置
+
+//    QVector<double> coordinates;                           //存储盘符对应的坐标和计算后的P波相对位置
+
+//    QVector<int> data;
+//    for(int i=0;i<10;i++){                                 //只保留非零值
+//        if(ReadCSVData::TEMPMOTIPOS[i]!=0)
+//            data.append(ReadCSVData::TEMPMOTIPOS[i]);
+//    }
+
+//    //在这些非零值中求出最小值作为基准
+//   // QVector<int>::iterator min = std::min_element(std::begin(data),std::end(data));
+//    auto min = std::min_element(std::begin(data), std::end(data));
+//    baseLine = *min;
+//    auto positionmin = std::distance(std::begin(data),min);
+//    baseLineIndex = int(positionmin);
+//    baseLinePWave = baseLine/5000;                         // 基准/频率
+//    qDebug()<<"baseline = "<<baseLine<<"baselineIndex = "<<baseLineIndex<<" baseLinePWave"<<baseLinePWave;
+
+//    //目前仅添加了红阳的坐标点，后续也可以添加其他区域，在ConnectDataBase::WHICHREGION中
+//    //已经获取到了当前区域，所以可以直接加个if语句做一下判断，就可以调用不同区域的坐标值了
+//    for(int i=0;i<str.size();i++){                         //按照盘符名依次获取台站名及台站的红线位置
+//        ch =str.at(i);
+//        station = ReadCSVData::TEMPSTATION[i];
+//        motipos = ReadCSVData::TEMPMOTIPOS[station];
+//        motiposPWave = motipos/WAVEVELOCITY - baseLinePWave;
+//        qDebug()<<"panfu:"<<ch<<" motipos:"<<motipos<<" motiposPWave:"<<motiposPWave;
+//        if(ch == 's'){
+//            //.append(HONGYANG_SENSORINFO[0][0]);
+//            coordinates<<HONGYANG_SENSORINFO[0][0]<<HONGYANG_SENSORINFO[0][1]<<HONGYANG_SENSORINFO[0][2];
+
+//            //因为基准的相对位置应该是0.0，不是基准的应该存储motiposPWave
+//            if(i == baseLineIndex) coordinates<<0.0;
+//            else coordinates<<motiposPWave;
+//        }
+//        if(ch == 't'){
+//            coordinates<<HONGYANG_SENSORINFO[1][0]<<HONGYANG_SENSORINFO[1][1]<<HONGYANG_SENSORINFO[1][2];
+//            if(i == baseLineIndex) coordinates<<0.0;
+//            else coordinates<<motiposPWave;
+//        }
+//        if(ch == 'u'){
+//            coordinates<<HONGYANG_SENSORINFO[2][0]<<HONGYANG_SENSORINFO[2][1]<<HONGYANG_SENSORINFO[2][2];
+//            if(i == baseLineIndex) coordinates<<0.0;
+//            else coordinates<<motiposPWave;
+//        }
+//        if(ch == 'w'){
+//            coordinates<<HONGYANG_SENSORINFO[3][0]<<HONGYANG_SENSORINFO[3][1]<<HONGYANG_SENSORINFO[3][2];
+//            if(i == baseLineIndex) coordinates<<0.0;
+//            else coordinates<<motiposPWave;
+//        }
+//        if(ch == 'x'){
+//            coordinates<<HONGYANG_SENSORINFO[4][0]<<HONGYANG_SENSORINFO[4][1]<<HONGYANG_SENSORINFO[4][2];
+//            if(i == baseLineIndex) coordinates<<0.0;
+//            else coordinates<<motiposPWave;
+//        }
+//        if(ch == 'y'){
+//            coordinates<<HONGYANG_SENSORINFO[5][0]<<HONGYANG_SENSORINFO[5][1]<<HONGYANG_SENSORINFO[5][2];
+//            if(i == baseLineIndex) coordinates<<0.0;
+//            else coordinates<<motiposPWave;
+//        }
+//        if(ch == 'z'){
+//            coordinates<<HONGYANG_SENSORINFO[6][0]<<HONGYANG_SENSORINFO[6][1]<<HONGYANG_SENSORINFO[6][2];
+//            if(i == baseLineIndex) coordinates<<0.0;
+//            else coordinates<<motiposPWave;
+//        }
+//        if(ch == 'v'){
+//            coordinates<<HONGYANG_SENSORINFO[7][0]<<HONGYANG_SENSORINFO[7][1]<<HONGYANG_SENSORINFO[7][2];
+//            if(i == baseLineIndex) coordinates<<0.0;
+//            else coordinates<<motiposPWave;
+//        }
+//        if(ch == 'r'){
+//            coordinates<<HONGYANG_SENSORINFO[8][0]<<HONGYANG_SENSORINFO[8][1]<<HONGYANG_SENSORINFO[8][2];
+//            if(i == baseLineIndex) coordinates<<0.0;
+//            else coordinates<<motiposPWave;
+//        }
+//    }
+////    for(int i=0;i<coordinates.size();i++){
+////        qDebug()<<coordinates.at(i);
+////    }
+
+//    double toArray[4*str.size()];                                //将QVector转成数组
+//    for(int i=0;i<coordinates.size();i++){
+//        toArray[i] = coordinates.at(i);
+//        qDebug()<<"toArray["<<i<<"]="<<toArray[i];
+//    }
+//    double adjustToArray[4*str.size()];                         //将toArray调成按列存储，即调整成matlab列向量形式
+//    for(int i=0,k=0;i<4*str.size();k++)
+//        for(int j=0;j<str.size();j++)
+//            adjustToArray[i++] = toArray[k+j*4];
+//    //比如这个vect[]数组输入到Matlab，按列读取正好
+//    //    double vect[]={
+//    //        41517290.037,41519304.125,41519926.476,41520207.356,41518060.298,
+//    //        4599537.326,4595913.485,4597275.978,4597983.404,4594304.927,
+//    //        24.565,23.921,20.705,22.661,21.926,
+//    //        0,0.08,0.08999,0.099999,0.23
+//    //    };
+
+
+//    for(int i=0;i<4*str.size();i++)
+//        qDebug()<<"adjustToArray["<<i<<"]="<<adjustToArray[i];
+
+//    //下面是调用MatLab编译好的粒子群算法
+//    QLibrary myLib("pso.dll");
+//    typedef bool MW_CALL_CONV(*Fun)(int,class mwArray const &,class mwArray const &,class mwArray const &,class mwArray const &,class mwArray const &,class mwArray const &);
+//    Fun myFunc = Fun(myLib.resolve("?PSO@@YAXHAEAVmwArray@@000AEBV1@1@Z"));
+
+//    if(!psoInitialize())                                  //必须要初始化成功
+//    {
+//        qDebug()<<"could not initialize psodll\n";
+//        exit(0);
+//    }
+
+//    mwArray coor(str.size(),4,mxDOUBLE_CLASS);            //输入值
+//    mwArray v(1,1,mxDOUBLE_CLASS);
+
+//    mwArray x(1,1,mxDOUBLE_CLASS);                        //输出值
+//    mwArray y(1,1,mxDOUBLE_CLASS);
+//    mwArray z(1,1,mxDOUBLE_CLASS);
+//    mwArray t(1,1,mxDOUBLE_CLASS);
+
+//    //coor(5,4) = vect;
+//    coor.SetData(adjustToArray,4*str.size());             //将C++的一维数组存储到 MATLAB的二维数组
+//    v(1,1)=WAVEVELOCITY;
+
+//    myFunc(4,x,y,z,t,coor,v);
+
+//    XRESULT=x.ToString();
+//    YRESULT=y.ToString();
+//    ZRESULT=z.ToString();
+//    TRESULT=t.ToString();
+//}
+
+
+
+//下面是调整MATLAB算法中的程序后修改的，可用
 void LocationAlgorithm::psoAlgorithm()
 {
     QString str = ReadCSVData::PANFU;
@@ -94,27 +242,10 @@ void LocationAlgorithm::psoAlgorithm()
 
     int station;                                           //台站名，比如3或者2或者5等
     int motipos;                                           //台站对应的红线位置，比如3对应11520
-    double motiposPWave;                                   //保存 激发位置/频率-基准/频率 得到的相对位置
-    int baseLine;                                          //将红线位置中最小的那个作为基准
-    int baseLineIndex;                                     //基准在数组中的索引
-    double baseLinePWave;                                  //保存由基准求出的相对位置
+    double motiposPWave;                                   //保存 激发位置/频率 得到的相对位置
 
     QVector<double> coordinates;                           //存储盘符对应的坐标和计算后的P波相对位置
 
-    QVector<int> data;
-    for(int i=0;i<10;i++){                                 //只保留非零值
-        if(ReadCSVData::TEMPMOTIPOS[i]!=0)
-            data.append(ReadCSVData::TEMPMOTIPOS[i]);
-    }
-
-    //在这些非零值中求出最小值作为基准
-   // QVector<int>::iterator min = std::min_element(std::begin(data),std::end(data));
-    auto min = std::min_element(std::begin(data), std::end(data));
-    baseLine = *min;
-    auto positionmin = std::distance(std::begin(data),min);
-    baseLineIndex = int(positionmin);
-    baseLinePWave = baseLine/5000;                         // 基准/频率
-    qDebug()<<"baseline = "<<baseLine<<"baselineIndex = "<<baseLineIndex<<" baseLinePWave"<<baseLinePWave;
 
     //目前仅添加了红阳的坐标点，后续也可以添加其他区域，在ConnectDataBase::WHICHREGION中
     //已经获取到了当前区域，所以可以直接加个if语句做一下判断，就可以调用不同区域的坐标值了
@@ -122,55 +253,43 @@ void LocationAlgorithm::psoAlgorithm()
         ch =str.at(i);
         station = ReadCSVData::TEMPSTATION[i];
         motipos = ReadCSVData::TEMPMOTIPOS[station];
-        motiposPWave = motipos/WAVEVELOCITY - baseLinePWave;
+        motiposPWave = motipos/5000;
         qDebug()<<"panfu:"<<ch<<" motipos:"<<motipos<<" motiposPWave:"<<motiposPWave;
         if(ch == 's'){
-            //.append(HONGYANG_SENSORINFO[0][0]);
             coordinates<<HONGYANG_SENSORINFO[0][0]<<HONGYANG_SENSORINFO[0][1]<<HONGYANG_SENSORINFO[0][2];
-
-            //因为基准的相对位置应该是0.0，不是基准的应该存储motiposPWave
-            if(i == baseLineIndex) coordinates<<0.0;
-            else coordinates<<motiposPWave;
+            coordinates<<motiposPWave;
         }
         if(ch == 't'){
             coordinates<<HONGYANG_SENSORINFO[1][0]<<HONGYANG_SENSORINFO[1][1]<<HONGYANG_SENSORINFO[1][2];
-            if(i == baseLineIndex) coordinates<<0.0;
-            else coordinates<<motiposPWave;
+            coordinates<<motiposPWave;
         }
         if(ch == 'u'){
             coordinates<<HONGYANG_SENSORINFO[2][0]<<HONGYANG_SENSORINFO[2][1]<<HONGYANG_SENSORINFO[2][2];
-            if(i == baseLineIndex) coordinates<<0.0;
-            else coordinates<<motiposPWave;
+            coordinates<<motiposPWave;
         }
         if(ch == 'w'){
             coordinates<<HONGYANG_SENSORINFO[3][0]<<HONGYANG_SENSORINFO[3][1]<<HONGYANG_SENSORINFO[3][2];
-            if(i == baseLineIndex) coordinates<<0.0;
-            else coordinates<<motiposPWave;
+            coordinates<<motiposPWave;
         }
         if(ch == 'x'){
             coordinates<<HONGYANG_SENSORINFO[4][0]<<HONGYANG_SENSORINFO[4][1]<<HONGYANG_SENSORINFO[4][2];
-            if(i == baseLineIndex) coordinates<<0.0;
-            else coordinates<<motiposPWave;
+            coordinates<<motiposPWave;
         }
         if(ch == 'y'){
             coordinates<<HONGYANG_SENSORINFO[5][0]<<HONGYANG_SENSORINFO[5][1]<<HONGYANG_SENSORINFO[5][2];
-            if(i == baseLineIndex) coordinates<<0.0;
-            else coordinates<<motiposPWave;
+            coordinates<<motiposPWave;
         }
         if(ch == 'z'){
             coordinates<<HONGYANG_SENSORINFO[6][0]<<HONGYANG_SENSORINFO[6][1]<<HONGYANG_SENSORINFO[6][2];
-            if(i == baseLineIndex) coordinates<<0.0;
-            else coordinates<<motiposPWave;
+            coordinates<<motiposPWave;
         }
         if(ch == 'v'){
             coordinates<<HONGYANG_SENSORINFO[7][0]<<HONGYANG_SENSORINFO[7][1]<<HONGYANG_SENSORINFO[7][2];
-            if(i == baseLineIndex) coordinates<<0.0;
-            else coordinates<<motiposPWave;
+            coordinates<<motiposPWave;
         }
         if(ch == 'r'){
             coordinates<<HONGYANG_SENSORINFO[8][0]<<HONGYANG_SENSORINFO[8][1]<<HONGYANG_SENSORINFO[8][2];
-            if(i == baseLineIndex) coordinates<<0.0;
-            else coordinates<<motiposPWave;
+            coordinates<<motiposPWave;
         }
     }
 //    for(int i=0;i<coordinates.size();i++){
@@ -186,13 +305,6 @@ void LocationAlgorithm::psoAlgorithm()
     for(int i=0,k=0;i<4*str.size();k++)
         for(int j=0;j<str.size();j++)
             adjustToArray[i++] = toArray[k+j*4];
-    //比如这个vect[]数组输入到Matlab，按列读取正好
-    //    double vect[]={
-    //        41517290.037,41519304.125,41519926.476,41520207.356,41518060.298,
-    //        4599537.326,4595913.485,4597275.978,4597983.404,4594304.927,
-    //        24.565,23.921,20.705,22.661,21.926,
-    //        0,0.08,0.08999,0.099999,0.23
-    //    };
 
 
     for(int i=0;i<4*str.size();i++)
@@ -228,4 +340,3 @@ void LocationAlgorithm::psoAlgorithm()
     ZRESULT=z.ToString();
     TRESULT=t.ToString();
 }
-
