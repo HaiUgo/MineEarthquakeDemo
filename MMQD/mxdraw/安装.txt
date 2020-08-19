@@ -1,0 +1,1 @@
+运行MxDraw5.2TryVersion，安装至该目录下，安装完毕以管理员模式运行RegMxDrawX进行控件注册
