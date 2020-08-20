@@ -131,19 +131,37 @@ void Widget::reSelectDataBaseSource(QString value)
 void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
 {
     if(iCommandId == 1){
-        // 调用控件打开dwg文件命令。
+        QString path = QDir::currentPath();
+        //qDebug()<<"当前路径"<<path;
+        QString tempPath;
+        // 调用控件打开dwg文件命令，使用相对路径
         if(0 == whichRegion){
-            ui->axWidget->dynamicCall("OpenDwgFile(const QString&)","C:\\Users\\13696\\Desktop\\项目参考资料\\红阳三矿20200713lh.dwg");
-            globalStatusBar->showMessage("打开矿区图：C:\\Users\\13696\\Desktop\\项目参考资料\\红阳三矿20200713lh.dwg");
+            //QString path = QApplication::applicationDirPath();    //是获取的执行文件exe所在的路径
+
+            tempPath=path + "/src/dwg/红阳三矿20200713lh.dwg";
+            ui->axWidget->dynamicCall("OpenDwgFile(const QString&)",tempPath);
+//            path = QDir::toNativeSeparators(path);
+//            qDebug()<<"当前路径"<<path;
+            globalStatusBar->showMessage("打开矿区图："+tempPath);
+            tempPath.clear();
         }
         if(1 == whichRegion){
-            globalStatusBar->showMessage("大同.dwg");
+            tempPath=path + "/src/dwg/大同.dwg";
+            ui->axWidget->dynamicCall("OpenDwgFile(const QString&)",tempPath);
+            globalStatusBar->showMessage("打开矿区图："+tempPath);
+            tempPath.clear();
         }
         if(2 == whichRegion){
-            globalStatusBar->showMessage("平顶山.dwg");
+            tempPath=path + "/src/dwg/平顶山.dwg";
+            ui->axWidget->dynamicCall("OpenDwgFile(const QString&)",tempPath);
+            globalStatusBar->showMessage("打开矿区图："+tempPath);
+            tempPath.clear();
         }
         if(3 == whichRegion){
-            globalStatusBar->showMessage(tr("双鸭山.dwg"));
+            tempPath=path + "/src/dwg/双鸭山.dwg";
+            ui->axWidget->dynamicCall("OpenDwgFile(const QString&)",tempPath);
+            globalStatusBar->showMessage("打开矿区图："+tempPath);
+            tempPath.clear();
         }
     }
     if(iCommandId == 5){

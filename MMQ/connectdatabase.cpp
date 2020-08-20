@@ -11,7 +11,7 @@ int ConnectDataBase::WHICHREGION = 0;
 void ConnectDataBase::conDataBase()
 {
     db = QSqlDatabase::addDatabase("QMYSQL");  //连接的MYSQL的数据库驱动
-    db.setHostName("127.0.0.1");               //连接数据库主机名，这里需要注意（若填的为”127.0.0.1“，出现不能连接，则改为localhost)
+    db.setHostName("localhost");               //连接数据库主机名，这里需要注意（若填的为”127.0.0.1“，出现不能连接，则改为localhost)
     db.setPort(3306);                          //端口
     db.setDatabaseName("minedemo");            //数据库名
     db.setUserName("root");                    //用户名
