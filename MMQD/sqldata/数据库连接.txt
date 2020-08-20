@@ -1,0 +1,9 @@
+1.解压资源到目标路径
+2.MySQL8.0不需要添加配置文件my.ini
+3.配置MySQL环境,右击此电脑 -> 属性 ->高级系统设置 -> 环境变量 -> Path -> 编辑找到安装的MySQL下的bin
+4.管理员模式打开cmd，输入mysqld --initialize-insecure --user=mysql 
+  之后在终端输入 mysqld -install
+5.在终端 输入net start mysql  输入 mysql -u root -p
+  用户名为root,密码为071139
+  mine_quack_5_results.sql和mine_quack_3_results.sql为minedemo下的两个表，
+  请自行插入数据或者直接复制该目录中的minedemo文件到本地MySQL的Data文件下
