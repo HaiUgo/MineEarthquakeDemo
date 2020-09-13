@@ -23,6 +23,7 @@ SOURCES += \
     chart.cpp \
     chartview.cpp \
     connectdatabase.cpp \
+    databaseconfigure.cpp \
     drawthread.cpp \
     locationalgorithm.cpp \
     main.cpp \
@@ -34,6 +35,7 @@ HEADERS += \
     chart.h \
     chartview.h \
     connectdatabase.h \
+    databaseconfigure.h \
     drawthread.h \
     locationalgorithm.h \
     param.h \

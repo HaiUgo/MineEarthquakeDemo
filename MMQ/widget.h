@@ -25,6 +25,7 @@
 #include <QMutexLocker>
 #include "showchart.h"
 #include "connectdatabase.h"
+#include "databaseconfigure.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }

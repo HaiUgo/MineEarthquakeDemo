@@ -13,8 +13,11 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    db = new ConnectDataBase;
-    db->conDataBase();
+
+    if(DataBaseConfigure::getDataBaseConfigure()){
+        db = new ConnectDataBase;
+        db->conDataBase();
+    }
 
     whichRegion = 0;
 

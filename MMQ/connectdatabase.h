@@ -11,6 +11,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QDebug>
+#include "databaseconfigure.h"
 
 class ConnectDataBase{
 public:
