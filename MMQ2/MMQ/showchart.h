@@ -23,7 +23,7 @@
 #include "drawthread.h"
 #include "locationalgorithm.h"
 #include "statusbarmonitoring.h"
-
+#include "screenconfigure.h"
 
 QT_CHARTS_USE_NAMESPACE
 

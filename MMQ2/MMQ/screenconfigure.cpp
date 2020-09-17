@@ -8,6 +8,9 @@ int ScreenConfigure::mwidth = 0;
 
 int ScreenConfigure::mheight = 0;
 
+int ScreenConfigure::waveChartWidth = 0;
+
+int ScreenConfigure::waveChartHeight = 0;
 
 bool ScreenConfigure::getScreenConfigure()
 {
@@ -42,6 +45,14 @@ bool ScreenConfigure::getScreenConfigure()
     if (jsonObject.contains(QStringLiteral("mHeight"))){
         mheight = jsonObject["mHeight"].toString().toInt();
     }
-    qDebug()<<"width = "<<width <<"height = "<<height <<"mwidth = "<<mwidth <<"mheight = "<<mheight;
+    if (jsonObject.contains(QStringLiteral("WaveChartWidth"))){
+        waveChartWidth = jsonObject["WaveChartWidth"].toString().toInt();
+    }
+    if (jsonObject.contains(QStringLiteral("WaveChartHeight"))){
+        waveChartHeight = jsonObject["WaveChartHeight"].toString().toInt();
+    }
+    qDebug()<<"width = "<<width <<"height = "<<height <<"mwidth = "
+           <<mwidth <<"mheight = "<<mheight<<"waveChartWidth"
+          <<waveChartWidth<<"waveChartHeight"<<waveChartHeight;
     return true;
 }

@@ -69,8 +69,12 @@ void ShowChart::initCharts()
 
     m_valueLabel = new QLabel(this);
 
+    ScreenConfigure *sc = new ScreenConfigure;
+    sc->getScreenConfigure();
+    int waveChartWidth = ScreenConfigure::waveChartWidth;
+    int waveChartHeight = ScreenConfigure::waveChartHeight;
     //QMargins margin(10,10,5,5);                           //设置chart rectangle（图表矩形）的边距
-    QRectF recf(5,5,220,50);                               //显示设置plot area（图表区域）的大小
+    QRectF recf(10,10,waveChartWidth,waveChartHeight);                               //显示设置plot area（图表区域）的大小
 
     for (int i=0;i<27;i++) {
         splineSeries[i].setColor(QColor(Qt::black));

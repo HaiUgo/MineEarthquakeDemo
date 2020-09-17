@@ -24,6 +24,9 @@ public:
     static int mwidth;
     static int mheight;
 
+    static int waveChartWidth;
+    static int waveChartHeight;
+
     static bool getScreenConfigure();
 };
 

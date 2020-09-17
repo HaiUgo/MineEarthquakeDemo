@@ -17,6 +17,7 @@ Widget::Widget(QWidget *parent)
     ScreenConfigure *sc = new ScreenConfigure;
     sc->getScreenConfigure();
     ui->scrollArea->setFixedSize(ScreenConfigure::width,ScreenConfigure::height);
+    ui->scrollAreaWidgetContents->setFixedSize(ScreenConfigure::width,ScreenConfigure::height);
 
     if(DataBaseConfigure::getDataBaseConfigure()){
         db = new ConnectDataBase;
@@ -26,7 +27,8 @@ Widget::Widget(QWidget *parent)
     whichRegion = 0;
 
     showChart = new ShowChart(this);
-    showChart->resize(ScreenConfigure::mwidth,ScreenConfigure::mheight);
+    showChart->setFixedSize(ScreenConfigure::mwidth,ScreenConfigure::mheight);
+    //showChart->resize(ScreenConfigure::mwidth,ScreenConfigure::mheight);
     ui->scrollArea->setWidget(showChart);
 
     globalStatusBar = new QStatusBar(this);
@@ -143,6 +145,10 @@ void Widget::reSelectDataBaseSource(QString value)
 void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
 {
     if(iCommandId == 1){
+
+        QColor c(255,255,255);
+        ui->axWidget->dynamicCall("SetViewColor(QColor)", c);
+
         QString path = QDir::currentPath();
         //qDebug()<<"当前路径"<<path;
         QString tempPath;

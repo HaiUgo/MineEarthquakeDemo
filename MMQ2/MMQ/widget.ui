@@ -93,7 +93,7 @@ color: rgb(255, 255, 255);</string>
         <number>2</number>
        </property>
        <property name="text">
-        <string>XX矿高频微震地面台网监控系统-辽宁大学</string>
+        <string>红阳矿高频微震地面台网监控系统-辽宁大学</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
@@ -119,7 +119,7 @@ color: rgb(255, 255, 255);</string>
      <item>
       <widget class="QPushButton" name="startButton">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -171,7 +171,7 @@ color: rgb(255, 255, 255);</string>
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
+        <enum>QSizePolicy::Preferred</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -183,6 +183,12 @@ color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <widget class="QPushButton" name="dailyStatement">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>80</width>
@@ -214,7 +220,7 @@ color: rgb(255, 255, 255);</string>
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
+        <enum>QSizePolicy::Preferred</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -226,6 +232,12 @@ color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <widget class="QPushButton" name="monthlyStatement">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>80</width>
@@ -260,7 +272,7 @@ color: rgb(255, 255, 255);</string>
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
+        <enum>QSizePolicy::Preferred</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -272,6 +284,12 @@ color: rgb(255, 255, 255);</string>
      </item>
      <item>
       <widget class="QPushButton" name="helpButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>80</width>
@@ -303,7 +321,7 @@ color: rgb(255, 255, 255);</string>
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
+        <enum>QSizePolicy::Preferred</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -328,27 +346,20 @@ color: rgb(255, 255, 255);</string>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="currentIncidentButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <spacer name="horizontalSpacer_11">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-       <property name="font">
-        <font>
-         <family>Adobe 楷体 Std R</family>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
+       <property name="sizeType">
+        <enum>QSizePolicy::Preferred</enum>
        </property>
-       <property name="text">
-        <string>显示图表：</string>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>20</height>
+        </size>
        </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-      </widget>
+      </spacer>
      </item>
      <item>
       <widget class="QLabel" name="currentIncidentStation">
@@ -373,7 +384,7 @@ color: rgb(255, 255, 255);</string>
          <item>
           <widget class="QPushButton" name="zoomIn">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -425,7 +436,7 @@ color: rgb(255, 255, 255);</string>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>10</width>
+             <width>5</width>
              <height>20</height>
             </size>
            </property>
@@ -434,7 +445,7 @@ color: rgb(255, 255, 255);</string>
          <item>
           <widget class="QPushButton" name="zoomOut">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -474,7 +485,7 @@ color: rgb(255, 255, 255);</string>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>10</width>
+             <width>5</width>
              <height>20</height>
             </size>
            </property>
@@ -483,7 +494,7 @@ color: rgb(255, 255, 255);</string>
          <item>
           <widget class="QPushButton" name="moveViewButton">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -534,7 +545,7 @@ color: rgb(255, 255, 255);</string>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>10</width>
+             <width>5</width>
              <height>20</height>
             </size>
            </property>
@@ -543,7 +554,7 @@ color: rgb(255, 255, 255);</string>
          <item>
           <widget class="QPushButton" name="restoreButton">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -583,7 +594,7 @@ color: rgb(255, 255, 255);</string>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>10</width>
+             <width>5</width>
              <height>20</height>
             </size>
            </property>
@@ -592,7 +603,7 @@ color: rgb(255, 255, 255);</string>
          <item>
           <widget class="QPushButton" name="cancelDynBlink">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -629,7 +640,7 @@ color: rgb(255, 255, 255);</string>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>10</width>
+             <width>5</width>
              <height>20</height>
             </size>
            </property>
@@ -638,14 +649,14 @@ color: rgb(255, 255, 255);</string>
          <item>
           <widget class="QComboBox" name="whichRegion">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="minimumSize">
             <size>
-             <width>70</width>
+             <width>65</width>
              <height>25</height>
             </size>
            </property>
@@ -683,22 +694,6 @@ color: rgb(255, 255, 255);</string>
             </property>
            </item>
           </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_9">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Preferred</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>10</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </item>
@@ -756,9 +751,9 @@ color: rgb(255, 255, 255);</string>
          </property>
          <property name="ViewColor" stdset="0">
           <color>
-           <red>0</red>
-           <green>0</green>
-           <blue>0</blue>
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
           </color>
          </property>
          <property name="Watermark" stdset="0">
@@ -786,6 +781,12 @@ color: rgb(255, 255, 255);</string>
          </item>
          <item>
           <widget class="QComboBox" name="databaseSoureComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <item>
             <property name="text">
              <string>mine_quack_5_results</string>
@@ -800,8 +801,37 @@ color: rgb(255, 255, 255);</string>
          </item>
          <item>
           <widget class="QPushButton" name="refreshCurrentDataTable">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
             <string>刷新表</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="currentIncidentButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>Adobe 楷体 Std R</family>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>显示图表</string>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -842,7 +872,7 @@ color: rgb(255, 255, 255);</string>
        <item>
         <widget class="QScrollArea" name="scrollArea">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -873,20 +903,20 @@ color: rgb(255, 255, 255);</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1000</width>
-            <height>1000</height>
+            <width>750</width>
+            <height>625</height>
            </rect>
           </property>
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>1000</width>
-            <height>1000</height>
+            <width>750</width>
+            <height>625</height>
            </size>
           </property>
          </widget>
