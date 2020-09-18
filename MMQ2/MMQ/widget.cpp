@@ -14,6 +14,8 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->refreshCurrentDataTable->setEnabled(false);
+
     ScreenConfigure *sc = new ScreenConfigure;
     sc->getScreenConfigure();
     ui->scrollArea->setFixedSize(ScreenConfigure::width,ScreenConfigure::height);
@@ -41,7 +43,7 @@ Widget::Widget(QWidget *parent)
 
     sqlModel = new QSqlQueryModel(this);
     //sqlModel->setEditStrategy(QsqlModel::OnFieldChange);
-    currentDataBase = "mine_quack_5_results";
+    currentDataBase = "mine_quake_results";
 
     connect(ui->startButton,SIGNAL(clicked()),this,SLOT(startButtonClicked()));
     connect(ui->dailyStatement,SIGNAL(clicked()),this,SLOT(dailyStatementClicked()));
@@ -89,28 +91,28 @@ void Widget::selectWhichRegion(int index)
 void Widget::refreshCurrentDataTable()
 {
     //sqlModel->setTable(value);
-    if(currentDataBase == "mine_quack_3_results"){
-        //sqlModel->select();
-        sqlModel->setQuery("select * from "+currentDataBase);
-        sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
-        sqlModel->setHeaderData(1,Qt::Horizontal,tr("X"));
-        sqlModel->setHeaderData(2,Qt::Horizontal,tr("Y"));
-        sqlModel->setHeaderData(3,Qt::Horizontal,tr("Z"));
-        sqlModel->setHeaderData(4,Qt::Horizontal,tr("触发时间"));
-        sqlModel->setHeaderData(5,Qt::Horizontal,tr("震级"));
-        sqlModel->setHeaderData(6,Qt::Horizontal,tr("到时"));
-        sqlModel->setHeaderData(7,Qt::Horizontal,tr("触发站台"));
-        sqlModel->setHeaderData(8,Qt::Horizontal,tr("DuringGrade"));
-        sqlModel->setHeaderData(9,Qt::Horizontal,tr("能量/J"));
-        sqlModel->setHeaderData(10,Qt::Horizontal,tr("路径"));
+//    if(currentDataBase == "mine_quack_3_results"){
+//        //sqlModel->select();
+//        sqlModel->setQuery("select * from "+currentDataBase);
+//        sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
+//        sqlModel->setHeaderData(1,Qt::Horizontal,tr("X"));
+//        sqlModel->setHeaderData(2,Qt::Horizontal,tr("Y"));
+//        sqlModel->setHeaderData(3,Qt::Horizontal,tr("Z"));
+//        sqlModel->setHeaderData(4,Qt::Horizontal,tr("触发时间"));
+//        sqlModel->setHeaderData(5,Qt::Horizontal,tr("震级"));
+//        sqlModel->setHeaderData(6,Qt::Horizontal,tr("到时"));
+//        sqlModel->setHeaderData(7,Qt::Horizontal,tr("触发站台"));
+//        sqlModel->setHeaderData(8,Qt::Horizontal,tr("DuringGrade"));
+//        sqlModel->setHeaderData(9,Qt::Horizontal,tr("能量/J"));
+//        sqlModel->setHeaderData(10,Qt::Horizontal,tr("路径"));
 
-        int rowCount = sqlModel->rowCount();
-        QAbstractItemModel *itemModel = ui->dataBaseView->model();
-        QModelIndex itemIndex = itemModel->index(rowCount-1,4);                  //定位到事件1，获取其时间
-        QVariant data = itemModel->data(itemIndex);
-        ui->lastestIncidentLabel->setText("最新事件："+data.toString());
-    }
-    if(currentDataBase == "mine_quack_5_results"){
+//        int rowCount = sqlModel->rowCount();
+//        QAbstractItemModel *itemModel = ui->dataBaseView->model();
+//        QModelIndex itemIndex = itemModel->index(rowCount-1,4);                  //定位到事件1，获取其时间
+//        QVariant data = itemModel->data(itemIndex);
+//        ui->lastestIncidentLabel->setText("最新事件："+data.toString());
+//    }
+    if(currentDataBase == "mine_quake_results"){
         sqlModel->setQuery("select * from "+currentDataBase);
         sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
         sqlModel->setHeaderData(1,Qt::Horizontal,tr("类型"));
@@ -121,16 +123,25 @@ void Widget::refreshCurrentDataTable()
         sqlModel->setHeaderData(6,Qt::Horizontal,tr("震级"));
         sqlModel->setHeaderData(7,Qt::Horizontal,tr("到时"));
         sqlModel->setHeaderData(8,Qt::Horizontal,tr("触发站台"));
-        sqlModel->setHeaderData(9,Qt::Horizontal,tr("DuringGrade"));
+        sqlModel->setHeaderData(9,Qt::Horizontal,tr("持续时间震级"));
         sqlModel->setHeaderData(10,Qt::Horizontal,tr("能量/J"));
         sqlModel->setHeaderData(11,Qt::Horizontal,tr("路径"));
-        sqlModel->setHeaderData(12,Qt::Horizontal,tr("传感器"));
+        sqlModel->setHeaderData(12,Qt::Horizontal,tr("矩张量"));
 
-        int rowCount = sqlModel->rowCount();
-        QAbstractItemModel *itemModel = ui->dataBaseView->model();
-        QModelIndex itemIndex = itemModel->index(rowCount-1,5);                  //定位到事件1，获取其时间
-        QVariant data = itemModel->data(itemIndex);
-        ui->lastestIncidentLabel->setText("最新事件："+data.toString());
+//        int rowCount = sqlModel->rowCount();
+//        QAbstractItemModel *itemModel = ui->dataBaseView->model();
+//        QModelIndex itemIndex = itemModel->index(rowCount-1,5);                  //定位到事件1，获取其时间
+//        QVariant data = itemModel->data(itemIndex);
+//        ui->lastestIncidentLabel->setText("最新事件："+data.toString());
+
+        QString latestDate;
+        QSqlQuery query;
+        query.exec( "select max(quackTime) from mine_quake_results;");            // 执行查询操作
+        while(query.next()){
+            latestDate = query.value(0).toString();
+            qDebug()<<"date="<<latestDate;
+        }
+        ui->lastestIncidentLabel->setText("最新事件："+latestDate);
     }
 }
 
@@ -211,9 +222,9 @@ void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
 void Widget::startButtonClicked()
 { 
     ui->startButton->setEnabled(false);                      //运行按钮点击一次后就禁用
-
     ui->axWidget->dynamicCall("DoCommand(const qint32&)",1); //执行控件自定义命令函数，命令的id为2，该值为命令编号，可任取.
     showTable();
+    ui->refreshCurrentDataTable->setEnabled(true);
 }
 //日报表
 void Widget::dailyStatementClicked()
@@ -262,7 +273,8 @@ void Widget::showTable()
 {
     //sqlModel->setTable("mine_quack_5_results");
     //sqlModel->select();
-    sqlModel->setQuery("select * from mine_quack_5_results");
+    //sqlModel->setQuery("select * from mine_quack_5_results");
+    sqlModel->setQuery("select * from mine_quake_results");
     sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
     sqlModel->setHeaderData(1,Qt::Horizontal,tr("类型"));
     sqlModel->setHeaderData(2,Qt::Horizontal,tr("X"));
@@ -272,10 +284,10 @@ void Widget::showTable()
     sqlModel->setHeaderData(6,Qt::Horizontal,tr("震级"));
     sqlModel->setHeaderData(7,Qt::Horizontal,tr("到时"));
     sqlModel->setHeaderData(8,Qt::Horizontal,tr("触发站台"));
-    sqlModel->setHeaderData(9,Qt::Horizontal,tr("DuringGrade"));
+    sqlModel->setHeaderData(9,Qt::Horizontal,tr("持续时间震级"));
     sqlModel->setHeaderData(10,Qt::Horizontal,tr("能量/J"));
     sqlModel->setHeaderData(11,Qt::Horizontal,tr("路径"));
-    sqlModel->setHeaderData(12,Qt::Horizontal,tr("传感器"));
+    sqlModel->setHeaderData(12,Qt::Horizontal,tr("矩张量"));
 
     ui->dataBaseView->verticalHeader()->setVisible(false);            //禁止显示列标头
     //ui->dataBaseView->sortByColumn(0,Qt::DescendingOrder);          //按找事件序号降序排序
@@ -284,11 +296,20 @@ void Widget::showTable()
     //ui->dataBaseView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->dataBaseView->setModel(sqlModel);
 
-    int rowCount = sqlModel->rowCount();
-    QAbstractItemModel *itemModel = ui->dataBaseView->model();
-    QModelIndex itemIndex = itemModel->index(rowCount-1,5);                  //定位到事件1，获取其时间
-    QVariant data = itemModel->data(itemIndex);
-    ui->lastestIncidentLabel->setText("最新事件："+data.toString());
+//    int rowCount = sqlModel->rowCount();
+//    QAbstractItemModel *itemModel = ui->dataBaseView->model();
+//    QModelIndex itemIndex = itemModel->index(rowCount-1,5);                  //定位到事件1，获取其时间
+//    QVariant data = itemModel->data(itemIndex);
+//    ui->lastestIncidentLabel->setText("最新事件："+data.toString());
+
+    QString latestDate;
+    QSqlQuery query;
+    query.exec( "select max(quackTime) from mine_quake_results;");            // 执行查询操作
+    while(query.next()){
+        latestDate = query.value(0).toString();
+        qDebug()<<"date="<<latestDate;
+    }
+    ui->lastestIncidentLabel->setText("最新事件："+latestDate);
 }
 
 //鼠标双击dataBaseView(数据库视图)序号显示台站以及CAD定位点
@@ -299,22 +320,20 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
     QString str = ui->dataBaseView->model()->data(index).toString();
     QModelIndex tempIndex;
     QVariant data;
-    if(currentDataBase == "mine_quack_3_results"){
-        for(int i=0;i<3;i++){
-            tempIndex = ui->dataBaseView->model()->index(row,i+1);       //获取CAD定位点
-            data = ui->dataBaseView->model()->data(tempIndex);
-            coordinates[i] = data.toDouble();
-        }
-        qDebug()<<"the current coordinate is :"<<coordinates[0]<<" "<<coordinates[1]<<" "<<coordinates[2];
+//    if(currentDataBase == "mine_quack_3_results"){
+//        for(int i=0;i<3;i++){
+//            tempIndex = ui->dataBaseView->model()->index(row,i+1);       //获取CAD定位点
+//            data = ui->dataBaseView->model()->data(tempIndex);
+//            coordinates[i] = data.toDouble();
+//        }
+//        qDebug()<<"the current coordinate is :"<<coordinates[0]<<" "<<coordinates[1]<<" "<<coordinates[2];
 
-        tempIndex = ui->dataBaseView->model()->index(row,10);            //获取CSV文件路径
-        data = ui->dataBaseView->model()->data(tempIndex);
-        ReadCSVData::FILEPATH = data.toString();
-        qDebug()<<"the current csv file path is :"<<ReadCSVData::FILEPATH;
-    }
-
-    if(currentDataBase == "mine_quack_5_results"){
-
+//        tempIndex = ui->dataBaseView->model()->index(row,10);            //获取CSV文件路径
+//        data = ui->dataBaseView->model()->data(tempIndex);
+//        ReadCSVData::FILEPATH = data.toString();
+//        qDebug()<<"the current csv file path is :"<<ReadCSVData::FILEPATH;
+//    }
+    if(currentDataBase == "mine_quake_results"){
         for(int i=0;i<3;i++){
             tempIndex = ui->dataBaseView->model()->index(row,i+2);       //获取CAD定位点
             data = ui->dataBaseView->model()->data(tempIndex);
@@ -332,7 +351,6 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
     ConnectDataBase::SQLTABLE = currentDataBase;
     tempIndex = ui->dataBaseView->model()->index(row,0);                 //获取数据库事件ID
     ConnectDataBase::EVENTID  =ui->dataBaseView->model()->data(tempIndex).toInt();
-
 
     //画一个圆形，然后获取其ID，再动态闪烁
     QVariant result = ui->axWidget->dynamicCall("DrawCircle(double, double, double)",coordinates[0],coordinates[1],300);

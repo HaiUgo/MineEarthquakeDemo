@@ -10,8 +10,6 @@ ReadCSVData::~ReadCSVData()
     qDebug()<<"ReadCSVData::~ReadCSVData()";
 }
 
-
-
 //初始化
 QString ReadCSVData::FILEPATH = "";
 
@@ -42,38 +40,38 @@ void ReadCSVData::parseCSVFileName(QString filePath)
     motiPos = new int[SENNUM];
 
     //存储每个事件触发日期，在CSV文件中表现为每行的第一列，即日期
-    date = new QString[(STARTTIME+ENDTIME)*5000];
+    //date = new QString[(STARTTIME+ENDTIME)*5000];
 
     //存储后三个通道中Z轴的数据，在CSV文件中表现为G列，O列，W列...以此类推
-    senChannelZ = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)];
-    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000); i++){
+    senChannelZ = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
+    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
         senChannelZ[i] = new QString[SENNUM];
       //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
     }
 
     //存储后三个通道中Y轴的数据，在CSV文件中表现为F列，N列，V列...以此类推
-    senChannelY = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)];
-    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000); i++){
+    senChannelY = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
+    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
         senChannelY[i] = new QString[SENNUM];
       //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
     }
 
-    //存储后三个通道中Z轴的数据，在CSV文件中表现为E列，M列，U列...以此类推
-    senChannelX = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)];
-    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000); i++){
+    //存储后三个通道中X轴的数据，在CSV文件中表现为E列，M列，U列...以此类推
+    senChannelX = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
+    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
         senChannelX[i] = new QString[SENNUM];
       //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
     }
 
     //存储每个事件触发的台站名称，在CSV文件中表现为I列，Q列，Y列...以此类推
-    senChannelNum = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)];
-    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000); i++){
+    senChannelNum = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
+    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
         senChannelNum[i] = new QString[SENNUM];
       //  qDebug()<<"senChannelNum[i].size="<<senChannelNum[i]->size();
     }
 
     qDebug()<<"motiPos:"<<motiPos;
-    qDebug()<<"date:"<<date;
+    //qDebug()<<"date:"<<date;
     qDebug()<<"senChannelZ:"<<senChannelZ;
     qDebug()<<"senChannelY:"<<senChannelY;
     qDebug()<<"senChannelX:"<<senChannelX;
@@ -93,6 +91,8 @@ void ReadCSVData::readCSVFile(QString fileName)
     QStringList line;
     QStringList item;
     QString block ;
+    int k=0;
+
     if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
         qDebug()<<"open file failed!";
         return ;
@@ -106,16 +106,20 @@ void ReadCSVData::readCSVFile(QString fileName)
     }
     COUNT = line.size();
     qDebug()<<"COUNT ="<<COUNT;
-    for(int i=0;i<COUNT-1;i++){
+    for(int i=0;i<(COUNT-1);i++){
         item = line.at(i).split(',');
-        date[i] = item.at(0);                         //存储每个事件的日期
-        for(int j=0;j<SENNUM;j++){
-            senChannelZ[i][j] = item.at(6+j*8);       //存储每个事件后三个通道中Z轴的数据
-            senChannelX[i][j] = item.at(4+j*8);       //存储每个事件后三个通道中X轴的数据
-            senChannelY[i][j] = item.at(5+j*8);       //存储每个事件后三个通道中Y轴的数据
-            senChannelNum[i][j] = item.at(8+j*8);     //存储每个事件触发台站名称
-            motiPos[j] = item.at(7+j*8).toInt();      //存储每个传感器波形激发位置
-            //qDebug()<<"senChannelX[i][j]="<<senChannelX[i][j]<<'\n';
+        //date[i] = item.at(0);                         //存储每个事件的日期
+        if(0 == i%10){                                    //采样，只取十分之一的数据
+            for(int j=0;j<SENNUM;j++){
+                senChannelZ[k][j] = item.at(6+j*8);       //存储每个事件后三个通道中Z轴的数据
+                senChannelX[k][j] = item.at(4+j*8);       //存储每个事件后三个通道中X轴的数据
+                senChannelY[k][j] = item.at(5+j*8);       //存储每个事件后三个通道中Y轴的数据
+                senChannelNum[k][j] = item.at(8+j*8);     //存储每个事件触发台站名称
+                motiPos[j] = item.at(7+j*8).toInt();      //存储每个传感器波形激发位置
+                //qDebug()<<"senChannelX[i][j]="<<senChannelX[i][j]<<'\n';
+            }
+            //qDebug()<<"K="<<k;
+            k++;
         }
         //qDebug()<<"i="<<i<<'\n';
     }
@@ -184,25 +188,25 @@ void ReadCSVData::locateCSVData()
         if(TEMPMOTIPOS[j]!=0){
             qDebug()<<"this station is"<<j<<"and its motivated position is "<<TEMPMOTIPOS[j];  //打印测试站台及其激发位置
             //因为P波到时是一条垂线，所以只需要添加横坐标相同的几个点就好
-            POINTBUFFER_P[j].append(QPointF(TEMPMOTIPOS[j],0));
-            POINTBUFFER_P[j].append(QPointF(TEMPMOTIPOS[j],50000));
-            POINTBUFFER_P[j].append(QPointF(TEMPMOTIPOS[j],-50000));
+            POINTBUFFER_P[j].append(QPointF(TEMPMOTIPOS[j]/10,0));
+            POINTBUFFER_P[j].append(QPointF(TEMPMOTIPOS[j]/10,50000));
+            POINTBUFFER_P[j].append(QPointF(TEMPMOTIPOS[j]/10,-50000));
         }
     }
 
     //删除野指针，避免内存泄漏
     delete[] motiPos;
-    delete[] date;
-    for( int i = 0 ; i < 90000 ; i ++ )
+    //delete[] date;
+    for( int i = 0 ; i < 90000/10 ; i ++ )
         delete []senChannelZ[i] ;
     delete []senChannelZ;
-    for( int i = 0 ; i < 90000 ; i ++ )
+    for( int i = 0 ; i < 90000/10 ; i ++ )
         delete []senChannelY[i] ;
     delete []senChannelY;
-    for( int i = 0 ; i < 90000 ; i ++ )
+    for( int i = 0 ; i < 90000/10 ; i ++ )
         delete []senChannelX[i] ;
     delete []senChannelX;
-    for( int i = 0 ; i < 90000 ; i ++ )
+    for( int i = 0 ; i < 90000/10 ; i ++ )
         delete []senChannelNum[i] ;
     delete []senChannelNum;
 
@@ -217,16 +221,20 @@ void ReadCSVData::paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPoi
     double parseDataY;
     double parseDataZ;
     for(int j=0;j<COUNT;j++){
-        parseDataX = senChannelX[j][index].toDouble();        //QString转为float型
-        //qDebug()<<"parseDataX="<<parseDataX<<'\n';
-        parseDataY = senChannelY[j][index].toDouble();
-        //qDebug()<<"parseDataY="<<parseDataY<<'\n';
-        parseDataZ = senChannelZ[j][index].toDouble();
-        //qDebug()<<"parseDataZ="<<parseDataZ<<'\n';
-        pointBufferX->append(QPointF(listIndex, parseDataX)); //点坐标添加到缓存中
-        pointBufferY->append(QPointF(listIndex, parseDataY));
-        pointBufferZ->append(QPointF(listIndex, parseDataZ));
-        listIndex++;
+        if(0 == j%10){
+            parseDataX = senChannelX[listIndex][index].toDouble();        //QString转为float型
+            //qDebug()<<"parseDataX="<<parseDataX<<'\n';
+            parseDataY = senChannelY[listIndex][index].toDouble();
+            //qDebug()<<"parseDataY="<<parseDataY<<'\n';
+            parseDataZ = senChannelZ[listIndex][index].toDouble();
+            //qDebug()<<"parseDataZ="<<parseDataZ<<'\n';
+            pointBufferX->append(QPointF(listIndex, parseDataX)); //点坐标添加到缓存中
+            pointBufferY->append(QPointF(listIndex, parseDataY));
+            pointBufferZ->append(QPointF(listIndex, parseDataZ));
+
+            //qDebug()<<"listIndex= "<<listIndex;
+            listIndex++;
+        }
     }
     qDebug()<<"paddingPointBuffer successfully!";
 }

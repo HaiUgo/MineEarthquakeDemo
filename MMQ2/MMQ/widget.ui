@@ -789,12 +789,7 @@ color: rgb(255, 255, 255);</string>
            </property>
            <item>
             <property name="text">
-             <string>mine_quack_5_results</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>mine_quack_3_results</string>
+             <string>mine_quake_results</string>
             </property>
            </item>
           </widget>

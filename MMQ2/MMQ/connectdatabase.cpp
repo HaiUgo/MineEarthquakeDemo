@@ -37,11 +37,15 @@ void ConnectDataBase::close()
 void ConnectDataBase::updateDataBase(QString table,int id,double xData,double yData,double zData,double Parrival)
 {
     QSqlQuery query;
-    if(table == "mine_quack_5_results"){
-        query.prepare("update mine_quack_5_results  set xData=?,yData=?,zData=?,Parrival=? where id =?");
-    }else if(table == "mine_quack_3_results"){
-        query.prepare("update mine_quack_3_results  set xData=?,yData=?,zData=?,Parrival=? where id =?");
-    }else {
+
+    //if(table == "mine_quack_5_results"){
+    if(table == "mine_quake_results"){
+        query.prepare("update mine_quake_results  set xData=?,yData=?,zData=?,Parrival=? where id =?");
+    }
+//    else if(table == "mine_quack_3_results"){
+//        query.prepare("update mine_quack_3_results  set xData=?,yData=?,zData=?,Parrival=? where id =?");
+//    }
+    else {
         qDebug()<<"database table not found!";
         return;
     }

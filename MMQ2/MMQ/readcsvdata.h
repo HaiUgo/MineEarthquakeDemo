@@ -46,7 +46,7 @@ public:
     QString **senChannelY ;                  //存储每个事件后三个通道中Y轴的数据
     QString **senChannelX ;                  //存储每个事件后三个通道中X轴的数据
     QString **senChannelNum ;                //存储每个事件触发台站名称
-    QString *date;                           //存储每个事件的日期
+    //QString *date;                           //存储每个事件的日期
     int *motiPos;                            //每个台站的激发位置
 
     void readCSVFile(QString fileName);      //读取CSV文件中的数据

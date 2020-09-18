@@ -252,7 +252,6 @@ void LocationAlgorithm::psoAlgorithm()
 
     QVector<double> coordinates;                           //存储盘符对应的坐标和计算后的P波相对位置
 
-
     //目前仅添加了红阳的坐标点，后续也可以添加其他区域，在ConnectDataBase::WHICHREGION中
     //已经获取到了当前区域，所以可以直接加个if语句做一下判断，就可以调用不同区域的坐标值了
     for(int i=0;i<str.size();i++){                         //按照盘符名依次获取台站名及台站的红线位置
@@ -261,41 +260,105 @@ void LocationAlgorithm::psoAlgorithm()
         motipos = ReadCSVData::TEMPMOTIPOS[station];
         motiposPWave = motipos/5000;
         qDebug()<<"panfu:"<<ch<<" motipos:"<<motipos<<" motiposPWave:"<<motiposPWave;
-        if(ch == 's'){
-            coordinates<<HONGYANG_SENSORINFO[0][0]<<HONGYANG_SENSORINFO[0][1]<<HONGYANG_SENSORINFO[0][2];
-            coordinates<<motiposPWave;
-        }
-        if(ch == 't'){
-            coordinates<<HONGYANG_SENSORINFO[1][0]<<HONGYANG_SENSORINFO[1][1]<<HONGYANG_SENSORINFO[1][2];
-            coordinates<<motiposPWave;
-        }
-        if(ch == 'u'){
-            coordinates<<HONGYANG_SENSORINFO[2][0]<<HONGYANG_SENSORINFO[2][1]<<HONGYANG_SENSORINFO[2][2];
-            coordinates<<motiposPWave;
-        }
-        if(ch == 'w'){
-            coordinates<<HONGYANG_SENSORINFO[3][0]<<HONGYANG_SENSORINFO[3][1]<<HONGYANG_SENSORINFO[3][2];
-            coordinates<<motiposPWave;
-        }
-        if(ch == 'x'){
-            coordinates<<HONGYANG_SENSORINFO[4][0]<<HONGYANG_SENSORINFO[4][1]<<HONGYANG_SENSORINFO[4][2];
-            coordinates<<motiposPWave;
-        }
-        if(ch == 'y'){
-            coordinates<<HONGYANG_SENSORINFO[5][0]<<HONGYANG_SENSORINFO[5][1]<<HONGYANG_SENSORINFO[5][2];
-            coordinates<<motiposPWave;
-        }
-        if(ch == 'z'){
-            coordinates<<HONGYANG_SENSORINFO[6][0]<<HONGYANG_SENSORINFO[6][1]<<HONGYANG_SENSORINFO[6][2];
-            coordinates<<motiposPWave;
-        }
-        if(ch == 'v'){
-            coordinates<<HONGYANG_SENSORINFO[7][0]<<HONGYANG_SENSORINFO[7][1]<<HONGYANG_SENSORINFO[7][2];
-            coordinates<<motiposPWave;
-        }
-        if(ch == 'r'){
-            coordinates<<HONGYANG_SENSORINFO[8][0]<<HONGYANG_SENSORINFO[8][1]<<HONGYANG_SENSORINFO[8][2];
-            coordinates<<motiposPWave;
+        if(ConnectDataBase::WHICHREGION == 0){             //红阳
+            if(ch == 's'){
+                coordinates<<HONGYANG_SENSORINFO[0][0]<<HONGYANG_SENSORINFO[0][1]<<HONGYANG_SENSORINFO[0][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 't'){
+                coordinates<<HONGYANG_SENSORINFO[1][0]<<HONGYANG_SENSORINFO[1][1]<<HONGYANG_SENSORINFO[1][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'u'){
+                coordinates<<HONGYANG_SENSORINFO[2][0]<<HONGYANG_SENSORINFO[2][1]<<HONGYANG_SENSORINFO[2][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'w'){
+                coordinates<<HONGYANG_SENSORINFO[3][0]<<HONGYANG_SENSORINFO[3][1]<<HONGYANG_SENSORINFO[3][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'x'){
+                coordinates<<HONGYANG_SENSORINFO[4][0]<<HONGYANG_SENSORINFO[4][1]<<HONGYANG_SENSORINFO[4][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'y'){
+                coordinates<<HONGYANG_SENSORINFO[5][0]<<HONGYANG_SENSORINFO[5][1]<<HONGYANG_SENSORINFO[5][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'z'){
+                coordinates<<HONGYANG_SENSORINFO[6][0]<<HONGYANG_SENSORINFO[6][1]<<HONGYANG_SENSORINFO[6][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'v'){
+                coordinates<<HONGYANG_SENSORINFO[7][0]<<HONGYANG_SENSORINFO[7][1]<<HONGYANG_SENSORINFO[7][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'r'){
+                coordinates<<HONGYANG_SENSORINFO[8][0]<<HONGYANG_SENSORINFO[8][1]<<HONGYANG_SENSORINFO[8][2];
+                coordinates<<motiposPWave;
+            }
+        }else if(ConnectDataBase::WHICHREGION == 1){            //大同
+            if(ch == 'u'){
+                coordinates<<DATONG_SENSORINFO[0][0]<<DATONG_SENSORINFO[0][1]<<DATONG_SENSORINFO[0][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'v'){
+                coordinates<<DATONG_SENSORINFO[1][0]<<DATONG_SENSORINFO[1][1]<<DATONG_SENSORINFO[1][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'w'){
+                coordinates<<DATONG_SENSORINFO[2][0]<<DATONG_SENSORINFO[2][1]<<DATONG_SENSORINFO[2][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'x'){
+                coordinates<<DATONG_SENSORINFO[3][0]<<DATONG_SENSORINFO[3][1]<<DATONG_SENSORINFO[3][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'y'){
+                coordinates<<DATONG_SENSORINFO[4][0]<<DATONG_SENSORINFO[4][1]<<DATONG_SENSORINFO[4][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'z'){
+                coordinates<<DATONG_SENSORINFO[5][0]<<DATONG_SENSORINFO[5][1]<<DATONG_SENSORINFO[5][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 't'){
+                coordinates<<DATONG_SENSORINFO[6][0]<<DATONG_SENSORINFO[6][1]<<DATONG_SENSORINFO[6][2];
+                coordinates<<motiposPWave;
+            }
+        }else if(ConnectDataBase::WHICHREGION == 2){            //平顶山
+            if(ch == 't'){
+                coordinates<<PINDINGSHAN_SENSORINFO[0][0]<<PINDINGSHAN_SENSORINFO[0][1]<<PINDINGSHAN_SENSORINFO[0][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'u'){
+                coordinates<<PINDINGSHAN_SENSORINFO[1][0]<<PINDINGSHAN_SENSORINFO[1][1]<<PINDINGSHAN_SENSORINFO[1][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'w'){
+                coordinates<<PINDINGSHAN_SENSORINFO[2][0]<<PINDINGSHAN_SENSORINFO[2][1]<<PINDINGSHAN_SENSORINFO[2][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'v'){
+                coordinates<<PINDINGSHAN_SENSORINFO[3][0]<<PINDINGSHAN_SENSORINFO[3][1]<<PINDINGSHAN_SENSORINFO[3][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'z'){
+                coordinates<<PINDINGSHAN_SENSORINFO[4][0]<<PINDINGSHAN_SENSORINFO[4][1]<<PINDINGSHAN_SENSORINFO[4][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'y'){
+                coordinates<<PINDINGSHAN_SENSORINFO[5][0]<<PINDINGSHAN_SENSORINFO[5][1]<<PINDINGSHAN_SENSORINFO[5][2];
+                coordinates<<motiposPWave;
+            }
+            if(ch == 'x'){
+                coordinates<<PINDINGSHAN_SENSORINFO[6][0]<<PINDINGSHAN_SENSORINFO[6][1]<<PINDINGSHAN_SENSORINFO[6][2];
+                coordinates<<motiposPWave;
+            }
+        }else if(ConnectDataBase::WHICHREGION == 3){           //双鸭山
+            //盘符目前还不明确
+        }else{
+            qDebug()<<"programme has unexpected error ...";
         }
     }
 //    for(int i=0;i<coordinates.size();i++){

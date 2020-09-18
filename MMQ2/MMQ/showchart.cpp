@@ -89,7 +89,7 @@ void ShowChart::initCharts()
         chart[i].addSeries(&lineSeries[i]);                //为图标添加折线序列
         chart[i].addSeries(&scatterSeries[i]);             //为图表添加点序列
 
-        axisX[i].setRange(0, 90000);                       //设置坐标轴范围
+        axisX[i].setRange(0, 9000);                       //设置坐标轴范围
         axisX[i].setTitleText("time(0.2millisecs)");       //标题
         axisX[i].setTickCount(10);                         //9区域，10个刻度
         axisX[i].setMinorTickCount(1);                     //单位刻度中间再加一个副刻度
@@ -129,7 +129,7 @@ void ShowChart::initCharts()
         //chart2[i].setMargins(margin);
         chart2[i].setPlotArea(recf);
 
-        axisX2[i].setRange(0, 90000);                      //设置坐标轴范围
+        axisX2[i].setRange(0, 9000);                      //设置坐标轴范围
         axisX2[i].setTickCount(10);
         axisY2[i].setRange(-50000, 50000);
 
@@ -521,13 +521,13 @@ void ShowChart::repaintPWave()
     lineSeries2[USERINPUT[0]*3+2].clear();
 
     //绘制调整后的新P波红线
-    lineSeries[USERINPUT[0]*3] << QPointF(USERINPUT[2], 0)<<QPointF(USERINPUT[2], 50000)<<QPointF(USERINPUT[2], -50000);
-    lineSeries[USERINPUT[0]*3+1] << QPointF(USERINPUT[2], 0)<<QPointF(USERINPUT[2], 50000)<<QPointF(USERINPUT[2], -50000);
-    lineSeries[USERINPUT[0]*3+2] << QPointF(USERINPUT[2], 0)<<QPointF(USERINPUT[2], 50000)<<QPointF(USERINPUT[2], -50000);
+    lineSeries[USERINPUT[0]*3] << QPointF(USERINPUT[2]/10, 0)<<QPointF(USERINPUT[2]/10, 50000)<<QPointF(USERINPUT[2]/10, -50000);
+    lineSeries[USERINPUT[0]*3+1] << QPointF(USERINPUT[2]/10, 0)<<QPointF(USERINPUT[2]/10, 50000)<<QPointF(USERINPUT[2]/10, -50000);
+    lineSeries[USERINPUT[0]*3+2] << QPointF(USERINPUT[2]/10, 0)<<QPointF(USERINPUT[2]/10, 50000)<<QPointF(USERINPUT[2]/10, -50000);
 
-    lineSeries2[USERINPUT[0]*3] << QPointF(USERINPUT[2], 0)<<QPointF(USERINPUT[2], 50000)<<QPointF(USERINPUT[2], -50000);
-    lineSeries2[USERINPUT[0]*3+1] << QPointF(USERINPUT[2], 0)<<QPointF(USERINPUT[2], 50000)<<QPointF(USERINPUT[2], -50000);
-    lineSeries2[USERINPUT[0]*3+2] << QPointF(USERINPUT[2], 0)<<QPointF(USERINPUT[2], 50000)<<QPointF(USERINPUT[2], -50000);
+    lineSeries2[USERINPUT[0]*3] << QPointF(USERINPUT[2]/10, 0)<<QPointF(USERINPUT[2]/10, 50000)<<QPointF(USERINPUT[2]/10, -50000);
+    lineSeries2[USERINPUT[0]*3+1] << QPointF(USERINPUT[2]/10, 0)<<QPointF(USERINPUT[2]/10, 50000)<<QPointF(USERINPUT[2]/10, -50000);
+    lineSeries2[USERINPUT[0]*3+2] << QPointF(USERINPUT[2]/10, 0)<<QPointF(USERINPUT[2]/10, 50000)<<QPointF(USERINPUT[2]/10, -50000);
 
 }
 
