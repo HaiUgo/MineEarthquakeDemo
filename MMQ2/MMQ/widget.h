@@ -21,6 +21,7 @@
 #include <QStatusBar>
 #include <QComboBox>
 #include <QVector>
+#include <QQueue>
 #include <QMutex>
 #include <QMutexLocker>
 #include "showchart.h"
@@ -61,6 +62,8 @@ private slots:
     void selectWhichRegion(int index);                           //选择哪一个区域，比如红阳，大同，平顶山等
     void on_currentIncidentButton_clicked();
 
+    void on_cleanAllChartDatas_clicked();
+
 private:
     Ui::Widget *ui;
 
@@ -76,10 +79,13 @@ private:
     QMutex mutex;
     QVector<qlonglong> rowCount;                                 //记录用户在数据库视图上操作了哪些行事件
     QVector<qlonglong>::iterator iter;
+    QQueue<qlonglong> *blinkId ;                                 //存储实体闪烁ID
 signals:
     void pageSwitch9();
     void sendSelectedCSVFile();
     void finishedReadDataThread();
+    void cleanAllChartDatas();
+    void sendChartsYAxis();
 };
 
 #endif // WIDGET_H

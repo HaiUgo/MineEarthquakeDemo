@@ -12,6 +12,10 @@ bool StatusbarMonitoring::isNewValueOfStation = false;
 
 bool StatusbarMonitoring::isNewValueOfStationFailed = false;
 
+bool StatusbarMonitoring::isOverLimitedCounts = false;
+
+bool StatusbarMonitoring::isOpenFileError = false;
+
 QString StatusbarMonitoring::LocationResult = "";
 
 QString StatusbarMonitoring::StatusBarFILEPATH = "";
@@ -44,6 +48,14 @@ void StatusbarMonitoring::run()
         if(isNewValueOfStationFailed){
             globalStatusBar->showMessage(tr("数据")+NewValueOfStation+tr(" 更新到：")+StatusBarFILEPATH+tr(" 失败！请刷新！"));
             isNewValueOfStationFailed = false;
+        }
+        if(isOverLimitedCounts){
+            globalStatusBar->showMessage(tr("超过设置读取量，已舍去部分数据"));
+            isOverLimitedCounts = false;
+        }
+        if(isOpenFileError){
+            globalStatusBar->showMessage(tr("读取")+StatusBarFILEPATH+tr(" 打开失败！"));
+            isOpenFileError  = false;
         }
     }
 }

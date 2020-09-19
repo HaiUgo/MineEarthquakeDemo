@@ -28,9 +28,10 @@ Widget::Widget(QWidget *parent)
 
     whichRegion = 0;
 
+    blinkId = new QQueue<qlonglong>();
+
     showChart = new ShowChart(this);
     showChart->setFixedSize(ScreenConfigure::mwidth,ScreenConfigure::mheight);
-    //showChart->resize(ScreenConfigure::mwidth,ScreenConfigure::mheight);
     ui->scrollArea->setWidget(showChart);
 
     globalStatusBar = new QStatusBar(this);
@@ -60,7 +61,8 @@ Widget::Widget(QWidget *parent)
     connect(ui->refreshCurrentDataTable,SIGNAL(clicked()),SLOT(refreshCurrentDataTable()));
     connect(ui->dataBaseView,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(dataBaseViewDC(const QModelIndex &)));
     connect(this,SIGNAL(pageSwitch9()),showChart,SLOT(pageSwithTo9()));
-    //connect(this,SIGNAL(finishedReadDataThread()),this,SLOT(startDrawThread()));
+    connect(this,SIGNAL(cleanAllChartDatas()),showChart,SLOT(clearAllChartDatas()));
+    //connect(this,SIGNAL(sendChartsYAxis()),showChart,SLOT(getChartsYAxis()));
 
     qDebug()<<"Widget ThreadId:"<<QThread::currentThreadId();
 }
@@ -74,6 +76,7 @@ Widget::~Widget()
     delete[] ReadCSVData::POINTBUFFER;
     delete[] ReadCSVData::POINTBUFFER_P;
     //delete readData;
+    delete blinkId;
     delete ui;
 
     qDebug()<<"Widget::~Widget()";
@@ -156,7 +159,6 @@ void Widget::reSelectDataBaseSource(QString value)
 void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
 {
     if(iCommandId == 1){
-
         QColor c(255,255,255);
         ui->axWidget->dynamicCall("SetViewColor(QColor)", c);
 
@@ -166,11 +168,8 @@ void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
         // 调用控件打开dwg文件命令，使用相对路径
         if(0 == whichRegion){
             //QString path = QApplication::applicationDirPath();    //是获取的执行文件exe所在的路径
-
             tempPath=path + "/src/dwg/红阳三矿20200713lh.dwg";
             ui->axWidget->dynamicCall("OpenDwgFile(const QString&)",tempPath);
-//            path = QDir::toNativeSeparators(path);
-//            qDebug()<<"当前路径"<<path;
             globalStatusBar->showMessage("打开矿区图："+tempPath);
             tempPath.clear();
         }
@@ -209,12 +208,18 @@ void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
         ui->axWidget->dynamicCall("SendStringToExecute(P)");
     }
     if(iCommandId == 9){
-        ui->axWidget->dynamicCall("StopAllTwinkeEnt()");
-        for (iter = rowCount.begin(); iter != rowCount.end(); iter++){
-            ui->axWidget->dynamicCall("Clear(qlonglong)",*iter);
-            qDebug()<<"values="<< *iter;
+//        ui->axWidget->dynamicCall("StopAllTwinkeEnt()");
+//        for (iter = rowCount.begin(); iter != rowCount.end(); iter++){
+//            ui->axWidget->dynamicCall("Clear(qlonglong)",*iter);
+//            qDebug()<<"values="<< *iter;
+//        }
+//        rowCount.clear();
+        while(!blinkId->empty()){
+            qlonglong temp = blinkId->dequeue();
+            qDebug()<<"blikeId->size():"<<blinkId->size()<<"temp:"<<temp;
+            ui->axWidget->dynamicCall("StopTwinkeEnt(qlonglong)",temp);
+            ui->axWidget->dynamicCall("Clear(qlonglong)",temp);
         }
-        rowCount.clear();
     }
 }
 
@@ -273,7 +278,6 @@ void Widget::showTable()
 {
     //sqlModel->setTable("mine_quack_5_results");
     //sqlModel->select();
-    //sqlModel->setQuery("select * from mine_quack_5_results");
     sqlModel->setQuery("select * from mine_quake_results");
     sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
     sqlModel->setHeaderData(1,Qt::Horizontal,tr("类型"));
@@ -320,19 +324,7 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
     QString str = ui->dataBaseView->model()->data(index).toString();
     QModelIndex tempIndex;
     QVariant data;
-//    if(currentDataBase == "mine_quack_3_results"){
-//        for(int i=0;i<3;i++){
-//            tempIndex = ui->dataBaseView->model()->index(row,i+1);       //获取CAD定位点
-//            data = ui->dataBaseView->model()->data(tempIndex);
-//            coordinates[i] = data.toDouble();
-//        }
-//        qDebug()<<"the current coordinate is :"<<coordinates[0]<<" "<<coordinates[1]<<" "<<coordinates[2];
 
-//        tempIndex = ui->dataBaseView->model()->index(row,10);            //获取CSV文件路径
-//        data = ui->dataBaseView->model()->data(tempIndex);
-//        ReadCSVData::FILEPATH = data.toString();
-//        qDebug()<<"the current csv file path is :"<<ReadCSVData::FILEPATH;
-//    }
     if(currentDataBase == "mine_quake_results"){
         for(int i=0;i<3;i++){
             tempIndex = ui->dataBaseView->model()->index(row,i+2);       //获取CAD定位点
@@ -358,20 +350,20 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
     ui->axWidget->dynamicCall("TwinkeEnt(qlonglong)",id);                                  
     rowCount.append(id);                                      //将该圆形实体ID存入容器，方便后期操作
 
+    blinkId->enqueue(id);
+    if(blinkId->size()>=2){
+        //qDebug()<<"blikeId->size()"<<blinkId->size();
+        qlonglong temp = blinkId->dequeue();
+        //qDebug()<<"blikeId->size():"<<blinkId->size()<<"temp:"<<temp;
+        ui->axWidget->dynamicCall("StopTwinkeEnt(qlonglong)",temp);
+        ui->axWidget->dynamicCall("Clear(qlonglong)",temp);
+    }
     globalStatusBar->showMessage(tr("读取文件：")+ReadCSVData::FILEPATH);
-
     emit pageSwitch9();
 
     ReadCSVData *readData = new ReadCSVData();
     connect(readData, &ReadCSVData::finished, readData, &QObject::deleteLater);
     readData->start();
-
-    //DrawThread *drawThread = new DrawThread();
-    //connect(drawThread, &DrawThread::finished, drawThread, &QObject::deleteLater);
-    //drawThread->start();
-    //QMutexLocker locker(&mutex);
-    //mutex.lock();
-    //mutex.unlock();
 }
 
 void Widget::on_currentIncidentButton_clicked()
@@ -390,5 +382,10 @@ void Widget::on_currentIncidentButton_clicked()
     qDebug()<<"the current station is :"<<currentStation;
 
     globalStatusBar->showMessage(tr("显示图表"));
+    //emit sendChartsYAxis();
+}
 
+void Widget::on_cleanAllChartDatas_clicked()
+{
+    emit cleanAllChartDatas();
 }

@@ -16,6 +16,8 @@ public:
     static bool isStatusBarFILEPATH;
     static QString StatusBarFILEPATH;
 
+    static bool isOpenFileError;
+
     static bool isCancledUpdateOperation;
 
     static bool updateLocationSuccessfully;
@@ -24,6 +26,8 @@ public:
     static bool isNewValueOfStation;
 
     static bool isNewValueOfStationFailed;
+
+    static bool isOverLimitedCounts;
 protected:
     void run() override;
 };

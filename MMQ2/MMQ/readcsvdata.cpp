@@ -3,6 +3,10 @@
 ReadCSVData::ReadCSVData(QObject *parent):QThread(parent)
 {
     stopped = false;
+    fileReadDone = false;
+    maxValueOfXChannel = 0;
+    maxValueOfYChannel = 0;
+    maxValueOfZChannel = 0;
 }
 
 ReadCSVData::~ReadCSVData()
@@ -22,6 +26,10 @@ int ReadCSVData::SENNUM = 0;
 int ReadCSVData::TEMPMOTIPOS[10] = {0};
 
 int ReadCSVData::TEMPSTATION[10] = {0};
+
+bool ReadCSVData::READFILEFINISHED = false;
+
+int ReadCSVData::maxValueOfXYZChannel = 1000;
 
 //存储每个事件触发台站的X，Y，Z轴的数据
 QVector<QPointF> *ReadCSVData::POINTBUFFER = new QVector<QPointF>[27];
@@ -94,6 +102,8 @@ void ReadCSVData::readCSVFile(QString fileName)
     int k=0;
 
     if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
+        //文件打开失败，将标志置为true
+        StatusbarMonitoring::isOpenFileError = true;
         qDebug()<<"open file failed!";
         return ;
     }
@@ -106,14 +116,32 @@ void ReadCSVData::readCSVFile(QString fileName)
     }
     COUNT = line.size();
     qDebug()<<"COUNT ="<<COUNT;
+
+    //限制读取的行数 最多为90000行，如果超过90000行，则舍去多余数据
+    if(COUNT > 90000){
+        COUNT = 90000;
+    }
+
     for(int i=0;i<(COUNT-1);i++){
         item = line.at(i).split(',');
         //date[i] = item.at(0);                         //存储每个事件的日期
         if(0 == i%10){                                    //采样，只取十分之一的数据
             for(int j=0;j<SENNUM;j++){
                 senChannelZ[k][j] = item.at(6+j*8);       //存储每个事件后三个通道中Z轴的数据
-                senChannelX[k][j] = item.at(4+j*8);       //存储每个事件后三个通道中X轴的数据
+                int tempZ = senChannelZ[k][j].toInt();
+                if(tempZ > maxValueOfZChannel)
+                    maxValueOfZChannel = tempZ;
+
                 senChannelY[k][j] = item.at(5+j*8);       //存储每个事件后三个通道中Y轴的数据
+                int tempY = senChannelY[k][j].toInt();
+                if(tempY > maxValueOfYChannel)
+                    maxValueOfYChannel = tempY;
+
+                senChannelX[k][j] = item.at(4+j*8);       //存储每个事件后三个通道中X轴的数据
+                int tempX = senChannelX[k][j].toInt();
+                if(tempX > maxValueOfXChannel)
+                    maxValueOfXChannel = tempX;
+
                 senChannelNum[k][j] = item.at(8+j*8);     //存储每个事件触发台站名称
                 motiPos[j] = item.at(7+j*8).toInt();      //存储每个传感器波形激发位置
                 //qDebug()<<"senChannelX[i][j]="<<senChannelX[i][j]<<'\n';
@@ -124,6 +152,19 @@ void ReadCSVData::readCSVFile(QString fileName)
         //qDebug()<<"i="<<i<<'\n';
     }
     file.close();
+    fileReadDone = true;
+
+    qDebug()<<"maxValueOfXChannel"<<maxValueOfXChannel;
+    qDebug()<<"maxValueOfYChannel"<<maxValueOfYChannel;
+    qDebug()<<"maxValueOfZChannel"<<maxValueOfZChannel;
+
+    int temp = (maxValueOfXChannel > maxValueOfYChannel)?maxValueOfXChannel:maxValueOfYChannel;
+    maxValueOfXYZChannel = (temp > maxValueOfZChannel)?temp:maxValueOfZChannel;
+
+//    if(maxValueOfXYZChannel)
+//        emit sendChartsYAxis();
+
+    qDebug()<<"maxValueOfXYZChannel"<<maxValueOfXYZChannel;
     qDebug()<<"read csv file successfully!";
 }
 
@@ -194,6 +235,9 @@ void ReadCSVData::locateCSVData()
         }
     }
 
+    //程序运行到这里表示已经读取文件结束并且每个台站都定位到其数据列了，所以可以将READFILEFINISHED置为true
+    READFILEFINISHED = true;
+
     //删除野指针，避免内存泄漏
     delete[] motiPos;
     //delete[] date;
@@ -241,19 +285,26 @@ void ReadCSVData::paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPoi
 
 void ReadCSVData::run()
 {
+    //QMutexLocker locker(&mutex);
+    //mutex.lock();
+    for(int i=0;i<27;i++){
+        ReadCSVData::POINTBUFFER[i].clear();
+    }
+    for(int i=0;i<10;i++){
+        ReadCSVData::POINTBUFFER_P[i].clear();
+    }
     parseCSVFileName(ReadCSVData::FILEPATH);
     readCSVFile(ReadCSVData::FILEPATH);
-    locateCSVData();
+    if(fileReadDone){
+        locateCSVData();
+        StatusbarMonitoring::StatusBarFILEPATH = ReadCSVData::FILEPATH;
+        StatusbarMonitoring::isStatusBarFILEPATH = true;
+    }else{
+        StatusbarMonitoring::StatusBarFILEPATH = ReadCSVData::FILEPATH;
+    }
     qDebug()<<"ReadCSVData ThreadID:"<<QThread::currentThreadId();
-    msleep(10);
-
-    StatusbarMonitoring::StatusBarFILEPATH = ReadCSVData::FILEPATH;
-    StatusbarMonitoring::isStatusBarFILEPATH = true;
- //   globalStatusBar->showMessage(tr("读取")+ReadCSVData::FILEPATH+tr("完毕!请刷新图表!"));
-//    DrawThread *drawThread = new DrawThread();
-//    connect(drawThread, &DrawThread::finished, drawThread, &QObject::deleteLater);
-//    drawThread->start();
-//    msleep(10);
+    //msleep(10);
+    //mutex.unlock();
 }
 
 void ReadCSVData::stop()

@@ -24,6 +24,8 @@ public:
     ~DrawThread();
 protected:
     void run();
+signals:
+     void sendChartsYAxis();
 };
 
 #endif // DRAWTHREAD_H

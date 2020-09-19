@@ -90,11 +90,12 @@ void ShowChart::initCharts()
         chart[i].addSeries(&scatterSeries[i]);             //为图表添加点序列
 
         axisX[i].setRange(0, 9000);                       //设置坐标轴范围
-        axisX[i].setTitleText("time(0.2millisecs)");       //标题
+        //axisX[i].setTitleText("time(0.2millisecs)");       //标题
+        axisX[i].setTitleText("sampling point");
         axisX[i].setTickCount(10);                         //9区域，10个刻度
         axisX[i].setMinorTickCount(1);                     //单位刻度中间再加一个副刻度
 
-        axisY[i].setRange(-50000, 50000);
+        axisY[i].setRange(-20000, 20000);
         axisY[i].setTitleText("accelerated speed");
         axisY[i].setTickCount(5);
 
@@ -131,7 +132,7 @@ void ShowChart::initCharts()
 
         axisX2[i].setRange(0, 9000);                      //设置坐标轴范围
         axisX2[i].setTickCount(10);
-        axisY2[i].setRange(-50000, 50000);
+        axisY2[i].setRange(-20000, 20000);
 
         chart2[i].addAxis(&axisX2[i], Qt::AlignBottom);    //把坐标轴添加到chart中，第二个参数是设置坐标轴的位置，
         splineSeries2[i].attachAxis(&axisX2[i]);           //把曲线关联到坐标轴
@@ -145,6 +146,34 @@ void ShowChart::initCharts()
 
         view2[i].setChart(&chart2[i]);
         view2[i].installEventFilter(this);                //注册部件事件过滤
+    }
+}
+
+//获取XYZ通道中的最大数据值，用来动态调整图表中的Y轴范围
+void ShowChart::getChartsYAxis()
+{
+    for(int i=0;i<27;i++){
+        axisY[i].setRange(-ReadCSVData::maxValueOfXYZChannel, ReadCSVData::maxValueOfXYZChannel);                       //设置坐标轴范围
+        axisY2[i].setRange(-ReadCSVData::maxValueOfXYZChannel, ReadCSVData::maxValueOfXYZChannel);
+        //qDebug()<<"i="<<i;
+    }
+    //drawSplineWave();
+}
+
+//清空图表数据
+void ShowChart::clearAllChartDatas()
+{
+    for(int i=0;i<27;i++){
+        showChart->splineSeries2[i].clear();
+        showChart->lineSeries2[i].clear();
+        showChart->splineSeries[i].clear();
+        showChart->lineSeries[i].clear();
+    }
+    for(int i=0;i<27;i++){
+        ReadCSVData::POINTBUFFER[i].clear();
+    }
+    for(int i=0;i<10;i++){
+        ReadCSVData::POINTBUFFER_P[i].clear();
     }
 }
 
@@ -399,6 +428,123 @@ void ShowChart::slotPointHoverd(const QPointF &point, bool state)
     }
 }
 
+//绘制曲线图
+void ShowChart::drawSplineWave()
+{
+    if(ReadCSVData::READFILEFINISHED){
+        for(int i=0;i<27;i++){
+            showChart->splineSeries2[i].clear();
+            showChart->lineSeries2[i].clear();
+            showChart->splineSeries[i].clear();
+            showChart->lineSeries[i].clear();
+        }
+
+        for(int i=0;i<27;i++){
+            showChart->splineSeries2[i].replace(ReadCSVData::POINTBUFFER[i]);
+        }
+        for(int i=0;i<27;i++){
+            showChart->splineSeries[i].replace(ReadCSVData::POINTBUFFER[i]);
+        }
+
+        //根据TEMPMOTIPOS[j][0]获取站台及激发位置，然后将其绘制到图表中（P波到时）
+        for(int j=0;j<10;j++){
+            if(ReadCSVData::TEMPMOTIPOS[j]!=0){
+                if(1==j){                                 //如果站台是1站台，则将P波到时绘制到T1的XYZ轴曲线图表中
+                    showChart->lineSeries[T1X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T1Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T1Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+
+                    showChart->lineSeries2[T1X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T1Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T1Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+                }
+                if(2==j){                                 //如果站台是2站台，则将P波到时绘制到T2的XYZ轴曲线图表中，以此类推
+                    showChart->lineSeries[T2X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T2Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T2Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+
+                    showChart->lineSeries2[T2X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T2Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T2Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+                }
+                if(3==j){
+                    showChart->lineSeries[T3X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T3Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T3Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+
+                    showChart->lineSeries2[T3X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T3Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T3Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+                }
+                if(4==j){
+                    showChart->lineSeries[T4X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T4Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T4Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+
+                    showChart->lineSeries2[T4X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T4Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T4Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+                }
+                if(5==j){
+                    showChart->lineSeries[T5X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T5Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T5Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+
+                    showChart->lineSeries2[T5X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T5Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T5Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+                }
+                if(6==j){
+                    showChart->lineSeries[T6X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T6Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T6Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+
+                    showChart->lineSeries2[T6X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T6Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T6Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+                }
+                if(7==j){
+                    showChart->lineSeries[T7X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T7Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T7Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+
+                    showChart->lineSeries2[T7X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T7Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T7Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+                }
+                if(8==j){
+                    showChart->lineSeries[T8X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T8Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T8Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+
+                    showChart->lineSeries2[T8X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T8Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T8Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+                }
+                if(9==j){
+                    showChart->lineSeries[T9X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T9Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries[T9Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+
+                    showChart->lineSeries2[T9X].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T9Y].replace(ReadCSVData::POINTBUFFER_P[j]);
+                    showChart->lineSeries2[T9Z].replace(ReadCSVData::POINTBUFFER_P[j]);
+                }
+            }
+        }
+        for(int i=0;i<27;i++){
+            ReadCSVData::POINTBUFFER[i].clear();
+        }
+        for(int i=0;i<10;i++){
+            ReadCSVData::POINTBUFFER_P[i].clear();
+        }
+
+        //将ReadCSVData::READFILEFINISHED置为false准备下一次的读取
+        ReadCSVData::READFILEFINISHED = false;
+    }
+}
+
+
 //消息提示对话框
 void ShowChart::informationDialog()
 {
@@ -423,7 +569,6 @@ void ShowChart::informationDialog()
         else QMessageBox::warning(this,"警告","请输入有效值",QStringLiteral("确定"));
     }else {
         StatusbarMonitoring::isCancledUpdateOperation = true;
-        //globalStatusBar->showMessage(tr("更新操作已取消！"));
         qDebug()<<"updata locations and P wave arrival operation is cancelled ";
         return;
     }
@@ -439,7 +584,6 @@ void ShowChart::updatePSOandPwaveData()
 
     StatusbarMonitoring::updateLocationSuccessfully = true;
     StatusbarMonitoring::StatusBarFILEPATH = ReadCSVData::FILEPATH;
-    //globalStatusBar->showMessage(tr("新的定位值已更新到当前数据表！")+tr(" 新数据已更新到：")+ReadCSVData::FILEPATH);
 }
 //将输入的的P波到时位置保存/更新到CSV数据文件中
 void ShowChart::saveModifiedPWaveData()
@@ -495,11 +639,6 @@ void ShowChart::getLoactionData()
         LocationAlgorithm *psoAlgorithm = new LocationAlgorithm();
         connect(psoAlgorithm, &LocationAlgorithm::finished, psoAlgorithm, &QObject::deleteLater);
         psoAlgorithm->start();
-
-//        QString result = "X:"+LocationAlgorithm::XRESULT+" Y:"+LocationAlgorithm::YRESULT+
-//                " Z:"+LocationAlgorithm::ZRESULT+" T:"+LocationAlgorithm::TRESULT;
-//        qDebug()<<result;
-//        globalStatusBar->showMessage(tr("计算后得到的定位点为：")+result);
     }
 }
 
@@ -537,10 +676,6 @@ void ShowChart::pageSwithTo9()
     if(ui->stackedWidget->currentIndex()!=9)
         ui->stackedWidget->setCurrentIndex(9);         //切换到台站波形图显示
 }
-
-//注：receiveCSVFilePath(QString path)和drawSplineWave()转移到了子线程drawthread.cpp中
-//所以在本showchart.cpp文件中可以删掉，这里做了保留...
-
 
 //chartView事件过滤封装
 void ShowChart::charViewEventFilter(QEvent *event,QChart *tempChart)

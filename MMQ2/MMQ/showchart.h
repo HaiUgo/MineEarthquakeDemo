@@ -54,7 +54,7 @@ private:
     void charViewEventFilter(QEvent *event,QChart *tempChart);   //chartView事件过滤封装函数
     bool eventFilter(QObject *obj,QEvent *event);
     void handleTheInputData();                                   //处理用户手动输入的P波到时数据
-
+    void drawSplineWave();                                      //绘制曲线图
 private slots:
 
     void fullChartsButtonClicked();                              //显示全部台站波形按钮
@@ -75,6 +75,8 @@ private slots:
     void on_T8Button_clicked();
     void on_T9Button_clicked();
 
+    void clearAllChartDatas();
+    void getChartsYAxis();                                        //接收widget发来的信号，从而动态调整ShowChart图表的Y轴范围
     void pageSwithTo9();                                          //接收widget发来的信号，从而切换相应台站
     void txIsChecked(bool checked);                               //QRadioButton：tx,ty,tz的选中状态
     void tyIsChecked(bool checked);
