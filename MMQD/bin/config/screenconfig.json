@@ -1,8 +1,8 @@
 {
-    "Width": "1100",
-    "Height": "900",
-	"mWidth":"1095",
-	"mHeight":"895",
-	"WaveChartWidth":"335",
-	"WaveChartHeight":"80"
+    "Width": "750",
+    "Height": "625",
+	"mWidth":"745",
+	"mHeight":"620",
+	"WaveChartWidth":"230",
+	"WaveChartHeight":"40"
 }
