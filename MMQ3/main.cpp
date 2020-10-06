@@ -1,0 +1,15 @@
+#include "widget.h"
+#include "reportform.h"
+#include <QApplication>
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    //Widget w;
+    //w.showMaximized();
+
+    ReportForm r;
+    r.show();
+
+    return a.exec();
+}
