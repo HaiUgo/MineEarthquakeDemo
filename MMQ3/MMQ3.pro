@@ -2,7 +2,7 @@ QT       += core gui
 QT += axcontainer
 QT += sql
 QT += charts
-
+QT += printsupport
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = MMQ3
 CONFIG += c++11
@@ -29,7 +29,6 @@ SOURCES += \
     main.cpp \
     readcsvdata.cpp \
     reportform.cpp \
-    reportformparameter.cpp \
     screenconfigure.cpp \
     showchart.cpp \
     statusbarmonitoring.cpp \
@@ -45,7 +44,6 @@ HEADERS += \
     param.h \
     readcsvdata.h \
     reportform.h \
-    reportformparameter.h \
     screenconfigure.h \
     showchart.h \
     statusbarmonitoring.h \
