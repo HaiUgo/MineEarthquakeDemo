@@ -21,9 +21,27 @@ ReportForm::ReportForm(QWidget *parent):
     ui->axWidget->dynamicCall("EnableGripPoint(bool)",false);
     ui->axWidget->dynamicCall("DoCommand(const qint32&)",1); //执行控件自定义命令函数，命令的id为2，该值为命令编号，可任取.
 
+
+    ui->csvList->setEditTriggers(QAbstractItemView::NoEditTriggers);  //禁止编辑
+    ui->csvList->setSelectionBehavior(QAbstractItemView::SelectRows); //整行选中的方式
+    ui->csvList->setSelectionMode(QAbstractItemView::SingleSelection);//单击选中整行
+    ui->csvList->verticalHeader()->setVisible(true); //列表头
+    ui->csvList->horizontalHeader()->setVisible(true); //行表头
+    ui->csvList->setColumnCount(2); //设置列数
+    ui->csvList->setRowCount(30);//行数
+    QStringList sListHeader;
+    sListHeader << "路径" << "台站";
+    ui->csvList->setHorizontalHeaderLabels(sListHeader); //设置每一列的表头
+
+
+//    int iRow = ui->csvList->rowCount();
+//    ui->csvList->setRowCount(iRow + 1);//总行数增加1
+
     connect(ui->moveCAD,SIGNAL(clicked()),this,SLOT(moveCADButtonClicked()));
     connect(ui->restoreCAD,SIGNAL(clicked()),this,SLOT(restoreCADButtonClicked()));
-    connect(ui->snippingWave,SIGNAL(clicked()),this,SLOT(snippingWaveButtonClicked()));
+    connect(ui->captureByRobot,SIGNAL(clicked()),this,SLOT(captureByRobotClicked()));
+    connect(ui->captureByManual,SIGNAL(clicked()),this,SLOT(captureByManualClicked()));
+    connect(ui->saveCapturedImageByManual,SIGNAL(clicked()),this,SLOT(saveCapturedImageByManual()));
     connect(ui->queryButton,SIGNAL(clicked()),this,SLOT(queryButtonClicked()));
     connect(ui->clearTwinkeButton,SIGNAL(clicked()),SLOT(clearTwinkeButtonClickled()));
     //connect(ui->generateDOC,SIGNAL(clicked()),this,SLOT(generateDOCClicked()));
@@ -41,6 +59,10 @@ ReportForm::ReportForm(QWidget *parent):
     //connect(ui->startDate, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(onDateTimeChanged(QDateTime)));
     // 时间发生改变时执行
     //connect(ui->startDate, SIGNAL(timeChanged(QTime)), this, SLOT(onTimeChanged(QTime)));
+
+    connect(ui->csvList,SIGNAL(itemDoubleClicked(QTableWidgetItem*)),this, SLOT(getDoubleClickedItem(QTableWidgetItem*)));
+    connect(ui->csvList,SIGNAL(itemClicked(QTableWidgetItem*)),this, SLOT(getSingleClickedItem(QTableWidgetItem*)));
+
 }
 
 ReportForm::~ReportForm(){
@@ -108,9 +130,48 @@ void ReportForm::restoreCADButtonClicked()
     ui->axWidget->dynamicCall("DoCommand(const qint32&)",7);
 }
 
-void ReportForm::snippingWaveButtonClicked()
+// 点击手动截图按钮开始截图;
+void ReportForm::captureByManualClicked()
+{
+    captureHelper = new CaptureScreen();
+    connect(captureHelper, SIGNAL(signalCompleteCature(QPixmap)), this, SLOT(onCompleteCature(QPixmap)));
+    captureHelper->show();
+}
+
+void ReportForm::onCompleteCature(QPixmap captureImage)
+{
+    ui->displayCapturedImage->setPixmap(captureImage);
+    delete captureHelper;
+}
+
+//保存手动截图图片
+void ReportForm::saveCapturedImageByManual()
 {
 
+}
+
+//自动截图
+void ReportForm::captureByRobotClicked()
+{
+    QRect rect = ui->gridLayout->geometry();
+    QPixmap p = this->grab(rect);
+    QString filePathName = QDir::currentPath() + "/"+startDate + "-"+endDate+"wave";
+    //filePathName += QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss-zzz");
+    filePathName += ".png";
+    if(!p.save(filePathName,"png")){
+        qDebug()<<"save widget screen failed";
+    }
+}
+
+
+void ReportForm::getDoubleClickedItem(QTableWidgetItem *item)
+{
+    qDebug()<<"getDoubleClickedItem:"<<item->text();
+}
+
+void ReportForm::getSingleClickedItem(QTableWidgetItem *item)
+{
+    qDebug()<<"getSingleClickedItem:"<<item->text();
 }
 
 void ReportForm::queryButtonClicked()
@@ -130,6 +191,10 @@ void ReportForm::queryButtonClicked()
      query.exec(sql);            // 执行查询操作
 
 
+     mapParameter.clear();           //每次查询时要把上一次查询的数据库结果清除
+     ui->csvList->clearContents();   //只清除表中数据，不清除表头内容
+
+
      QString quackTime;
      QString kind;
      double xData;
@@ -144,6 +209,8 @@ void ReportForm::queryButtonClicked()
      QList<double> list;
      QList<double> coordinates;
      QList<QVariant> dataParameters;
+
+     int index = 0;           //tablewidget的索引，用来插入wenjianming和panfu
 
      //query.next()指向查找到的第一条记录，然后每次后移一条记录
      while(query.next())
@@ -188,6 +255,10 @@ void ReportForm::queryButtonClicked()
          qDebug()<<"param:"<<dataParameters.at(i);
          dataParameters.clear();
 
+         ui->csvList->setItem(index,0,new QTableWidgetItem(wenjianming));
+         ui->csvList->setItem(index,1,new QTableWidgetItem(panfu));
+
+         index ++;           //行数加一
      }
 
      QString pointPath=QDir::currentPath() + "/centerpoint.png";

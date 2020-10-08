@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>677</width>
-    <height>463</height>
+    <height>709</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,70 +22,70 @@
      <item>
       <layout class="QGridLayout" name="gridLayout">
        <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="station2">
          <property name="text">
-          <string>TextLabel</string>
+          <string>台站2</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="station3">
          <property name="text">
-          <string>TextLabel</string>
+          <string>台站3</string>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="station4">
          <property name="text">
-          <string>TextLabel</string>
+          <string>台站4</string>
          </property>
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="label_5">
+        <widget class="QLabel" name="station5">
          <property name="text">
-          <string>TextLabel</string>
+          <string>台站5</string>
          </property>
         </widget>
        </item>
        <item row="7" column="0">
-        <widget class="QLabel" name="label_8">
+        <widget class="QLabel" name="station8">
          <property name="text">
-          <string>TextLabel</string>
+          <string>台站8</string>
          </property>
         </widget>
        </item>
        <item row="6" column="0">
-        <widget class="QLabel" name="label_7">
+        <widget class="QLabel" name="station7">
          <property name="text">
-          <string>TextLabel</string>
+          <string>台站7</string>
          </property>
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="station1">
          <property name="text">
-          <string>TextLabel</string>
+          <string>台站1</string>
          </property>
         </widget>
        </item>
        <item row="5" column="0">
-        <widget class="QLabel" name="label_6">
+        <widget class="QLabel" name="station6">
          <property name="text">
-          <string>TextLabel</string>
+          <string>台站6</string>
          </property>
         </widget>
        </item>
        <item row="8" column="0">
-        <widget class="QLabel" name="label_9">
+        <widget class="QLabel" name="station9">
          <property name="text">
-          <string>TextLabel</string>
+          <string>台站9</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QGraphicsView" name="graphicsView"/>
+        <widget class="QGraphicsView" name="graphicsView_1"/>
        </item>
        <item row="1" column="1">
         <widget class="QGraphicsView" name="graphicsView_2"/>
@@ -123,6 +123,50 @@
      <property name="leftMargin">
       <number>0</number>
      </property>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <spacer name="horizontalSpacer_9">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="moveCAD">
+         <property name="text">
+          <string>移动CAD</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="restoreCAD">
+         <property name="text">
+          <string>还原CAD</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_10">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
      <item>
       <widget class="QAxWidget" name="axWidget">
        <property name="control" stdset="0">
@@ -192,72 +236,48 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_10">
-       <property name="text">
-        <string>待读文件表列，双击读取</string>
+      <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <property name="bottomMargin">
+        <number>10</number>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QListWidget" name="listWidget"/>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <spacer name="horizontalSpacer_9">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>待读取文件表列，选中点击读取</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
+        </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="readCSVInList">
          <property name="text">
           <string>读取</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="readCSVOfAnother">
          <property name="text">
-          <string>打开波形文件</string>
+          <string>打开其他波形文件</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="moveCAD">
-         <property name="text">
-          <string>移动CAD</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="restoreCAD">
-         <property name="text">
-          <string>还原CAD</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_10">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QTableWidget" name="csvList"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="displayCapturedImage">
+       <property name="minimumSize">
+        <size>
+         <width>300</width>
+         <height>150</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>手动截图效果在此显示</string>
+       </property>
+      </widget>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -424,14 +444,21 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="captureByManual">
          <property name="text">
           <string>手动截图</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="snippingWave">
+        <widget class="QPushButton" name="saveCapturedImageByManual">
+         <property name="text">
+          <string>保存手动截图</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="captureByRobot">
          <property name="text">
           <string>自动截图</string>
          </property>
@@ -479,16 +506,16 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QLabel" name="label_11">
+        <widget class="QLabel" name="statusLabel">
          <property name="text">
           <string>状态：</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_12">
+        <widget class="QLabel" name="statusOfProgramme">
          <property name="text">
-          <string>TextLabel</string>
+          <string/>
          </property>
         </widget>
        </item>

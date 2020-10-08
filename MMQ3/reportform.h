@@ -15,10 +15,12 @@
 #include <QPrinter>
 #include <QTextBlock>
 #include <QTextDocument>
+#include <QHeaderView>
+#include <QTableWidgetItem>
 
 #include "databaseconfigure.h"
 #include "connectdatabase.h"
-
+#include "capturescreen.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -41,6 +43,8 @@ private:
 
     QString startDate;
     QString endDate;
+
+    CaptureScreen* captureHelper;
 
     const QString R = "大棚";
     const QString S = "蒿子屯";
@@ -67,12 +71,19 @@ private slots:
     void generatePDFClicked();
     void generateWebDOCClicked();
     void printResultClicked();
-    void snippingWaveButtonClicked();
+    void captureByRobotClicked();
+    void captureByManualClicked();
     void restoreCADButtonClicked();
     void moveCADButtonClicked();
 
     void onStartDateChanged(const QDate &date);
     void onEndDateChanged(const QDate &date);
+
+    void onCompleteCature(QPixmap captureImage);
+    void saveCapturedImageByManual();
+
+    void getDoubleClickedItem(QTableWidgetItem *item);
+    void getSingleClickedItem(QTableWidgetItem* item);
 };
 
 
