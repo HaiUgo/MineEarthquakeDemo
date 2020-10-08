@@ -17,7 +17,11 @@
 #include <QTextDocument>
 #include <QHeaderView>
 #include <QTableWidgetItem>
+#include <QTimer>
+#include <QDirIterator>
 
+#include "chart.h"
+#include "chartview.h"
 #include "databaseconfigure.h"
 #include "connectdatabase.h"
 #include "capturescreen.h"
@@ -56,6 +60,26 @@ private:
     const QString Y = "火药库";
     const QString Z = "工业广场";
 
+    //存储台站XYZ通道数据中的最大值用来动态调整图表的Y轴范围
+    int maxValueOfZChannel;
+
+    QSplineSeries *splineSeries;                                  //曲线序列
+    QLineSeries *lineSeries;                                      //折线图数据序列
+    Chart *chart;                                                 //图表
+    QValueAxis *axisX;                                            //X坐标轴
+    QValueAxis *axisY;                                            //Y坐标轴
+    ChartView *view;                                              //视图
+
+    QVector<QPointF> *pointBuffer;    //存储坐标点序列
+    QVector<QPointF> *pointBuffer_P;  //用于绘制P波到时
+
+    QString filePathOnTableWidget;    //获取的表格中的文件路径
+
+    bool isManual ;                   //是否是人工截图
+    QList<QString> listOfFilePath;    //保存查询到的文件路径表列，用于自动截图读取文件路径
+
+    void initZCharts();
+    bool readCSVFileOfZ(QString fileName);
 public:
     explicit ReportForm(QWidget *parent = nullptr);
     ~ReportForm();
@@ -84,6 +108,8 @@ private slots:
 
     void getDoubleClickedItem(QTableWidgetItem *item);
     void getSingleClickedItem(QTableWidgetItem* item);
+
+    void readCSVInListClicked();
 };
 
 

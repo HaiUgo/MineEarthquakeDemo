@@ -6,6 +6,8 @@ ReportForm::ReportForm(QWidget *parent):
 {
     ui->setupUi(this);
 
+    initZCharts();
+
     blinkId = new QQueue<qlonglong>();
     textId = new QQueue<qlonglong>();
     pointId = new QQueue<qlonglong>();
@@ -21,7 +23,6 @@ ReportForm::ReportForm(QWidget *parent):
     ui->axWidget->dynamicCall("EnableGripPoint(bool)",false);
     ui->axWidget->dynamicCall("DoCommand(const qint32&)",1); //执行控件自定义命令函数，命令的id为2，该值为命令编号，可任取.
 
-
     ui->csvList->setEditTriggers(QAbstractItemView::NoEditTriggers);  //禁止编辑
     ui->csvList->setSelectionBehavior(QAbstractItemView::SelectRows); //整行选中的方式
     ui->csvList->setSelectionMode(QAbstractItemView::SingleSelection);//单击选中整行
@@ -32,10 +33,10 @@ ReportForm::ReportForm(QWidget *parent):
     QStringList sListHeader;
     sListHeader << "路径" << "台站";
     ui->csvList->setHorizontalHeaderLabels(sListHeader); //设置每一列的表头
-
-
 //    int iRow = ui->csvList->rowCount();
 //    ui->csvList->setRowCount(iRow + 1);//总行数增加1
+
+    isManual = true;
 
     connect(ui->moveCAD,SIGNAL(clicked()),this,SLOT(moveCADButtonClicked()));
     connect(ui->restoreCAD,SIGNAL(clicked()),this,SLOT(restoreCADButtonClicked()));
@@ -48,6 +49,7 @@ ReportForm::ReportForm(QWidget *parent):
     connect(ui->generateWebDOC,SIGNAL(clicked()),this,SLOT(generateWebDOCClicked()));
     connect(ui->generatePDF,SIGNAL(clicked()),this,SLOT(generatePDFClicked()));
     connect(ui->printResult,SIGNAL(clicked()),this,SLOT(printResultClicked()));
+    connect(ui->readCSVInList,SIGNAL(clicked()),this,SLOT(readCSVInListClicked()));
     qDebug()<<"checkpoint4";
 
 
@@ -68,7 +70,285 @@ ReportForm::ReportForm(QWidget *parent):
 ReportForm::~ReportForm(){
     delete blinkId;
     delete textId;
+    delete db;
     qDebug()<<"distructed ReporForm";
+}
+
+void ReportForm::initZCharts()
+{
+    splineSeries = new QSplineSeries[9];
+    lineSeries = new QLineSeries[9];
+    chart = new Chart[9];
+    axisX = new QValueAxis[9];
+    axisY = new QValueAxis[9];
+    view = new ChartView [9];
+
+    QMargins margin(1,1,1,1);   //设置chart rectangle（图表矩形）的边距
+    //QRectF recf(5,5,550,50);  //显示设置plot area（图表区域）的大小
+
+    for (int i=0;i<9;i++) {
+        splineSeries[i].setColor(QColor(Qt::black));
+        splineSeries[i].setUseOpenGL(true);
+        splineSeries[i].setPointsVisible(true);
+        lineSeries[i].setColor(QColor(255,0,0));
+
+        chart[i].legend()->hide();
+        chart[i].addSeries(&splineSeries[i]);              //为图表添加曲线序列
+        chart[i].addSeries(&lineSeries[i]);                //为图标添加折线序列
+
+        chart[i].setBackgroundVisible(true);
+        chart[i].setMargins(margin);
+        //chart[i].setPlotArea(recf);
+
+        axisX[i].setRange(0, 9000);                       //设置坐标轴范围
+        axisX[i].setTickCount(10);                         //9区域，10个刻度
+        axisX[i].setMinorTickCount(1);                     //单位刻度中间再加一个副刻度
+
+        axisY[i].setRange(-20000, 20000);
+        axisY[i].setTickCount(5);
+
+        chart[i].addAxis(&axisX[i], Qt::AlignBottom);      //把坐标轴添加到chart中，第二个参数是设置坐标轴的位置，
+        splineSeries[i].attachAxis(&axisX[i]);             //把曲线关联到坐标轴
+        lineSeries[i].attachAxis(&axisX[i]);
+
+        chart[i].addAxis(&axisY[i], Qt::AlignLeft);
+        splineSeries[i].attachAxis(&axisY[i]);
+        lineSeries[i].attachAxis(&axisY[i]);
+
+        view[i].setChart(&chart[i]);
+        view[i].setRubberBand(QChartView::RectangleRubberBand);
+        view[i].installEventFilter(this);                  //注册部件事件过滤
+    }
+
+    for(int i=0;i<9;i++){
+        ui->gridLayout->addWidget(&view[i],i,1);
+    }
+}
+
+
+//读取CSV文件数据
+bool ReportForm::readCSVFileOfZ(QString fileName)
+{
+    if(fileName.isEmpty()||fileName.split('/').size() == 0){
+        //路径为空
+        qDebug()<<"fileName is empty or filepath is wrong";
+        ui->statusOfProgramme->setText("文件读取失败，请检查文件路径");
+        QMessageBox::warning(this,tr("警告"),tr("请检查文件路径"),QMessageBox::Yes);
+        return false;
+    }
+
+    QStringList fileSplits = fileName.split('/');
+    QString panfu = fileSplits[fileSplits.length()-1].split(' ')[0];
+    int sennum = panfu.length();
+    qDebug()<<"SENNUM="<<sennum;
+
+
+    QFile file(fileName);
+    qDebug()<<"fileName="<<fileName<<'\n';
+    QStringList line;
+    QStringList item;
+    QString block ;
+    int k=0;
+
+    if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
+        //文件打开失败
+        qDebug()<<"open file failed!";
+        //QMessageBox::warning(this,tr("警告"),tr("此文件读取失败"),QMessageBox::Yes);
+        ui->statusOfProgramme->setText("此文件打开失败");
+
+        QMessageBox *box = new QMessageBox(QMessageBox::Warning,tr("警告"),tr("此文件读取失败"));
+        QTimer::singleShot(3000,box,SLOT(accept())); //也可将accept改为close
+        box->exec();//box->show();都可以
+        return false;
+    }
+
+    //存储每个事件触发台站的X，Y，Z轴的数据
+    pointBuffer = new QVector<QPointF>[sennum];
+    //用于绘制P波到时（红线）
+    pointBuffer_P = new QVector<QPointF>[sennum];
+
+    int *motiPos;                            //每个台站的激发位置
+    //存储每个传感器波形的激发位置，在CSV文件中表现为第H列，P列，X列...以此类推
+    motiPos = new int[sennum];
+
+    QString **senChannelZ ;                  //存储每个事件后三个通道中Z轴的数据
+    //存储后三个通道中Z轴的数据，在CSV文件中表现为G列，O列，W列...以此类推
+    senChannelZ = new QString*[9000];
+    for (int i = 0; i < 9000; i++){
+        senChannelZ[i] = new QString[sennum];
+      //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
+    }
+
+    QString *senChannelNum ;                //存储每个事件触发台站名称
+    //存储每个事件触发的台站名称，在CSV文件中表现为I列，Q列，Y列...以此类推
+    senChannelNum = new QString[sennum];
+    QChar ch;
+    //panfu是按照到时顺序来的
+    for(int i=0;i<panfu.size();i++){
+        ch = panfu.at(i);
+        if(ch == 'r'){
+            senChannelNum[i] = R;
+        }
+        if(ch == 's'){
+            senChannelNum[i] = S;
+        }
+        if(ch == 't'){
+            senChannelNum[i] = T;
+        }
+        if(ch == 'u'){
+            senChannelNum[i] = U;
+        }
+        if(ch == 'v'){
+            senChannelNum[i] = V;
+        }
+        if(ch == 'w'){
+            senChannelNum[i] = W;
+        }
+        if(ch == 'x'){
+            senChannelNum[i] = X;
+        }
+        if(ch == 'y'){
+            senChannelNum[i] = Y;
+        }
+        if(ch == 'z'){
+            senChannelNum[i] = Z;
+        }
+    }
+
+    //这时候已经把盘符获取到了，同时台站名也知道了，然后就把标签设置成台站名称
+    //至少有三个台站，所以前三个一定有内容
+    ui->station1->setText(senChannelNum[0]);
+    ui->station2->setText(senChannelNum[1]);
+    ui->station3->setText(senChannelNum[2]);
+    if(sennum == 4){
+        ui->station4->setText(senChannelNum[3]);
+    }else if(sennum == 5){
+        ui->station4->setText(senChannelNum[3]);
+        ui->station5->setText(senChannelNum[4]);
+    }else if(sennum == 6){
+        ui->station4->setText(senChannelNum[3]);
+        ui->station5->setText(senChannelNum[4]);
+        ui->station6->setText(senChannelNum[5]);
+    }else if(sennum == 7){
+        ui->station4->setText(senChannelNum[3]);
+        ui->station5->setText(senChannelNum[4]);
+        ui->station6->setText(senChannelNum[5]);
+        ui->station7->setText(senChannelNum[6]);
+    }else if(sennum == 8){
+        ui->station4->setText(senChannelNum[3]);
+        ui->station5->setText(senChannelNum[4]);
+        ui->station6->setText(senChannelNum[5]);
+        ui->station7->setText(senChannelNum[6]);
+        ui->station8->setText(senChannelNum[7]);
+    }else if(sennum == 9){
+        ui->station4->setText(senChannelNum[3]);
+        ui->station5->setText(senChannelNum[4]);
+        ui->station6->setText(senChannelNum[5]);
+        ui->station7->setText(senChannelNum[6]);
+        ui->station8->setText(senChannelNum[7]);
+        ui->station9->setText(senChannelNum[8]);
+    }
+
+    qDebug()<<"parsing the csv file completed";
+
+
+    QTextStream stream(&file);
+    while (!stream.atEnd())
+    {
+        block = stream.readAll();
+        line = block.split('\t');
+    }
+    int count = line.size();
+    qDebug()<<"COUNT ="<<count;
+    //限制读取的行数 最多为90000行，如果超过90000行，则舍去多余数据
+    if(count > 90000){
+        count = 90000;
+    }
+    for(int i=0;i<(count-1);i++){
+        item = line.at(i).split(',');
+        if(0 == i%10){                                    //采样，只取十分之一的数据
+            for(int j=0;j<sennum;j++){
+                senChannelZ[k][j] = item.at(6+j*8);       //存储每个事件后三个通道中Z轴的数据
+                int tempZ = senChannelZ[k][j].toInt();
+                if(tempZ > maxValueOfZChannel)
+                    maxValueOfZChannel = tempZ;
+
+                if(i == 0) motiPos[j] = item.at(7+j*8).toInt();   //存储每个传感器波形激发位置，每行都一样，所以存第一行就行
+                //qDebug()<<"senChannelX[i][j]="<<senChannelX[i][j]<<'\n';
+            }
+            //qDebug()<<"K="<<k;
+            k++;
+        }
+        //qDebug()<<"i="<<i<<'\n';
+    }
+    file.close();
+
+    qDebug()<<"maxValueOfXYZChannel"<<maxValueOfZChannel;
+    qDebug()<<"read csv file successfully!";
+
+    //若maxValueOfZChannel存在极端值，取最大值50000
+    if(maxValueOfZChannel >= 50000){
+        maxValueOfZChannel = 50000;
+    }
+    for(int i=0;i<9;i++){
+        axisY[i].setRange(-maxValueOfZChannel, maxValueOfZChannel);   //设置坐标轴范围
+    }
+
+    for(int j=0;j<sennum;j++){
+        //qDebug()<<"motivated position is "<<motiPos[j];  //打印测试站台及其激发位置
+        //因为P波到时是一条垂线，所以只需要添加横坐标相同的几个点就好
+        pointBuffer_P[j].append(QPointF(motiPos[j]/10,0));
+        pointBuffer_P[j].append(QPointF(motiPos[j]/10,50000));
+        pointBuffer_P[j].append(QPointF(motiPos[j]/10,-50000));
+    }
+
+    int listIndex = 0; 	                                      //可以理解为横坐标，因为横坐标就是每个事件（也就是CSV文件中的一行数据）
+    double parseDataZ;
+    for(int j=0;j<count;j++){
+        if(0 == j%10){
+            for(int i=0;i<sennum;i++){
+                parseDataZ = senChannelZ[listIndex][i].toDouble();
+                pointBuffer[i].append(QPointF(listIndex, parseDataZ));
+                //qDebug()<<"parseDataZ="<<parseDataZ<<'\n';
+                //qDebug()<<"listIndex= "<<listIndex;
+            }
+            listIndex++;
+        }
+    }
+    delete[] motiPos;
+    delete[] senChannelNum;
+    for( int i = 0 ; i < 9000 ; i ++ )
+        delete []senChannelZ[i] ;
+    delete []senChannelZ;
+
+    ui->statusOfProgramme->setText("文件读取完毕");
+
+    //每次绘制曲线之前都需要清空上一次数据，所有台站曲线数据都要清空，因为假如一开始有5个，后来有3个台站，那么数据就会混杂在一起
+    for(int i=0;i<9;i++){
+        splineSeries[i].clear();
+        lineSeries[i].clear();
+    }
+    for(int i=0;i<9;i++){
+        //如果有5个台站，那么只需要替换5个台站的曲线数据
+        if(i< sennum){
+            splineSeries[i].replace(pointBuffer[i]);
+            lineSeries[i].replace(pointBuffer_P[i]);
+        }
+    }
+
+    //绘制曲线完毕后，把容器的数据删除，然后删除对象
+    for(int i=0;i<sennum;i++){
+        pointBuffer[i].clear();
+        pointBuffer_P[i].clear();
+    }
+    delete [] pointBuffer;
+    delete [] pointBuffer_P;
+
+    ui->statusOfProgramme->setText("绘制完毕");
+    if(isManual){
+        QMessageBox::warning(this,tr("完成"),tr("该文件读取完毕"),QMessageBox::Yes);
+    }
+    return true;
 }
 
 void ReportForm::on_axWidget_ImplementCommandEvent(int iCommandId)
@@ -133,6 +413,7 @@ void ReportForm::restoreCADButtonClicked()
 // 点击手动截图按钮开始截图;
 void ReportForm::captureByManualClicked()
 {
+    isManual = true;
     captureHelper = new CaptureScreen();
     connect(captureHelper, SIGNAL(signalCompleteCature(QPixmap)), this, SLOT(onCompleteCature(QPixmap)));
     captureHelper->show();
@@ -147,31 +428,74 @@ void ReportForm::onCompleteCature(QPixmap captureImage)
 //保存手动截图图片
 void ReportForm::saveCapturedImageByManual()
 {
+    QString pathsave = QFileDialog::getSaveFileName(this,"Save","../",tr("Images (*.png *.xpm *.jpg)"));
+    QFile outFile(pathsave);
+    if(!outFile.open(QIODevice::WriteOnly)){
+        QMessageBox::warning(this,tr("警告"),tr("保存失败"),QMessageBox::Yes);
+        return;
+    }
+    ui->displayCapturedImage->pixmap()->save(&outFile, "PNG");
+    QMessageBox::warning(this,tr("完成"),tr("截图已保存"),QMessageBox::Yes);
 
 }
 
 //自动截图
 void ReportForm::captureByRobotClicked()
 {
-    QRect rect = ui->gridLayout->geometry();
-    QPixmap p = this->grab(rect);
-    QString filePathName = QDir::currentPath() + "/"+startDate + "-"+endDate+"wave";
-    //filePathName += QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss-zzz");
-    filePathName += ".png";
-    if(!p.save(filePathName,"png")){
-        qDebug()<<"save widget screen failed";
+    isManual = false;
+
+    int i = 1;
+    for(QString filePath:listOfFilePath){
+        if(readCSVFileOfZ(filePath)){
+            QRect rect = ui->gridLayout->geometry();
+            QPixmap p = this->grab(rect);
+            QString filePathName = QDir::currentPath() + "/captures/"+startDate + "-"+endDate+"capture"+QString::number(i);
+            //filePathName += QDateTime::currentDateTime().toString("yyyy-MM-dd hh-mm-ss-zzz");
+            filePathName += ".png";
+            if(!p.save(filePathName,"png")){
+                ui->statusOfProgramme->setText("自动截图"+filePathName+"保存失败");
+                qDebug()<<"save widget screen failed";
+            }
+            i++;
+            if((i-1)== listOfFilePath.size()){
+                //记得要清掉保存的路径，不然下次再查询会重复添加
+                listOfFilePath.clear();
+                QMessageBox::warning(this,tr("完成"),tr("自动截图已完成，保存至/captures"),QMessageBox::Yes);
+            }
+        }else{
+            QMessageBox *msg = new QMessageBox(this);
+            msg->setWindowTitle(tr("错误"));
+            msg->setText(tr("在自动截图过程中，发生异常"));
+            msg->setIcon(QMessageBox::Warning);
+            QPushButton *conntinueButton = msg->addButton(tr("继续执行"), QMessageBox::ActionRole);
+            QPushButton *abortButton = msg->addButton(tr("退出"),QMessageBox::RejectRole);
+            msg->exec();
+            if (msg->clickedButton() == conntinueButton) {
+                continue;
+            } else {
+                return;
+            }
+        }
     }
 }
 
 
 void ReportForm::getDoubleClickedItem(QTableWidgetItem *item)
 {
-    qDebug()<<"getDoubleClickedItem:"<<item->text();
+    QString text = item->text();
+    qDebug()<<"getDoubleClickedItem:"<<text;
+    readCSVFileOfZ(text);
 }
 
 void ReportForm::getSingleClickedItem(QTableWidgetItem *item)
 {
-    qDebug()<<"getSingleClickedItem:"<<item->text();
+    filePathOnTableWidget = item->text();
+    qDebug()<<"getSingleClickedItem:"<<filePathOnTableWidget;
+}
+
+void ReportForm::readCSVInListClicked()
+{
+    readCSVFileOfZ(filePathOnTableWidget);
 }
 
 void ReportForm::queryButtonClicked()
@@ -190,10 +514,8 @@ void ReportForm::queryButtonClicked()
              startDate+" 00:00:00' and quackTime<='"+endDate+" 23:59:59' ";
      query.exec(sql);            // 执行查询操作
 
-
      mapParameter.clear();           //每次查询时要把上一次查询的数据库结果清除
      ui->csvList->clearContents();   //只清除表中数据，不清除表头内容
-
 
      QString quackTime;
      QString kind;
@@ -255,6 +577,7 @@ void ReportForm::queryButtonClicked()
          qDebug()<<"param:"<<dataParameters.at(i);
          dataParameters.clear();
 
+         listOfFilePath.append(wenjianming);
          ui->csvList->setItem(index,0,new QTableWidgetItem(wenjianming));
          ui->csvList->setItem(index,1,new QTableWidgetItem(panfu));
 
@@ -262,6 +585,9 @@ void ReportForm::queryButtonClicked()
      }
 
      QString pointPath=QDir::currentPath() + "/centerpoint.png";
+     QString pointPath2=QDir::currentPath() + "/centerpoint2.png";
+     QString pointPath3=QDir::currentPath() + "/centerpoint3.png";
+
      QMap<QString,QList<double>>::Iterator it=map.begin();
      while(it!=map.end()){
          //qDebug()<<it.key()<<"\t"<<it.value();
@@ -281,7 +607,7 @@ void ReportForm::queryButtonClicked()
             blinkId->enqueue(result2);
 
             qlonglong result3 = ui->axWidget->dynamicCall("DrawImage(double, double, double, double, QString)",
-                                                          coordinates.at(0),coordinates.at(1),2,0,pointPath).toLongLong();
+                                                          coordinates.at(0)-50,coordinates.at(1)-50,2,0,pointPath).toLongLong();
             pointId->enqueue(result3);
          }else if(it.key().compare("five") == 0){
             QColor color2(0,255,0);
@@ -295,7 +621,7 @@ void ReportForm::queryButtonClicked()
             blinkId->enqueue(result2);
 
             qlonglong result3 = ui->axWidget->dynamicCall("DrawImage(double, double, double, double, QString)",
-                                                          coordinates.at(0),coordinates.at(1),2,0,pointPath).toLongLong();
+                                                          coordinates.at(0)-50,coordinates.at(1)-50,1,0,pointPath2).toLongLong();
             pointId->enqueue(result3);
          }else if(it.key().compare("PSO") == 0){
             QColor color3(0,0,255);
@@ -309,7 +635,7 @@ void ReportForm::queryButtonClicked()
             blinkId->enqueue(result2);
 
             qlonglong result3 = ui->axWidget->dynamicCall("DrawImage(double, double, double, double, QString)",
-                                                          coordinates.at(0),coordinates.at(1),2,0,pointPath).toLongLong();
+                                                          coordinates.at(0)-50,coordinates.at(1)-50,1,0,pointPath3).toLongLong();
             pointId->enqueue(result3);
          }
          it++;
@@ -400,6 +726,31 @@ void ReportForm::generateDOCClicked()
 void ReportForm::generateWebDOCClicked()
 {
     QString locationPath=QDir::currentPath() + "/locationresult.jpg";
+    QString capturesPath=QDir::currentPath() + "/captures/";
+
+    //下面这几句是过滤截图文件
+    QQueue<QString> capturesOfPng ;
+    QDir dir;
+    QStringList filters;
+    filters << "*.png";
+    dir.setPath(capturesPath);
+    if (!dir.exists()){
+        qDebug()<<"captures目录不存在";
+    }
+    dir.setNameFilters(filters);
+    QDirIterator iter(dir,QDirIterator::Subdirectories);
+    while (iter.hasNext()){
+        iter.next();
+        QFileInfo info=iter.fileInfo();
+        if (info.isFile()){
+            //return info.absoluteFilePath().replace('/', '\\');
+            QString temp = info.absoluteFilePath();
+            if(temp.contains(startDate)&&temp.contains(endDate)){
+                capturesOfPng.enqueue(temp);
+            }
+        }
+    }
+
     //将CAD转JPG
     ui->axWidget->dynamicCall("SaveJpgFile(QString, int, int, int)",locationPath,-1,-1,0);
 
@@ -476,81 +827,81 @@ void ReportForm::generateWebDOCClicked()
                         html +=  wenjianmingDate.at(1)+wenjianmingDate.at(2).split(".").at(0);
                         html +=  "</p>";
                     }
-                    html += "<p style=\"font-size:10;\">  " ;
-                    html +=  R+"R: s";
-                    html +=  "</p>";
+//                    html += "<p style=\"font-size:10;\">  " ;
+//                    html +=  R+"R: s";
+//                    html +=  "</p>";
                 }
                 if(ch == 's'){
                     if(0 == i){
                         html +=  wenjianmingDate.at(1)+wenjianmingDate.at(2).split(".").at(0);
                         html +=  "</p>";
                     }
-                    html += "<p style=\"font-size:10;\">  " ;
-                    html +=  S+"S: s";
-                    html +=  "</p>";
+//                    html += "<p style=\"font-size:10;\">  " ;
+//                    html +=  S+"S: s";
+//                    html +=  "</p>";
                 }
                 if(ch == 't'){
                     if(0 == i){
                         html +=  wenjianmingDate.at(1)+wenjianmingDate.at(2).split(".").at(0);
                         html +=  "</p>";
                     }
-                    html += "<p style=\"font-size:10;\">  " ;
-                    html +=  T+"T: s";
-                    html +=  "</p>";
+//                    html += "<p style=\"font-size:10;\">  " ;
+//                    html +=  T+"T: s";
+//                    html +=  "</p>";
                 }
                 if(ch == 'u'){
                     if(0 == i){
                         html +=  wenjianmingDate.at(1)+wenjianmingDate.at(2).split(".").at(0);
                         html +=  "</p>";
                     }
-                    html += "<p style=\"font-size:10;\">  " ;
-                    html +=  U+"U: s";
-                    html +=  "</p>";
+//                    html += "<p style=\"font-size:10;\">  " ;
+//                    html +=  U+"U: s";
+//                    html +=  "</p>";
                 }
                 if(ch == 'v'){
                     if(0 == i){
                         html +=  wenjianmingDate.at(1)+wenjianmingDate.at(2).split(".").at(0);
                         html +=  "</p>";
                     }
-                    html += "<p style=\"font-size:10;\">  " ;
-                    html +=  V+"V: s";
-                    html +=  "</p>";
+//                    html += "<p style=\"font-size:10;\">  " ;
+//                    html +=  V+"V: s";
+//                    html +=  "</p>";
                 }
                 if(ch == 'w'){
                     if(0 == i){
                         html +=  wenjianmingDate.at(1)+wenjianmingDate.at(2).split(".").at(0);
                         html +=  "</p>";
                     }
-                    html += "<p style=\"font-size:10;\">  " ;
-                    html +=  W+"W: s";
-                    html +=  "</p>";
+//                    html += "<p style=\"font-size:10;\">  " ;
+//                    html +=  W+"W: s";
+//                    html +=  "</p>";
                 }
                 if(ch == 'x'){
                     if(0 == i){
                         html +=  wenjianmingDate.at(1)+wenjianmingDate.at(2).split(".").at(0);
                         html +=  "</p>";
                     }
-                    html += "<p style=\"font-size:10;\">  " ;
-                    html +=  X+"X: s";
-                    html +=  "</p>";
+//                    html += "<p style=\"font-size:10;\">  " ;
+//                    html +=  X+"X: s";
+//                    html +=  "</p>";
                 }
                 if(ch == 'y'){
                     if(0 == i){
                         html +=  wenjianmingDate.at(1)+wenjianmingDate.at(2).split(".").at(0);
                         html +=  "</p>";
                     }
-                    html += "<p style=\"font-size:10;\">  " ;
-                    html +=  Y+"Y: s";
-                    html +=  "</p>";
+//                    html += "<p style=\"font-size:10;\">  " ;
+//                    html +=  Y+"Y: s";
+//                    html +=  "</p>";
                 }
                 if(ch == 'z'){
                     if(0 == i){
                         html +=  wenjianmingDate.at(1)+wenjianmingDate.at(2).split(".").at(0);
                         html +=  "</p>";
                     }
-                    html += "<p style=\"font-size:10;\">  " ;
-                    html +=  Z+"Z: s";
-                    html +=  "</p>";
+//                    html += "<p style=\"font-size:10;\">  " ;
+//                    html +=  Z+"Z: s";
+//                    html +=  "</p>";
                 }
 
             }
@@ -583,6 +934,9 @@ void ReportForm::generateWebDOCClicked()
 
     //定位图后面加上波形图
     html += "<h5 align=\"left\">3、波形图：</h5> ";
+    while(!capturesOfPng.isEmpty()){
+        html += "<img align=\"middle\" src = \"" + capturesOfPng.dequeue() + "\"  width=\"500\" height=\"500\" /><br>" ;
+    }
 
     ts<<html<<endl;
     html = "";

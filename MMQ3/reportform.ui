@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>677</width>
-    <height>709</height>
+    <width>714</width>
+    <height>715</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,45 +17,13 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
+      <enum>QLayout::SetNoConstraint</enum>
      </property>
      <item>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="0">
-        <widget class="QLabel" name="station2">
-         <property name="text">
-          <string>台站2</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="station3">
-         <property name="text">
-          <string>台站3</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="station4">
-         <property name="text">
-          <string>台站4</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="station5">
-         <property name="text">
-          <string>台站5</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="station8">
-         <property name="text">
-          <string>台站8</string>
-         </property>
-        </widget>
-       </item>
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item row="6" column="0">
         <widget class="QLabel" name="station7">
          <property name="text">
@@ -77,6 +45,13 @@
          </property>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="station2">
+         <property name="text">
+          <string>台站2</string>
+         </property>
+        </widget>
+       </item>
        <item row="8" column="0">
         <widget class="QLabel" name="station9">
          <property name="text">
@@ -84,32 +59,33 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QGraphicsView" name="graphicsView_1"/>
+       <item row="4" column="0">
+        <widget class="QLabel" name="station5">
+         <property name="text">
+          <string>台站5</string>
+         </property>
+        </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QGraphicsView" name="graphicsView_2"/>
+       <item row="2" column="0">
+        <widget class="QLabel" name="station3">
+         <property name="text">
+          <string>台站3</string>
+         </property>
+        </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QGraphicsView" name="graphicsView_3"/>
+       <item row="3" column="0">
+        <widget class="QLabel" name="station4">
+         <property name="text">
+          <string>台站4</string>
+         </property>
+        </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QGraphicsView" name="graphicsView_4"/>
-       </item>
-       <item row="4" column="1">
-        <widget class="QGraphicsView" name="graphicsView_5"/>
-       </item>
-       <item row="5" column="1">
-        <widget class="QGraphicsView" name="graphicsView_6"/>
-       </item>
-       <item row="6" column="1">
-        <widget class="QGraphicsView" name="graphicsView_7"/>
-       </item>
-       <item row="7" column="1">
-        <widget class="QGraphicsView" name="graphicsView_8"/>
-       </item>
-       <item row="8" column="1">
-        <widget class="QGraphicsView" name="graphicsView_9"/>
+       <item row="7" column="0">
+        <widget class="QLabel" name="station8">
+         <property name="text">
+          <string>台站8</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -168,72 +144,79 @@
       </layout>
      </item>
      <item>
-      <widget class="QAxWidget" name="axWidget">
-       <property name="control" stdset="0">
-        <string>{74a777f8-7a8f-4e7c-af47-7074828086e2}</string>
+      <layout class="QHBoxLayout" name="horizontalLayout_11">
+       <property name="bottomMargin">
+        <number>0</number>
        </property>
-       <property name="minimumSize" stdset="0">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize" stdset="0">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="DynToolTip" stdset="0">
-        <bool>true</bool>
-       </property>
-       <property name="EditGripPoint" stdset="0">
-        <bool>true</bool>
-       </property>
-       <property name="EnableDeleteKey" stdset="0">
-        <bool>true</bool>
-       </property>
-       <property name="EnableDrawOrder" stdset="0">
-        <bool>true</bool>
-       </property>
-       <property name="EnableIntelliSelect" stdset="0">
-        <bool>true</bool>
-       </property>
-       <property name="EnableMouseMoveView" stdset="0">
-        <bool>true</bool>
-       </property>
-       <property name="IsDrawCoord" stdset="0">
-        <bool>false</bool>
-       </property>
-       <property name="ShowCommandWindow" stdset="0">
-        <bool>false</bool>
-       </property>
-       <property name="ShowModelBar" stdset="0">
-        <bool>false</bool>
-       </property>
-       <property name="ShowStatusBar" stdset="0">
-        <bool>false</bool>
-       </property>
-       <property name="ShowToolBars" stdset="0">
-        <bool>false</bool>
-       </property>
-       <property name="ViewColor" stdset="0">
-        <color>
-         <red>255</red>
-         <green>255</green>
-         <blue>255</blue>
-        </color>
-       </property>
-       <property name="Watermark" stdset="0">
-        <string>辽宁大学</string>
-       </property>
-       <property name="sizePolicy" stdset="0">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
+       <item>
+        <widget class="QAxWidget" name="axWidget">
+         <property name="control" stdset="0">
+          <string>{74a777f8-7a8f-4e7c-af47-7074828086e2}</string>
+         </property>
+         <property name="minimumSize" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize" stdset="0">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="DynToolTip" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="EditGripPoint" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="EnableDeleteKey" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="EnableDrawOrder" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="EnableIntelliSelect" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="EnableMouseMoveView" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="IsDrawCoord" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="ShowCommandWindow" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="ShowModelBar" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="ShowStatusBar" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="ShowToolBars" stdset="0">
+          <bool>false</bool>
+         </property>
+         <property name="ViewColor" stdset="0">
+          <color>
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </property>
+         <property name="Watermark" stdset="0">
+          <string>辽宁大学</string>
+         </property>
+         <property name="sizePolicy" stdset="0">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -264,20 +247,34 @@
       </layout>
      </item>
      <item>
-      <widget class="QTableWidget" name="csvList"/>
+      <layout class="QHBoxLayout" name="horizontalLayout_10">
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QTableWidget" name="csvList"/>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QLabel" name="displayCapturedImage">
-       <property name="minimumSize">
-        <size>
-         <width>300</width>
-         <height>150</height>
-        </size>
+      <layout class="QHBoxLayout" name="horizontalLayout_9">
+       <property name="bottomMargin">
+        <number>0</number>
        </property>
-       <property name="text">
-        <string>手动截图效果在此显示</string>
-       </property>
-      </widget>
+       <item>
+        <widget class="QLabel" name="displayCapturedImage">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>150</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>手动截图效果在此显示</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">

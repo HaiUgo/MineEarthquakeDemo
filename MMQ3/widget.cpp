@@ -206,8 +206,8 @@ void Widget::startButtonClicked()
 //日报表
 void Widget::dailyStatementClicked()
 {
-    ReportForm *reportForm = new ReportForm(this);
-    reportForm->show();
+    ReportForm *reportForm = new ReportForm();
+    reportForm->showMaximized();
 }
 //月报表按钮
 void Widget::monthlyStatementClicked()
