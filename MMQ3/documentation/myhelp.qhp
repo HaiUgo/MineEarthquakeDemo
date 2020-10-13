@@ -1,21 +1,36 @@
 <?xml version="1.0" encoding="GB2312"?>
  <QtHelpProject version="1.0">
-    <namespace>bookmisClient.myhelp</namespace>
+    <namespace>MineQuakeClient.myhelp</namespace>
     <virtualFolder>doc</virtualFolder>
     <filterSection>
       <toc>
           <section title="首页" ref="./demoHtml/welcome.html">
-              <section title="用户登录" ref="./demoHtml/first.html"></section>
-              <section title="书籍查询" ref="./demoHtml/second.html"></section>
-         </section>
+          <section title="运行程序" ref="./demoHtml/start.html"></section>
+          <section title="矿区图显示" ref="./demoHtml/displaycad.html"></section>
+		  <section title="数据库事件" ref="./demoHtml/dataevents.html"></section>
+          <section title="波形图显示" ref="./demoHtml/displaywave.html"></section>
+		  <section title="人工校正" ref="./demoHtml/manualcorrection.html"></section>
+          <section title="报表模块" ref="./demoHtml/reportform.html"></section>
+		  </section>
      </toc>
      <keywords>
-         <keyword name = "登录" ref="./demoHtml/second.html"></keyword>
+         <keyword name = "运行" ref="./demoHtml/start.html"></keyword>
+		 <keyword name = "矿区图" ref="./demoHtml/displaycad.html"></keyword>
+		 <keyword name = "事件" ref="./demoHtml/dataevents.html"></keyword>
+		 <keyword name = "波形图" ref="./demoHtml/displaywave.html"></keyword>
+		 <keyword name = "人工校正" ref="./demoHtml/manualcorrection.html"></keyword>
+		 <keyword name = "报表" ref="./demoHtml/reportform.html"></keyword>
      </keywords>
      <files>
        <file>demoHtml/*.html</file>
-       <file>image/*.png</file>
-	   <file>image/*.jpg</file>
+	   <file>demoHtml/dataevents.files/*.png</file>
+	   <file>demoHtml/displaycad.files/*.png</file>
+	   <file>demoHtml/displaywave.files/*.png</file>
+	   <file>demoHtml/manualcorrection.files/*.png</file>
+	   <file>demoHtml/reportform.files/*.png</file>
+	   <file>demoHtml/start.files/*.png</file>
+       <file>images/*.png</file>
+	   <file>images/*.jpg</file>
      </files>
    </filterSection>
  </QtHelpProject>
