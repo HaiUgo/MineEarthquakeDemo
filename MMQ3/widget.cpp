@@ -48,7 +48,7 @@ Widget::Widget(QWidget *parent)
 
     connect(ui->startButton,SIGNAL(clicked()),this,SLOT(startButtonClicked()));
     connect(ui->dailyStatement,SIGNAL(clicked()),this,SLOT(dailyStatementClicked()));
-    connect(ui->monthlyStatement,SIGNAL(clicked()),this,SLOT(monthlyStatementClicked()));
+    //connect(ui->monthlyStatement,SIGNAL(clicked()),this,SLOT(monthlyStatementClicked()));
     connect(ui->helpButton,SIGNAL(clicked()),this,SLOT(helpButtonClicked()));
 
     connect(ui->zoomIn,SIGNAL(clicked()),this,SLOT(zoomInClicked()));
@@ -210,14 +210,17 @@ void Widget::dailyStatementClicked()
     reportForm->showMaximized();
 }
 //月报表按钮
-void Widget::monthlyStatementClicked()
-{
+//void Widget::monthlyStatementClicked()
+//{
 
-}
+//}
+
 //帮助按钮
 void Widget::helpButtonClicked()
 {
-
+    Assistant *pAssistant = new Assistant;
+    // 按下“帮助”按钮，运行Qt Assistant，显示index.html页面
+    pAssistant->showDocumentation("welcome.html");
 }
 
 //放大按钮

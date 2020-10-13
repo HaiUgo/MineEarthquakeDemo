@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>714</width>
-    <height>715</height>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -237,13 +237,6 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="readCSVOfAnother">
-         <property name="text">
-          <string>打开其他波形文件</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item>
@@ -465,20 +458,6 @@
         <widget class="QPushButton" name="generateWebDOC">
          <property name="text">
           <string>生成 doc</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="generatePDF">
-         <property name="text">
-          <string>生成PDF</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="printResult">
-         <property name="text">
-          <string>打印</string>
          </property>
         </widget>
        </item>

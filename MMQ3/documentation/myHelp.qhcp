@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="GB2312"?>
+<QHelpCollectionProject version="1.0">
+<assistant>
+  <title>矿山微震界面帮助文档</title>
+  <applicationIcon>image/lnu.jpg</applicationIcon>
+  <cacheDirectory>cache/myhelp</cacheDirectory>
+  <homePage>qthelp://bookmisClient.myhelp/doc/welcome.html</homePage>
+  <startPage>qthelp://bookmisClient.myhelp/doc/welcome.html</startPage>
+  <aboutMenuText>
+    <text>关于</text>
+  </aboutMenuText>
+  <aboutDialog>
+    <file>./about.txt</file>
+    <icon>images/lnu.jpg</icon>
+  </aboutDialog>
+  <enableDocumentationManager>false</enableDocumentationManager>
+  <enableAddressBar>false</enableAddressBar>
+  <enableFilterFunctionality>false</enableFilterFunctionality>
+</assistant>
+<docFiles>
+  <generate>
+    <file>
+      <input>myhelp.qhp</input>
+      <output>myhelp.qch</output>
+    </file>
+  </generate>
+  <register>
+    <file>myhelp.qch</file>
+  </register>
+</docFiles>
+</QHelpCollectionProject>

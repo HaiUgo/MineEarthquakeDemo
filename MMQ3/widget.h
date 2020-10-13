@@ -29,6 +29,7 @@
 #include "databaseconfigure.h"
 #include "screenconfigure.h"
 #include "reportform.h"
+#include "assistant.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -54,7 +55,7 @@ private slots:
 
     void startButtonClicked();                                   //运行按钮
     void dailyStatementClicked();                                //日报表按钮
-    void monthlyStatementClicked();                              //月报表按钮
+    //void monthlyStatementClicked();                              //月报表按钮
     void helpButtonClicked();                                    //帮助按钮
     void dataBaseViewDC(const QModelIndex &);                    //dataBaseView鼠标双击事件
     void reSelectDataBaseSource(QString value);                  //重新选择数据表

@@ -92,9 +92,7 @@ private slots:
     void clearTwinkeButtonClickled();
 
     void generateDOCClicked();
-    void generatePDFClicked();
     void generateWebDOCClicked();
-    void printResultClicked();
     void captureByRobotClicked();
     void captureByManualClicked();
     void restoreCADButtonClicked();
