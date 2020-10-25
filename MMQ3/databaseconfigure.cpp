@@ -8,6 +8,9 @@ int DataBaseConfigure::port = 0;
 
 QString DataBaseConfigure::dataBaseName = "";
 
+//给一个默认表名
+//QString DataBaseConfigure::eventTable = "mine_quack_results";
+
 QString DataBaseConfigure::userName = "";
 
 QString DataBaseConfigure::password = "";
@@ -44,6 +47,9 @@ bool DataBaseConfigure::getDataBaseConfigure()
     if (jsonObject.contains(QStringLiteral("DatabaseName"))){
         dataBaseName = jsonObject["DatabaseName"].toString();
     }
+//    if (jsonObject.contains(QStringLiteral("EventTable"))){
+//        eventTable = jsonObject["EventTable"].toString();
+//    }
     if (jsonObject.contains(QStringLiteral("UserName"))){
         userName = jsonObject["UserName"].toString();
     }

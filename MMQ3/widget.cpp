@@ -44,7 +44,6 @@ Widget::Widget(QWidget *parent)
 
     sqlModel = new QSqlQueryModel(this);
     //sqlModel->setEditStrategy(QsqlModel::OnFieldChange);
-    currentDataBase = "mine_quake_results";
 
     connect(ui->startButton,SIGNAL(clicked()),this,SLOT(startButtonClicked()));
     connect(ui->dailyStatement,SIGNAL(clicked()),this,SLOT(dailyStatementClicked()));
@@ -57,7 +56,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->moveViewButton,SIGNAL(clicked()),SLOT(moveViewButtonClicked()));
     connect(ui->cancelDynBlink,SIGNAL(clicked()),SLOT(cancleDynBlinkClicked()));
     connect(ui->whichRegion,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&Widget::selectWhichRegion);
-    connect(ui->databaseSoureComboBox,QOverload<const QString &>::of(&QComboBox::currentIndexChanged),this,&Widget::reSelectDataBaseSource);
+    //connect(ui->databaseSoureComboBox,QOverload<const QString &>::of(&QComboBox::currentIndexChanged),this,&Widget::reSelectDataBaseSource);
     connect(ui->refreshCurrentDataTable,SIGNAL(clicked()),SLOT(refreshCurrentDataTable()));
     connect(ui->dataBaseView,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(dataBaseViewDC(const QModelIndex &)));
     connect(this,SIGNAL(pageSwitch9()),showChart,SLOT(pageSwithTo9()));
@@ -92,46 +91,44 @@ void Widget::selectWhichRegion(int index)
 void Widget::refreshCurrentDataTable()
 {
     //sqlModel->setTable(value);
-
     ConnectDataBase *dataBaseConnect = new ConnectDataBase;
     dataBaseConnect->conDataBase();
 
-    if(currentDataBase == "mine_quake_results"){
-        sqlModel->setQuery("select * from "+currentDataBase);
-        sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
-        sqlModel->setHeaderData(1,Qt::Horizontal,tr("类型"));
-        sqlModel->setHeaderData(2,Qt::Horizontal,tr("X"));
-        sqlModel->setHeaderData(3,Qt::Horizontal,tr("Y"));
-        sqlModel->setHeaderData(4,Qt::Horizontal,tr("Z"));
-        sqlModel->setHeaderData(5,Qt::Horizontal,tr("触发时间"));
-        sqlModel->setHeaderData(6,Qt::Horizontal,tr("震级"));
-        sqlModel->setHeaderData(7,Qt::Horizontal,tr("到时"));
-        sqlModel->setHeaderData(8,Qt::Horizontal,tr("触发站台"));
-        sqlModel->setHeaderData(9,Qt::Horizontal,tr("持续时间震级"));
-        sqlModel->setHeaderData(10,Qt::Horizontal,tr("能量/J"));
-        sqlModel->setHeaderData(11,Qt::Horizontal,tr("路径"));
-        sqlModel->setHeaderData(12,Qt::Horizontal,tr("矩张量"));
-        sqlModel->setHeaderData(13,Qt::Horizontal,tr("B值"));
-        QString latestDate;
-        QSqlQuery query;
-        query.exec( "select max(quackTime) from mine_quake_results;");            // 执行查询操作
-        while(query.next()){
-            latestDate = query.value(0).toString();
-            qDebug()<<"date="<<latestDate;
-        }
-        ui->lastestIncidentLabel->setText("最新事件："+latestDate);
+    sqlModel->setQuery("select * from mine_quack_results");
+    sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
+    sqlModel->setHeaderData(1,Qt::Horizontal,tr("类型"));
+    sqlModel->setHeaderData(2,Qt::Horizontal,tr("X"));
+    sqlModel->setHeaderData(3,Qt::Horizontal,tr("Y"));
+    sqlModel->setHeaderData(4,Qt::Horizontal,tr("Z"));
+    sqlModel->setHeaderData(5,Qt::Horizontal,tr("触发时间"));
+    sqlModel->setHeaderData(6,Qt::Horizontal,tr("震级"));
+    sqlModel->setHeaderData(7,Qt::Horizontal,tr("到时"));
+    sqlModel->setHeaderData(8,Qt::Horizontal,tr("触发站台"));
+    sqlModel->setHeaderData(9,Qt::Horizontal,tr("持续时间震级"));
+    sqlModel->setHeaderData(10,Qt::Horizontal,tr("能量/J"));
+    sqlModel->setHeaderData(11,Qt::Horizontal,tr("路径"));
+    sqlModel->setHeaderData(12,Qt::Horizontal,tr("矩张量"));
+    sqlModel->setHeaderData(13,Qt::Horizontal,tr("B值"));
+    QString latestDate;
+    QSqlQuery query;
+    query.exec( "select max(quackTime) from mine_quack_results;");            // 执行查询操作
+    while(query.next()){
+        latestDate = query.value(0).toString();
+        qDebug()<<"date="<<latestDate;
     }
+    ui->lastestIncidentLabel->setText("最新事件："+latestDate);
+
 
     dataBaseConnect->close();
     delete dataBaseConnect;
 }
 
 //重新选择数据表
-void Widget::reSelectDataBaseSource(QString value)
-{
-    currentDataBase = value;
-    refreshCurrentDataTable();
-}
+//void Widget::reSelectDataBaseSource(QString value)
+//{
+//    currentDataBase = value;
+//    refreshCurrentDataTable();
+//}
 
 //控件命令按钮
 void Widget::on_axWidget_ImplementCommandEvent(int iCommandId)
@@ -254,7 +251,7 @@ void Widget::showTable()
 {
     //sqlModel->setTable("mine_quack_5_results");
     //sqlModel->select();
-    sqlModel->setQuery("select * from mine_quake_results");
+    sqlModel->setQuery("select * from mine_quack_results");
     sqlModel->setHeaderData(0,Qt::Horizontal,tr("事件序号"));
     sqlModel->setHeaderData(1,Qt::Horizontal,tr("类型"));
     sqlModel->setHeaderData(2,Qt::Horizontal,tr("X"));
@@ -277,8 +274,8 @@ void Widget::showTable()
     ui->dataBaseView->setModel(sqlModel);
 
     QString latestDate;
-    QSqlQuery query;
-    query.exec( "select max(quackTime) from mine_quake_results;");            // 执行查询操作
+    QSqlQuery query;    
+    query.exec( "select max(quackTime) from mine_quack_results");            // 执行查询操作
     while(query.next()){
         latestDate = query.value(0).toString();
         qDebug()<<"date="<<latestDate;
@@ -298,22 +295,21 @@ void Widget::dataBaseViewDC(const QModelIndex &index)
     QModelIndex tempIndex;
     QVariant data;
 
-    if(currentDataBase == "mine_quake_results"){
-        for(int i=0;i<3;i++){
-            tempIndex = ui->dataBaseView->model()->index(row,i+2);       //获取CAD定位点
-            data = ui->dataBaseView->model()->data(tempIndex);
-            coordinates[i] = data.toDouble();
-        }
-        qDebug()<<"the current coordinate is :"<<coordinates[0]<<" "<<coordinates[1]<<" "<<coordinates[2];
 
-        tempIndex = ui->dataBaseView->model()->index(row,11);            //获取CSV文件路径
+    for(int i=0;i<3;i++){
+        tempIndex = ui->dataBaseView->model()->index(row,i+2);       //获取CAD定位点
         data = ui->dataBaseView->model()->data(tempIndex);
-        QString filePath = data.toString();
-        ReadCSVData::FILEPATH = filePath;
-        qDebug()<<"the current csv file path is :"<<ReadCSVData::FILEPATH;
+        coordinates[i] = data.toDouble();
     }
+    qDebug()<<"the current coordinate is :"<<coordinates[0]<<" "<<coordinates[1]<<" "<<coordinates[2];
 
-    ConnectDataBase::SQLTABLE = currentDataBase;
+    tempIndex = ui->dataBaseView->model()->index(row,11);            //获取CSV文件路径
+    data = ui->dataBaseView->model()->data(tempIndex);
+    QString filePath = data.toString();
+    ReadCSVData::FILEPATH = filePath;
+    qDebug()<<"the current csv file path is :"<<ReadCSVData::FILEPATH;
+
+
     tempIndex = ui->dataBaseView->model()->index(row,0);                 //获取数据库事件ID
     ConnectDataBase::EVENTID  =ui->dataBaseView->model()->data(tempIndex).toInt();
 

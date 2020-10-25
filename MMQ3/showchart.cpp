@@ -580,7 +580,7 @@ void ShowChart::updatePSOandPwaveData()
 
     ConnectDataBase *db = new ConnectDataBase;
     db->conDataBase();
-    db->updateDataBase(ConnectDataBase::SQLTABLE,ConnectDataBase::EVENTID,
+    db->updateDataBase(ConnectDataBase::EVENTID,
                        LocationAlgorithm::XRESULT.toDouble(),LocationAlgorithm::YRESULT.toDouble(),
                        LocationAlgorithm::ZRESULT.toDouble(),LocationAlgorithm::TRESULT.toDouble());
 //    ConnectDataBase::updateDataBase(ConnectDataBase::SQLTABLE,ConnectDataBase::EVENTID,

@@ -23,6 +23,7 @@ public:
     static QString hostName;
     static int port;
     static QString dataBaseName;
+    //static QString eventTable;
     static QString userName;
     static QString password;
 

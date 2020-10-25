@@ -135,12 +135,6 @@ bool ReportForm::readCSVFileOfZ(QString fileName)
         return false;
     }
 
-    QStringList fileSplits = fileName.split('/');
-    QString panfu = fileSplits[fileSplits.length()-1].split(' ')[0];
-    int sennum = panfu.length();
-    qDebug()<<"SENNUM="<<sennum;
-
-
     QFile file(fileName);
     qDebug()<<"fileName="<<fileName<<'\n';
     QStringList line;
@@ -159,6 +153,43 @@ bool ReportForm::readCSVFileOfZ(QString fileName)
         box->exec();//box->show();都可以
         return false;
     }
+
+    QTextStream stream(&file);
+    while (!stream.atEnd())
+    {
+        block = stream.readAll();
+        line = block.split('\t');
+    }
+    int count = line.size();
+    qDebug()<<"COUNT ="<<count;
+    //限制读取的行数 最多为90000行，如果超过90000行，则舍去多余数据
+    if(count > 90000){
+        count = 90000;
+    }
+
+    //先获取第一行的内容，然后看看该行中有多少个台站，因为文件路径中的盘符所对应的台站名是有激发的
+    //而某些CSV文件中存在不激发但是有数据的台站，所以不能根据路径中的盘符来判断
+    QStringList valueOfOneLine = line.at(0).split(",");
+    int valueOfOneLineSize = valueOfOneLine.size();
+    int sennumInRealCSV = (valueOfOneLineSize-1)/8;
+    QStringList panfuListInRealCSV;
+    QString panfuInRealCSV="";
+    for(QString temp:panfuListInRealCSV){
+        panfuInRealCSV+=temp;
+    }
+
+    QStringList fileSplits = fileName.split('/');
+    QString panfu = fileSplits[fileSplits.length()-1].split(' ')[0];
+    int sennum = panfu.length();
+
+    qDebug()<<"SENNUM="<<sennum<<" sennumInRealCSV="<<sennumInRealCSV;
+    qDebug()<<"panfu="<<panfu<<" panfuInRealCSV="<<panfuInRealCSV;
+
+//    if(sennumInRealCSV>sennum){
+//        sennum = sennumInRealCSV;
+//        panfu = panfuInRealCSV;
+//    }
+
 
     //存储每个事件触发台站的X，Y，Z轴的数据
     pointBuffer = new QVector<QPointF>[sennum];
@@ -250,18 +281,7 @@ bool ReportForm::readCSVFileOfZ(QString fileName)
     qDebug()<<"parsing the csv file completed";
 
 
-    QTextStream stream(&file);
-    while (!stream.atEnd())
-    {
-        block = stream.readAll();
-        line = block.split('\t');
-    }
-    int count = line.size();
-    qDebug()<<"COUNT ="<<count;
-    //限制读取的行数 最多为90000行，如果超过90000行，则舍去多余数据
-    if(count > 90000){
-        count = 90000;
-    }
+
     for(int i=0;i<(count-1);i++){
         item = line.at(i).split(',');
         if(0 == i%10){                                    //采样，只取十分之一的数据
@@ -508,7 +528,7 @@ void ReportForm::queryButtonClicked()
 
      //以下执行相关sql语句
      QSqlQuery query;
-     QString sql = "select quackTime,kind,xData,yData,zData,quackGrade,Parrival,panfu,wenjianming from mine_quake_results where quackTime>='"+
+     QString sql = "select quackTime,kind,xData,yData,zData,quackGrade,Parrival,panfu,nengliang,wenjianming from mine_quack_results where quackTime>='"+
              startDate+" 00:00:00' and quackTime<='"+endDate+" 23:59:59' ";
      query.exec(sql);            // 执行查询操作
 
@@ -523,6 +543,7 @@ void ReportForm::queryButtonClicked()
      double quackGrade;
      double Parrival;
      QString panfu;
+     double nengliang;
      QString wenjianming;
 
      QMap<QString,QList<double>> map ;
@@ -559,7 +580,10 @@ void ReportForm::queryButtonClicked()
          panfu = query.value(7).toString();
          dataParameters.append(panfu);
 
-         wenjianming = query.value(8).toString();
+         nengliang = query.value(8).toDouble();
+         dataParameters.append(nengliang);
+
+         wenjianming = query.value(9).toString();
          dataParameters.append(wenjianming);
 
          list.append(xData);
@@ -575,7 +599,9 @@ void ReportForm::queryButtonClicked()
          qDebug()<<"param:"<<dataParameters.at(i);
          dataParameters.clear();
 
-         listOfFilePath.append(wenjianming);
+         if(!listOfFilePath.contains(wenjianming)){
+             listOfFilePath.append(wenjianming);
+         }
          ui->csvList->setItem(index,0,new QTableWidgetItem(wenjianming));
          ui->csvList->setItem(index,1,new QTableWidgetItem(panfu));
 
@@ -760,6 +786,7 @@ void ReportForm::generateWebDOCClicked()
     double quackGrade;
     double Parrival;
     QString panfu;
+    double nengliang;
     QString wenjianming;
 
     QString filename = QFileDialog::getSaveFileName(this,"Save File",startDate+"-"+endDate,"*.doc");
@@ -778,7 +805,10 @@ void ReportForm::generateWebDOCClicked()
     }
 
     QFile outFile(filename);
-    outFile.open(QIODevice::WriteOnly | QIODevice::Append );
+    if(!outFile.open(QIODevice::WriteOnly | QIODevice::Append )){
+        return ;
+    }
+
     QTextStream ts(&outFile);
 
     //先把大标题和第一个子标题写上，然后将html置为空
@@ -788,6 +818,7 @@ void ReportForm::generateWebDOCClicked()
 
     //quackTime为主键
     QList<QString> paramKeys = mapParameter.keys();
+    QString compareFile ="";
     int i = 0;                                   //表示事件计数
     for(QString singleKey:paramKeys){
         qDebug()<<"singleKey:"<<singleKey;
@@ -802,13 +833,25 @@ void ReportForm::generateWebDOCClicked()
             quackGrade = temp.at(5).toDouble();
             Parrival = temp.at(6).toDouble();
             panfu = temp.at(7).toString();
-            wenjianming = temp.at(8).toString();
+            nengliang = temp.at(8).toDouble();
+            wenjianming = temp.at(9).toString();
 
             //如果查询查到多个事件，那么将事件写为事件1：quackTime、事件2：quackTime...这样的形式
-            html += "<p style=\"font-size:10;\"><b>事件";
-            html += QString::number(i+1)+":"+quackTime;
-            html += " 分析结果如下：";
-            html += "</b></p>";
+            //wenjiangming不同就认为是一次事件
+            if(compareFile != wenjianming){
+                compareFile = wenjianming;
+                html += "<p style=\"font-size:10;\"><b>事件";
+                html += QString::number(i+1)+":"+quackTime;
+                html += " 分析结果如下：";
+                html += "</b></p>";
+                i++;
+            }
+
+            html += "<p style=\"font-size:10;\">" ;
+            html +=  "类型: ";
+            html +=  kind;
+            html +=  "</p>";
+
             html += "<p style=\"font-size:10;\">" ;
             html +=  "最早到时: ";
 
@@ -916,6 +959,9 @@ void ReportForm::generateWebDOCClicked()
             html += "<p style=\"font-size:10;color:#FF0000\">  震级：" ;
             html +=  QString::number(quackGrade);
             html +=  "</p>";
+            html += "<p style=\"font-size:10;color:#FF0000\">  能量：" ;
+            html +=  QString::number(nengliang);
+            html +=  "</p>";
             html += "<p style=\"font-size:10;\">  发震时刻：" ;
             html +=  quackTime;
             html +=  "</p>";
@@ -924,7 +970,7 @@ void ReportForm::generateWebDOCClicked()
             ts<<html<<endl;
             html = "";
         }
-        i++;
+
     }
     //如果每个事件的参数都写完之后，只需要在后边加一个定位图
     html += "<h5 align=\"left\">2.定位图：</h5> ";

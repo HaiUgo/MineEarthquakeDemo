@@ -3,7 +3,7 @@
 
 int ConnectDataBase::EVENTID = 0;
 
-QString ConnectDataBase::SQLTABLE = "";
+//QString ConnectDataBase::SQLTABLE = "";
 
 int ConnectDataBase::WHICHREGION = 0;
 
@@ -34,20 +34,23 @@ void ConnectDataBase::close()
     qDebug()<<"ConnectDataBase::close()";
 }
 
-void ConnectDataBase::updateDataBase(QString table,int id,double xData,double yData,double zData,double Parrival)
+void ConnectDataBase::updateDataBase(int id,double xData,double yData,double zData,double Parrival)
 {
     QSqlQuery query;
-    if(table == "mine_quake_results"){
-        query.prepare("update mine_quake_results  set xData=?,yData=?,zData=?,Parrival=? where id =?");
-    }else {
-        qDebug()<<"database table not found!";
-        return;
-    }
+    //更新mine_quack_results表
+
+    query.prepare("update mine_quack_results set xData=?,yData=?,zData=?,Parrival=? where id =?");
     //query.addBindValue(table);
     query.addBindValue(xData);
     query.addBindValue(yData);
     query.addBindValue(zData);
     query.addBindValue(Parrival);
     query.addBindValue(id);
-    if(query.exec())qDebug()<<"update "<<table<<" at "<<id<<"successed";
+    try{
+        query.exec();
+        qDebug()<<"update mine_quack_results at "<<id<<"successed";
+    }catch(QString str){
+        QMessageBox::about(nullptr,"Error",str);
+    }
+
 }

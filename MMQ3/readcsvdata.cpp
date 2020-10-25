@@ -38,58 +38,6 @@ QVector<QPointF> *ReadCSVData::POINTBUFFER = new QVector<QPointF>[27];
 //用于绘制P波到时（红线）
 QVector<QPointF> *ReadCSVData::POINTBUFFER_P = new QVector<QPointF>[10];
 
-//该函数功能为解析文件路径，动态生成存储数组
-void ReadCSVData::parseCSVFileName(QString filePath)
-{
-    QStringList fileSplits = filePath.split('/');
-    PANFU = fileSplits[fileSplits.length()-1].split(' ')[0];
-    SENNUM = PANFU.length();
-    qDebug()<<"SENNUM="<<SENNUM;
-    //存储每个传感器波形的激发位置，在CSV文件中表现为第H列，P列，X列...以此类推
-    motiPos = new int[SENNUM];
-
-    //存储每个事件触发日期，在CSV文件中表现为每行的第一列，即日期
-    //date = new QString[(STARTTIME+ENDTIME)*5000];
-
-    //存储后三个通道中Z轴的数据，在CSV文件中表现为G列，O列，W列...以此类推
-    senChannelZ = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
-    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
-        senChannelZ[i] = new QString[SENNUM];
-      //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
-    }
-
-    //存储后三个通道中Y轴的数据，在CSV文件中表现为F列，N列，V列...以此类推
-    senChannelY = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
-    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
-        senChannelY[i] = new QString[SENNUM];
-      //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
-    }
-
-    //存储后三个通道中X轴的数据，在CSV文件中表现为E列，M列，U列...以此类推
-    senChannelX = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
-    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
-        senChannelX[i] = new QString[SENNUM];
-      //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
-    }
-
-    //存储每个事件触发的台站名称，在CSV文件中表现为I列，Q列，Y列...以此类推
-    senChannelNum = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
-    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
-        senChannelNum[i] = new QString[SENNUM];
-      //  qDebug()<<"senChannelNum[i].size="<<senChannelNum[i]->size();
-    }
-
-    qDebug()<<"motiPos:"<<motiPos;
-    //qDebug()<<"date:"<<date;
-    qDebug()<<"senChannelZ:"<<senChannelZ;
-    qDebug()<<"senChannelY:"<<senChannelY;
-    qDebug()<<"senChannelX:"<<senChannelX;
-    qDebug()<<"senChannelNum:"<<senChannelNum;
-    qDebug()<<"pointBuffer:"<<POINTBUFFER;
-    qDebug()<<"pointBuffer_P:"<<POINTBUFFER_P;
-    qDebug()<<"parsing the csv file completed";
-}
-
 
 //读取CSV文件数据
 void ReadCSVData::readCSVFile(QString fileName)
@@ -123,11 +71,60 @@ void ReadCSVData::readCSVFile(QString fileName)
         COUNT = 90000;
     }
 
+    //先获取第一行的内容，然后看看该行中有多少个台站，因为文件路径中的盘符所对应的台站名是有激发的
+    //而某些CSV文件中存在不激发但是有数据的台站，所以不能根据路径中的盘符来判断
+    QStringList valueOfOneLine = line.at(0).split(",");
+    int valueOfOneLineSize = valueOfOneLine.size();
+    senNumInRealCSV = (valueOfOneLineSize-1)/8;
+    QStringList panfuListInRealCSV;
+    panfuInRealCSV="";
+    for(QString temp:panfuListInRealCSV){
+        panfuInRealCSV+=temp;
+    }
+    qDebug()<<"panfuInRealCSV="<<panfuInRealCSV<<" senNumInRealCSV="<<senNumInRealCSV;
+
+    //CSV路径文件名中的台站名和台站数
+    QStringList fileSplits = fileName.split('/');
+    PANFU = fileSplits[fileSplits.length()-1].split(' ')[0];
+    SENNUM = PANFU.length();
+    qDebug()<<"SENNUM="<<SENNUM;
+
+
+    //存储每个传感器波形的激发位置，在CSV文件中表现为第H列，P列，X列...以此类推
+    motiPos = new int[senNumInRealCSV];
+    //存储每个事件触发日期，在CSV文件中表现为每行的第一列，即日期
+    //date = new QString[(STARTTIME+ENDTIME)*5000];
+    //存储后三个通道中Z轴的数据，在CSV文件中表现为G列，O列，W列...以此类推
+    senChannelZ = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
+    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
+        senChannelZ[i] = new QString[senNumInRealCSV];
+      //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
+    }
+    //存储后三个通道中Y轴的数据，在CSV文件中表现为F列，N列，V列...以此类推
+    senChannelY = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
+    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
+        senChannelY[i] = new QString[senNumInRealCSV];
+      //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
+    }
+    //存储后三个通道中X轴的数据，在CSV文件中表现为E列，M列，U列...以此类推
+    senChannelX = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
+    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
+        senChannelX[i] = new QString[senNumInRealCSV];
+      //  qDebug()<<"senChannel[i].size="<<senChannel[i]->size();
+    }
+    //存储每个事件触发的台站名称，在CSV文件中表现为I列，Q列，Y列...以此类推
+    senChannelNum = new QString*[(STARTTIME+ENDTIME)*(FREQUENCY+200)/10];
+    for (int i = 0; i < ((STARTTIME+ENDTIME)*5000)/10; i++){
+        senChannelNum[i] = new QString[senNumInRealCSV];
+      //  qDebug()<<"senChannelNum[i].size="<<senChannelNum[i]->size();
+    }
+    qDebug()<<"parsing the csv file completed";
+
     for(int i=0;i<(COUNT-1);i++){
         item = line.at(i).split(',');
         //date[i] = item.at(0);                         //存储每个事件的日期
         if(0 == i%10){                                    //采样，只取十分之一的数据
-            for(int j=0;j<SENNUM;j++){
+            for(int j=0;j<senNumInRealCSV;j++){
                 senChannelZ[k][j] = item.at(6+j*8);       //存储每个事件后三个通道中Z轴的数据
                 int tempZ = senChannelZ[k][j].toInt();
                 if(tempZ > maxValueOfZChannel)
@@ -155,13 +152,8 @@ void ReadCSVData::readCSVFile(QString fileName)
     file.close();
     fileReadDone = true;
 
-//    qDebug()<<"maxValueOfXChannel"<<maxValueOfXChannel;
-//    qDebug()<<"maxValueOfYChannel"<<maxValueOfYChannel;
-//    qDebug()<<"maxValueOfZChannel"<<maxValueOfZChannel;
-
     int temp = (maxValueOfXChannel > maxValueOfYChannel)?maxValueOfXChannel:maxValueOfYChannel;
     maxValueOfXYZChannel = (temp > maxValueOfZChannel)?temp:maxValueOfZChannel;
-
 
     qDebug()<<"maxValueOfXYZChannel"<<maxValueOfXYZChannel;
     qDebug()<<"read csv file successfully!";
@@ -301,7 +293,6 @@ void ReadCSVData::run()
     for(int i=0;i<10;i++){
         ReadCSVData::POINTBUFFER_P[i].clear();
     }
-    parseCSVFileName(ReadCSVData::FILEPATH);
     readCSVFile(ReadCSVData::FILEPATH);
     if(fileReadDone){
         locateCSVData();

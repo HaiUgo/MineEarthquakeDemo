@@ -32,12 +32,12 @@ public:
     ~ReadCSVData();
 public:
     static QString FILEPATH;                 //CSV文件的文件路径
-    static QString PANFU;                    //CSV文件中的盘符名
+    static QString PANFU;                    //CSV文件路径中的盘符名
     static int TEMPMOTIPOS[10];              //存储具体站台名称及其激发位置，比如TEMPMOTIPOS[1]表示台站T1的激发位置
     static int TEMPSTATION[10];              //按照CSV文件中站台顺序存储站台名称
     static int ORIGINMOTIPOS[10];            //存储最初的台站名称及其激发位置，与TEMPMOTIPOS不同的是，TEMPMOTIPOS能根据用户输入更改
                                              //而ORIGINMOTIPOS是用来修改CSV文件数据的一个判断值
-    static int SENNUM ;                      //记录传感器的数量
+    static int SENNUM ;                      //记录CSV文件路径中的激发传感器的数量
     static int COUNT ;                       //记录事件的个数，在CSV文件中表现为行数
 
     static bool READFILEFINISHED;            //判断当前文件是否 读取和定位到具体台站的列数据 结束
@@ -64,7 +64,6 @@ public:
     int maxValueOfZChannel;
 
     void readCSVFile(QString fileName);      //读取CSV文件中的数据
-    void parseCSVFileName(QString filePath); //解析CSV文件路径
     void locateCSVData();                    //定位事件站台在CSV文件哪一列，从而定位到该站台X，Y，Z轴以及激发位置在哪一列
     void paddingPointBuffer(QVector<QPointF> *pointBufferX,QVector<QPointF> *pointBufferY,QVector<QPointF> *pointBufferZ,int index);
     void stop();
@@ -74,6 +73,10 @@ private:
     volatile bool stopped;
     bool fileReadDone;                        //判断当前文件是否读取结束
     QMutex mutex;
+
+    int senNumInRealCSV ;                      //实际的CSV文件中的传感器的数量
+    QString panfuInRealCSV;                    //实际的CSV文件中的盘符名
+
 signals:
     //void sendChartsYAxis();
 

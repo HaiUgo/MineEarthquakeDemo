@@ -39,10 +39,15 @@ bool Assistant::startAssistant()
    // 如果进程没有运行，则运行assistant，并添加参数
    if (proc->state() != QProcess::Running)
    {
-       QString app = QLatin1String("../MMQ3/documentation/assistant.exe");
+       //QString app = QLatin1String("../MMQ3/documentation/assistant.exe");
+       QString path = QDir::currentPath();
+       QString app = path+"/documentation/assistant.exe";
+       qDebug()<<"app:"<<app;
        QStringList args;
-       args << QLatin1String("-collectionFile")
-            << QLatin1String("../MMQ3/documentation/myhelp.qhc");
+       args << ("-collectionFile")
+           << (path + "/documentation/myhelp.qhc");
+
+       //     << QLatin1String("../MMQ3/documentation/myhelp.qhc");
        proc->start(app, args); // 相当于执行命令：assistant –collectionFile myHelp.qhc
        if (!proc->waitForStarted())
        {

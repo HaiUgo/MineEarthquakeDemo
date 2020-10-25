@@ -2,6 +2,8 @@
 #define ASSISTANT_H
 
 #include <QtCore/QString>
+#include <QDir>
+#include <QDebug>
 
 class QProcess;
 class Assistant
