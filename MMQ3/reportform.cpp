@@ -775,8 +775,8 @@ void ReportForm::generateWebDOCClicked()
         }
     }
 
-    //将CAD转JPG
-    ui->axWidget->dynamicCall("SaveJpgFile(QString, int, int, int)",locationPath,-1,-1,0);
+    //将CAD转JPG -1是白色，0是黑色
+    ui->axWidget->dynamicCall("SaveJpgFile(QString, int, int, int)",locationPath,-1,-1,-1);
 
     QString quackTime;
     QString kind;

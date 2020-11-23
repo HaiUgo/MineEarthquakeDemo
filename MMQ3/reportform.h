@@ -50,7 +50,7 @@ private:
 
     CaptureScreen* captureHelper;
 
-    const QString R = "大棚";
+    const QString R = "李大人家";
     const QString S = "蒿子屯";
     const QString T = "杨甸子";
     const QString U = "树碑子";
